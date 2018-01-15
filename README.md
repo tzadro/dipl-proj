@@ -1,2 +1,2 @@
 # dipl-proj
-Diplomski projekt
+Projekt iz predmeta [Diplomski projekt](http://www.fer.unizg.hr/predmet/pro_dipl)
