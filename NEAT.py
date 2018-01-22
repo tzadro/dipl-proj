@@ -269,34 +269,29 @@ class Phenotype:  # Neural network
     def __init__(self, connections):
         self.neurons = {}
 
-        for key in config.input_keys:
+        for key in config.output_keys:
             self.neurons[key] = Neuron()
 
         for connection in connections.values():
             if not connection.enabled:
                 continue
 
+            if connection.from_key not in self.neurons:
+                self.neurons[connection.from_key] = Neuron()
+
+            from_neuron = self.neurons[connection.from_key]
+            from_neuron.outgoing_keys.append(connection.to_key)
+
             if connection.to_key not in self.neurons:
                 self.neurons[connection.to_key] = Neuron()
 
-            self.neurons[connection.to_key].incoming.append(connection)
+            to_neuron = self.neurons[connection.to_key]
+            to_neuron.incoming_connections.append(connection)
+            to_neuron.num_accepts_before_firing = to_neuron.num_accepts_before_firing + 1
 
     def forward(self, inputs):
         for key, value in zip(config.input_keys, inputs):
-            self.neurons[key].value = value
-
-        # todo: not everything is calculated??
-        for key, neuron in self.neurons.items():
-            if key in config.input_keys:
-                continue
-
-            score = 0
-
-            for connection in neuron.incoming:
-                from_neuron = self.neurons[connection.from_key]
-                score = score + connection.weight * from_neuron.value
-
-            neuron.value = sigmoid(score)
+            self.neurons[key].set_value(value, self.neurons)
 
         # todo: ugly
         max_key = None
@@ -307,6 +302,37 @@ class Phenotype:  # Neural network
                 max_value = self.neurons[key].value
 
         return max_key
+
+
+class Neuron:
+    def __init__(self):
+        self.incoming_connections = []
+        self.outgoing_keys = []
+        self.num_accepts_before_firing = 0
+        self.value = None
+
+    def accept(self, neurons):
+        self.num_accepts_before_firing = self.num_accepts_before_firing - 1
+
+        if self.num_accepts_before_firing == 0:
+            score = 0
+
+            for connection in self.incoming_connections:
+                from_neuron = neurons[connection.from_key]
+                score = score + connection.weight * from_neuron.value
+
+            self.value = sigmoid(score)
+
+            self.trigger_outgoing(neurons)
+
+    def set_value(self, value, neurons):
+        self.value = value
+        self.trigger_outgoing(neurons)
+
+    def trigger_outgoing(self, neurons):
+        for key in self.outgoing_keys:
+            outgoing_neuron = neurons[key]
+            outgoing_neuron.accept(neurons)
 
 
 class Population:
@@ -409,12 +435,6 @@ class Species:
     def clear(self):
         self.individuals = []
         self.num_children = None
-
-
-class Neuron:
-    def __init__(self):
-        self.incoming = []
-        self.value = 0
 
 
 class Config:
