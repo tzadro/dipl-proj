@@ -15,6 +15,26 @@ def max_num_connections(n):
     return n * (n - 1) / 2
 
 
+def check_if_path(from_node, to_node, connections, checked):
+    for connection in connections.values():
+        if not connection.enabled:
+            continue
+
+        if connection.from_key == from_node and connection.to_key == to_node:
+            return True
+
+    checked[from_node] = True
+
+    for connection in connections.values():
+        if not connection.enabled:
+            continue
+
+        if connection.from_key == from_node and connection.to_key not in checked and check_if_path(connection.to_key, to_node, connections, checked):
+            return True
+
+    return False
+
+
 # todo: are disabled genes included?
 def distance(individual1, individual2):
     connections1 = individual1.connections
@@ -225,6 +245,9 @@ class Individual:  # Genome
             node1 = node_list[randrange(num_inputs + num_outputs, num_nodes)]
             node2 = node_list[randrange(num_nodes)]
 
+            if node1.key == node2.key:
+                continue
+
             pair = (min(node1.key, node2.key), max(node1.key, node2.key))
 
             if pair in self.node_pairs:
@@ -232,7 +255,8 @@ class Individual:  # Genome
 
             self.node_pairs.append(pair)
 
-            if node2 in config.input_keys:
+            if node2.key in config.input_keys or check_if_path(node2.key, node1.key, self.connections, {}):
+                print("CIRC, reverse:", check_if_path(node1.key, node2.key, self.connections, {}))
                 temp = node1
                 node1 = node2
                 node2 = temp
@@ -297,6 +321,8 @@ class Phenotype:  # Neural network
         max_key = None
         max_value = -1
         for key in config.output_keys:
+            global asd
+            asd = self.neurons
             if self.neurons[key].value > max_value:
                 max_key = key
                 max_value = self.neurons[key].value
@@ -357,7 +383,7 @@ class Population:
                 distance_from_representative = distance(individual, spec.representative)
 
                 if distance_from_representative <= config.compatibility_threshold:
-                    spec.add(individual, distance_from_representative)
+                    spec.add(individual)
                     placed = True
                     break
 
@@ -379,8 +405,15 @@ class Population:
         children = []
 
         for spec in self.species:
+            if spec.num_children == 0:
+                continue
+
             spec.remove_worst()
-            children = children + [spec.breed_child() for i in range(spec.num_children)]
+            if len(spec.individuals) == 0:
+                self.species.remove(spec)
+                continue
+
+            children = children + [spec.breed_child() for _ in range(spec.num_children)]
             spec.clear()
 
         self.individuals = children
@@ -395,14 +428,18 @@ class Species:
         self.species_fitness = 0
         self.num_children = None
 
-    def add(self, individual, distance_from_representative):
-        if distance_from_representative < self.current_closest[1]:
-            self.current_closest = (individual, distance_from_representative)
-
+    def add(self, individual):
         self.individuals.append(individual)
 
     def set_representative(self):
+        for individual in self.individuals:
+            distance_from_representative = distance(individual, self.representative)
+            if distance_from_representative < self.current_closest[1]:
+                self.current_closest = (individual, distance_from_representative)
+
         self.representative = self.current_closest[0]
+        if self.representative is None:
+            print("None, num:", len(self.individuals))
         self.current_closest = (None, math.inf)
 
     def adjust_fitness(self):
@@ -429,6 +466,10 @@ class Species:
         def key(individual):
             return individual.fitness
 
+        if config.num_to_remove >= len(self.individuals):
+            self.individuals = []
+            return
+
         self.individuals.sort(key=key)
         self.individuals = self.individuals[config.num_to_remove:]
 
@@ -441,8 +482,8 @@ class Config:
     def __init__(self):
         self.connection_mutation_probability = 0.8
         self.perturbation_probability = 0.9
-        self.new_node_probability = 0.06  # 0.03
-        self.new_connection_probability = 0.1  # 0.05
+        self.new_node_probability = 0.4  # 0.06  # 0.03
+        self.new_connection_probability = 0.6  # 0.05
         self.step = 0.25
         self.innovation_number = 8
         self.node_key = 6
