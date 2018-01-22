@@ -1,13 +1,13 @@
-# todo: add interspecies mating probability; remove species after their best fitness doesn't imporove for some number of turns
+# todo: add interspecies mating probability; remove species after their best fitness doesn't improve for some number of turns
 
 import gym
 import math
+import numpy as np
 from copy import deepcopy
-from random import random, randrange
+from random import random, randrange, gauss
 
 
 def sigmoid(x):
-    # math.exp() faster than np.exp() for scalars
     return 1 / (1 + math.exp(-x))
 
 
@@ -29,10 +29,13 @@ def check_if_path(from_node, to_node, connections, checked):
         if not connection.enabled:
             continue
 
-        if connection.from_key == from_node and connection.to_key not in checked and check_if_path(connection.to_key, to_node, connections, checked):
+        if connection.from_key == from_node and connection.to_key not in checked and check_if_path(connection.to_key,
+                                                                                                   to_node, connections,
+                                                                                                   checked):
             return True
 
     return False
+
 
 def check_if_path2(from_key, to_key, neurons, checked):
     if to_key in neurons[from_key].outgoing_keys:
@@ -62,7 +65,6 @@ def distance(individual1, individual2):
 
     for innovation_number in innovation_numbers:
         if innovation_number in connections1 and innovation_number in connections2:
-            # abs() faster than np.abs() for scalars
             weight_diff = abs(connections1[innovation_number].weight - connections2[innovation_number].weight)
             weight_diffs.append(weight_diff)
         else:
@@ -71,7 +73,6 @@ def distance(individual1, individual2):
             else:
                 D = D + 1
 
-    # sum() faster than np.sum()
     delta = (config.c1 * E) / N + (config.c2 * D) / N + config.c3 * sum(weight_diffs) / len(weight_diffs)
     return delta
 
@@ -84,7 +85,10 @@ def innovation_numbers_union(connections1, connections2):
     return innovation_numbers
 
 
-def crossover(parent1, parent2):
+def crossover(parents):
+    parent1 = parents[0]
+    parent2 = parents[1]
+
     parent1_connections = parent1.connections
     parent2_connections = parent2.connections
 
@@ -148,8 +152,6 @@ def crossover(parent1, parent2):
                 child_nodes[new_connection.to_key] = Node(new_connection.to_key)
 
             node_pairs.append((new_connection.from_key, new_connection.to_key))
-        else:
-            print("This should not trigger..")
 
     max_innovation = max(parent1.max_innovation, parent2.max_innovation)
     max_node = max(parent1.max_node, parent2.max_node)
@@ -188,7 +190,7 @@ class Individual:  # Genome
             self.connections = connections
             self.nodes = nodes
             self.node_pairs = node_pairs
-            self.max_innovation = max_innovation  # np.amax(list(self.connections.keys()))
+            self.max_innovation = max_innovation
             self.max_node = max_node
 
     def configure_new(self):
@@ -202,7 +204,8 @@ class Individual:  # Genome
 
         for input_key in config.input_keys:
             for output_key in config.output_keys:
-                new_connection = Connection(self.max_innovation, input_key, output_key, random() * 2 - 1, True)
+                new_connection = Connection(self.max_innovation, input_key, output_key,
+                                            gauss(config.new_mu, config.new_sigma), True)
                 self.connections[self.max_innovation] = new_connection
                 self.max_innovation = self.max_innovation + 1
                 self.node_pairs.append((input_key, output_key))
@@ -220,7 +223,6 @@ class Individual:  # Genome
             self.fitness = self.fitness + reward
 
             if done:
-                # print(self.fitness)
                 return self.fitness
 
     def mutate(self, generation_innovations):
@@ -236,7 +238,8 @@ class Individual:  # Genome
     def mutate_connections(self):
         for connection in self.connections.values():
             if random() < config.perturbation_probability:
-                connection.weight = connection.weight + random() * 2 * config.step - config.step
+                connection.weight = connection.weight + gauss(config.step_mu,
+                                                              config.step_sigma)  # random() * 2 * config.step - config.step
             else:
                 connection.weight = random() * 2 - 1
 
@@ -266,7 +269,8 @@ class Individual:  # Genome
 
             self.node_pairs.append(pair)
 
-            if node2.key in config.input_keys or check_if_path(node2.key, node1.key, self.connections, {}) or (node2.key, node1.key) in generation_innovations:
+            if node2.key in config.input_keys or check_if_path(node2.key, node1.key, self.connections, {}) or (
+            node2.key, node1.key) in generation_innovations:
                 temp = node1
                 node1 = node2
                 node2 = temp
@@ -423,8 +427,6 @@ class Population:
             # todo: when should this be called?
             spec.set_representative()
 
-        print("num_species:", len(self.species))
-
     def breed_new_generation(self):
         children = []
         generation_innovations = {}
@@ -463,8 +465,6 @@ class Species:
                 self.current_closest = (individual, distance_from_representative)
 
         self.representative = self.current_closest[0]
-        if self.representative is None:
-            print("None, num:", len(self.individuals))
         self.current_closest = (None, math.inf)
 
     def adjust_fitness(self):
@@ -473,34 +473,38 @@ class Species:
             self.species_fitness = self.species_fitness + individual.fitness
 
     def breed_child(self, generation_innovations):
-        if random() < config.crossover_probability:
-            child = crossover(self.select(), self.select())
+        if random() < config.crossover_probability or len(self.individuals) < 2:
+            child = crossover(self.select(2))
         else:
             child = deepcopy(self.select())
 
         child.mutate(generation_innovations)
         return child
 
-    def select(self, n=1):
-        if n == 1:
-            return self.individuals[randrange(len(self.individuals))]
-        else:
-            return [self.individuals[randrange(len(self.individuals))] for _ in range(len(self.individuals))]
+    def select(self, size=None, replace=False):
+        p = [individual.fitness / self.species_fitness for individual in self.individuals]
+        print(sum(p))
+        print(sum([individual.fitness for individual in self.individuals]))
+        print(self.species_fitness)
+        return np.random.choice(self.individuals, size, replace, p)
 
     def remove_worst(self):
-        def key(individual):
-            return individual.fitness
+        def key(element):
+            return element.fitness
 
         if config.num_to_remove >= len(self.individuals):
             self.individuals = []
             return
 
         self.individuals.sort(key=key)
+        for individual in self.individuals[0:config.num_to_remove]:
+            self.species_fitness = self.species_fitness - individual.fitness
         self.individuals = self.individuals[config.num_to_remove:]
 
     def clear(self):
         self.individuals = []
         self.num_children = None
+        self.species_fitness = 0
 
 
 class Config:
@@ -514,7 +518,7 @@ class Config:
         self.node_key = 6
         self.c1 = 1.0
         self.c2 = 1.0
-        self.c3 = 1.0
+        self.c3 = 0.8
         self.compatibility_threshold = 1.0
         self.crossover_probability = 0.75
         self.disable_probability = 0.75
@@ -527,6 +531,10 @@ class Config:
         self.pop_size = 30
         self.num_iter = 70
         self.num_to_remove = 2
+        self.new_mu = 0
+        self.new_sigma = 1
+        self.step_mu = 0
+        self.step_sigma = 1
 
 
 config = Config()
@@ -534,7 +542,7 @@ env = gym.make('CartPole-v0')
 
 population = Population()
 for i in range(config.num_iter):
-    print(population.evaluate_fitness())
+    print('Generation: {:d}, best fitness: {:.2f}'.format(i, population.evaluate_fitness()))
     population.speciate()
     population.breed_new_generation()
 
