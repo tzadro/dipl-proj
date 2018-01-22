@@ -34,6 +34,18 @@ def check_if_path(from_node, to_node, connections, checked):
 
     return False
 
+def check_if_path2(from_key, to_key, neurons, checked):
+    if to_key in neurons[from_key].outgoing_keys:
+        return True
+
+    checked[from_key] = True
+
+    for key in neurons[from_key].outgoing_keys:
+        if key not in checked and check_if_path2(key, to_key, neurons, checked):
+            return True
+
+    return False
+
 
 # todo: are disabled genes included?
 def distance(individual1, individual2):
@@ -211,12 +223,12 @@ class Individual:  # Genome
                 # print(self.fitness)
                 return self.fitness
 
-    def mutate(self):
+    def mutate(self, generation_innovations):
         if random() < config.connection_mutation_probability:
             self.mutate_connections()
 
         if random() < config.new_connection_probability:
-            self.new_connection()
+            self.new_connection(generation_innovations)
 
         if random() < config.new_node_probability:
             self.new_node()
@@ -228,7 +240,7 @@ class Individual:  # Genome
             else:
                 connection.weight = random() * 2 - 1
 
-    def new_connection(self):
+    def new_connection(self, generation_innovations):
         num_connections = len(self.node_pairs)
         num_nodes = len(list(self.nodes.keys()))
         num_inputs = len(config.input_keys)
@@ -241,7 +253,6 @@ class Individual:  # Genome
             return
 
         while True:
-            # todo: possible recurrent networks??
             node1 = node_list[randrange(num_inputs + num_outputs, num_nodes)]
             node2 = node_list[randrange(num_nodes)]
 
@@ -255,16 +266,22 @@ class Individual:  # Genome
 
             self.node_pairs.append(pair)
 
-            if node2.key in config.input_keys or check_if_path(node2.key, node1.key, self.connections, {}):
-                print("CIRC, reverse:", check_if_path(node1.key, node2.key, self.connections, {}))
+            if node2.key in config.input_keys or check_if_path(node2.key, node1.key, self.connections, {}) or (node2.key, node1.key) in generation_innovations:
                 temp = node1
                 node1 = node2
                 node2 = temp
 
-            new_connection = Connection(config.innovation_number, node1.key, node2.key, random() * 2 - 1, True)
-            self.max_innovation = config.innovation_number
-            self.connections[config.innovation_number] = new_connection
-            config.innovation_number = config.innovation_number + 1
+            if (node1.key, node2.key) in generation_innovations:
+                innovation_number = generation_innovations[(node1.key, node2.key)]
+                self.max_innovation = max(self.max_innovation, innovation_number)
+            else:
+                innovation_number = config.innovation_number
+                generation_innovations[(node1.key, node2.key)] = innovation_number
+                self.max_innovation = config.innovation_number
+                config.innovation_number = config.innovation_number + 1
+
+            new_connection = Connection(innovation_number, node1.key, node2.key, random() * 2 - 1, True)
+            self.connections[innovation_number] = new_connection
             return
 
     def new_node(self):
@@ -293,27 +310,28 @@ class Phenotype:  # Neural network
     def __init__(self, connections):
         self.neurons = {}
 
-        for key in config.output_keys:
-            self.neurons[key] = Neuron()
-
         for connection in connections.values():
             if not connection.enabled:
                 continue
 
             if connection.from_key not in self.neurons:
-                self.neurons[connection.from_key] = Neuron()
+                self.neurons[connection.from_key] = Neuron(connection.from_key)
 
             from_neuron = self.neurons[connection.from_key]
             from_neuron.outgoing_keys.append(connection.to_key)
 
             if connection.to_key not in self.neurons:
-                self.neurons[connection.to_key] = Neuron()
+                self.neurons[connection.to_key] = Neuron(connection.to_key)
 
             to_neuron = self.neurons[connection.to_key]
             to_neuron.incoming_connections.append(connection)
-            to_neuron.num_accepts_before_firing = to_neuron.num_accepts_before_firing + 1
+            if not check_if_path2(connection.to_key, connection.from_key, self.neurons, {}):
+                to_neuron.num_accepts_before_firing = to_neuron.num_accepts_before_firing + 1
 
     def forward(self, inputs):
+        for neuron in self.neurons.values():
+            neuron.reset()
+
         for key, value in zip(config.input_keys, inputs):
             self.neurons[key].set_value(value, self.neurons)
 
@@ -323,6 +341,7 @@ class Phenotype:  # Neural network
         for key in config.output_keys:
             global asd
             asd = self.neurons
+
             if self.neurons[key].value > max_value:
                 max_key = key
                 max_value = self.neurons[key].value
@@ -331,16 +350,21 @@ class Phenotype:  # Neural network
 
 
 class Neuron:
-    def __init__(self):
+    def __init__(self, key):
+        self.key = key
         self.incoming_connections = []
         self.outgoing_keys = []
         self.num_accepts_before_firing = 0
-        self.value = None
+        self.count = None
+        self.value = 0
+
+    def reset(self):
+        self.count = self.num_accepts_before_firing
 
     def accept(self, neurons):
-        self.num_accepts_before_firing = self.num_accepts_before_firing - 1
+        self.count = self.count - 1
 
-        if self.num_accepts_before_firing == 0:
+        if self.count == 0:
             score = 0
 
             for connection in self.incoming_connections:
@@ -403,6 +427,7 @@ class Population:
 
     def breed_new_generation(self):
         children = []
+        generation_innovations = {}
 
         for spec in self.species:
             if spec.num_children == 0:
@@ -413,7 +438,7 @@ class Population:
                 self.species.remove(spec)
                 continue
 
-            children = children + [spec.breed_child() for _ in range(spec.num_children)]
+            children = children + [spec.breed_child(generation_innovations) for _ in range(spec.num_children)]
             spec.clear()
 
         self.individuals = children
@@ -447,13 +472,13 @@ class Species:
             individual.fitness = individual.fitness / len(self.individuals)
             self.species_fitness = self.species_fitness + individual.fitness
 
-    def breed_child(self):
+    def breed_child(self, generation_innovations):
         if random() < config.crossover_probability:
             child = crossover(self.select(), self.select())
         else:
             child = deepcopy(self.select())
 
-        child.mutate()
+        child.mutate(generation_innovations)
         return child
 
     def select(self, n=1):
@@ -482,15 +507,15 @@ class Config:
     def __init__(self):
         self.connection_mutation_probability = 0.8
         self.perturbation_probability = 0.9
-        self.new_node_probability = 0.4  # 0.06  # 0.03
-        self.new_connection_probability = 0.6  # 0.05
+        self.new_node_probability = 0.04
+        self.new_connection_probability = 0.08
         self.step = 0.25
         self.innovation_number = 8
         self.node_key = 6
         self.c1 = 1.0
         self.c2 = 1.0
-        self.c3 = 0.4
-        self.compatibility_threshold = 1.0  # 3.0
+        self.c3 = 1.0
+        self.compatibility_threshold = 1.0
         self.crossover_probability = 0.75
         self.disable_probability = 0.75
         self.input_keys = [0, 1, 2, 3]
