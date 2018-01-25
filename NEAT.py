@@ -473,7 +473,7 @@ class Species:
             self.species_fitness = self.species_fitness + individual.fitness
 
     def breed_child(self, generation_innovations):
-        if random() < config.crossover_probability or len(self.individuals) < 2:
+        if random() < config.crossover_probability and len(self.individuals) > 1:
             child = crossover(self.select(2))
         else:
             child = deepcopy(self.select())
@@ -482,10 +482,8 @@ class Species:
         return child
 
     def select(self, size=None, replace=False):
-        p = [individual.fitness / self.species_fitness for individual in self.individuals]
-        print(sum(p))
-        print(sum([individual.fitness for individual in self.individuals]))
-        print(self.species_fitness)
+        fitness_sum = sum([individual.fitness for individual in self.individuals])
+        p = [individual.fitness / fitness_sum for individual in self.individuals]
         return np.random.choice(self.individuals, size, replace, p)
 
     def remove_worst(self):
