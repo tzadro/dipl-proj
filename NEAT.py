@@ -212,19 +212,11 @@ class Individual:  # Genome
                 self.max_innovation = self.max_innovation + 1
                 self.node_pairs.append((input_key, output_key))
 
-    def evaluate_fitness(self, visualize=False):
+    def evaluate_fitness(self):
         phenotype = Phenotype(self.connections)
 
-        if visualize:
-            edges = [(connection.from_key, connection.to_key) for connection in self.connections.values()]
-            edges = edges + [(0, 0)]
-            print(edges)
-
-            G = nx.DiGraph()
-            G.add_edges_from(edges)
-
-            nx.draw(G)
-            plt.show()
+        if config.visualize:
+            self.visualize()
 
         observation = env.reset()
 
@@ -238,7 +230,23 @@ class Individual:  # Genome
             if done:
                 return self.fitness
 
+    def visualize(self):
+        edges = [(connection.from_key, connection.to_key, round(connection.weight, 2)) for connection in self.connections.values()]
+
+        G = nx.DiGraph()
+        G.add_weighted_edges_from(edges)
+        pos = nx.spring_layout(G)
+
+        nx.draw(G, pos)
+        labels = nx.get_edge_attributes(G, 'weight')
+        nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+        plt.show()
+
     def mutate(self, generation_innovations):
+        if config.fixed_topology:
+            self.mutate_connections()
+            return
+
         if random() < config.connection_mutation_probability:
             self.mutate_connections()
 
@@ -356,9 +364,6 @@ class Phenotype:  # Neural network
         max_key = None
         max_value = -1
         for key in config.output_keys:
-            global asd
-            asd = self.neurons
-
             if self.neurons[key].value > max_value:
                 max_key = key
                 max_value = self.neurons[key].value
@@ -408,9 +413,9 @@ class Population:
         self.species = []
         self.max_fitness = -math.inf
 
-    def evaluate_fitness(self, visualize=False):
+    def evaluate_fitness(self):
         for individual in self.individuals:
-            self.max_fitness = max(self.max_fitness, individual.evaluate_fitness(visualize=visualize))
+            self.max_fitness = max(self.max_fitness, individual.evaluate_fitness())
 
         return self.max_fitness
 
@@ -547,6 +552,7 @@ class Config:
         self.step_mu = 0
         self.step_sigma = 1
         self.visualize = True
+        self.fixed_topology = True
 
 
 if __name__ == "__main__":
@@ -555,7 +561,7 @@ if __name__ == "__main__":
 
     population = Population()
     for i in range(config.num_iter):
-        print('Generation: {:d}, best fitness: {:.2f}'.format(i, population.evaluate_fitness(visualize=config.visualize)))
+        print('Generation: {:d}, best fitness: {:.2f}'.format(i, population.evaluate_fitness()))
         population.speciate()
         population.breed_new_generation()
 
