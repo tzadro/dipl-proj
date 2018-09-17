@@ -3,6 +3,8 @@
 import gym
 import math
 import numpy as np
+import networkx as nx
+import matplotlib.pyplot as plt
 from copy import deepcopy
 from random import random, randrange, gauss
 
@@ -210,8 +212,19 @@ class Individual:  # Genome
                 self.max_innovation = self.max_innovation + 1
                 self.node_pairs.append((input_key, output_key))
 
-    def evaluate_fitness(self):
+    def evaluate_fitness(self, visualize=False):
         phenotype = Phenotype(self.connections)
+
+        if visualize:
+            edges = [(connection.from_key, connection.to_key) for connection in self.connections.values()]
+            edges = edges + [(0, 0)]
+            print(edges)
+
+            G = nx.DiGraph()
+            G.add_edges_from(edges)
+
+            nx.draw(G)
+            plt.show()
 
         observation = env.reset()
 
@@ -395,9 +408,9 @@ class Population:
         self.species = []
         self.max_fitness = -math.inf
 
-    def evaluate_fitness(self):
+    def evaluate_fitness(self, visualize=False):
         for individual in self.individuals:
-            self.max_fitness = max(self.max_fitness, individual.evaluate_fitness())
+            self.max_fitness = max(self.max_fitness, individual.evaluate_fitness(visualize=visualize))
 
         return self.max_fitness
 
@@ -533,15 +546,17 @@ class Config:
         self.new_sigma = 1
         self.step_mu = 0
         self.step_sigma = 1
+        self.visualize = True
 
 
-config = Config()
-env = gym.make('CartPole-v0')
+if __name__ == "__main__":
+    config = Config()
+    env = gym.make('CartPole-v0')
 
-population = Population()
-for i in range(config.num_iter):
-    print('Generation: {:d}, best fitness: {:.2f}'.format(i, population.evaluate_fitness()))
-    population.speciate()
-    population.breed_new_generation()
+    population = Population()
+    for i in range(config.num_iter):
+        print('Generation: {:d}, best fitness: {:.2f}'.format(i, population.evaluate_fitness(visualize=config.visualize)))
+        population.speciate()
+        population.breed_new_generation()
 
-env.render(close=True)
+    env.render(close=True)
