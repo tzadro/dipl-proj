@@ -18,8 +18,6 @@ class Population:
 		return self.max_fitness
 
 	def speciate(self):
-		sum_species_fitness = 0
-
 		for individual in self.individuals:
 			placed = False
 
@@ -34,16 +32,19 @@ class Population:
 			if not placed:
 				self.species.append(Species(individual))
 
+	def adjust_fitness_and_calculate_num_children(self):
+		sum_species_fitness = 0
+
 		for spec in self.species:
 			spec.adjust_fitness()
 			sum_species_fitness = sum_species_fitness + spec.species_fitness
 
 		for spec in self.species:
 			spec.num_children = math.floor(spec.species_fitness / sum_species_fitness * config.pop_size)
-			# todo: move this
-			spec.set_representative()
 
 	def breed_new_generation(self):
+		self.adjust_fitness_and_calculate_num_children()
+
 		children = []
 		generation_innovations = {}
 
@@ -51,12 +52,29 @@ class Population:
 			if spec.num_children == 0:
 				continue
 
-			spec.remove_worst()
 			if len(spec.individuals) == 0:
 				self.species.remove(spec)
 				continue
 
-			children = children + [spec.breed_child(generation_innovations) for _ in range(spec.num_children)]
+			spec.sort_individuals()
+
+			# first add best one
+			children = children + [spec.individuals[-1]]
+
+			if spec.num_children == 1:
+				continue
+
+			# todo: do we need to remove worst?
+			spec.remove_worst()
+
+			# todo: duplicate code!
+			if len(spec.individuals) == 0:
+				self.species.remove(spec)
+				continue
+
+			children = children + [spec.breed_child(generation_innovations) for _ in range(spec.num_children - 1)]
+
+			# todo: move?
 			spec.clear()
 
 		self.individuals = children

@@ -10,8 +10,8 @@ env = gym.make('CartPole-v0')
 population = Population()
 
 for i in range(config.num_iter):
-	best_fitness = population.evaluate_fitness(env)
 	population.speciate()
+	best_fitness = population.evaluate_fitness(env)
 	population.breed_new_generation()
 
 	print('Generation: {:d}, best fitness: {:.2f}'.format(i, best_fitness))
