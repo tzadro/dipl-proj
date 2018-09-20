@@ -48,22 +48,19 @@ class Species:
 		p = [individual.fitness / fitness_sum for individual in self.individuals]
 		return np.random.choice(self.individuals, size, replace, p)
 
-	def sort_individuals(self):
+	# from best to worst
+	def sort(self):
 		def key(element):
-			return element.fitness
+			return -element.fitness
 
 		self.individuals.sort(key=key)
 
-	def remove_worst(self):
-		if config.num_to_remove >= len(self.individuals):
-			self.individuals = []
-			return
-
-		self.individuals = self.individuals[config.num_to_remove:]
+	def trim_to(self, n=1):
+		self.individuals = self.individuals[:n]
 
 	def clear(self):
-		# todo: set best individual as representative?
-		self.representative = copy.deepcopy(random.choice(self.individuals))
+		# todo: set random individual as representative?
+		self.representative = copy.deepcopy(self.individuals[0])
 		self.individuals = []
 		self.species_fitness = 0
 		self.num_children = None

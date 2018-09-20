@@ -48,33 +48,24 @@ class Population:
 		children = []
 		generation_innovations = {}
 
-		for spec in self.species:
-			if spec.num_children == 0:
-				continue
+		for i, spec in enumerate(self.species):
+			print('\tSpecies: {:d}, num_individuals: {:d}, num_children: {:d}'.format(i, len(spec.individuals), spec.num_children))
 
-			if len(spec.individuals) == 0:
+			if spec.num_children == 0 or len(spec.individuals) == 0:
 				self.species.remove(spec)
 				continue
 
-			spec.sort_individuals()
+			spec.sort()
+			print('\t\tSpecies: {:d}, best fitness: {:.2f}'.format(i, spec.individuals[0].fitness))
 
 			# first add best one
-			children = children + [spec.individuals[-1]]
+			children = children + [spec.individuals[0]]
 
-			if spec.num_children == 1:
-				continue
-
-			# todo: do we need to remove worst?
-			spec.remove_worst()
-
-			# todo: duplicate code!
-			if len(spec.individuals) == 0:
-				self.species.remove(spec)
-				continue
+			num_surviving = math.floor(len(spec.individuals) * config.survival_threshold) + 1
+			spec.trim_to(num_surviving)
 
 			children = children + [spec.breed_child(generation_innovations) for _ in range(spec.num_children - 1)]
 
-			# todo: move?
 			spec.clear()
 
 		self.individuals = children

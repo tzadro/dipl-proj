@@ -46,7 +46,7 @@ class Individual:  # Genome
 	def evaluate_fitness(self, env):
 		phenotype = Phenotype(self.connections)
 
-		if config.visualize:
+		if config.visualize_networks:
 			self.visualize()
 
 		observation = env.reset()

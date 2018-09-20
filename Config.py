@@ -21,12 +21,12 @@ class Config:
 		}
 		self.pop_size = 30
 		self.num_iter = 70
-		self.num_to_remove = 2
+		self.survival_threshold = 0.8
 		self.new_mu = 0
 		self.new_sigma = 1
 		self.step_mu = 0
 		self.step_sigma = 1
-		self.visualize = True
+		self.visualize_networks = False
 		self.fixed_topology = True
 
 
