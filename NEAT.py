@@ -15,8 +15,7 @@ population = Population()
 for i in range(config.num_iter):
 	population.speciate()
 	best_fitness = population.evaluate_fitness(env)
+	print('Generation: {:d}, num_individuals: {:d}, best fitness: {:.2f}'.format(i, len(population.individuals), best_fitness))
 	population.breed_new_generation()
-
-	print('Generation: {:d}, best fitness: {:.2f}'.format(i, best_fitness))
 
 env.render(close=True)

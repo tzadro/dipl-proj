@@ -9,13 +9,14 @@ class Population:
 	def __init__(self):
 		self.individuals = [Individual() for _ in range(config.pop_size)]
 		self.species = []
-		self.max_fitness = -math.inf
 
 	def evaluate_fitness(self, env):
-		for individual in self.individuals:
-			self.max_fitness = max(self.max_fitness, individual.evaluate_fitness(env))
+		best_fitness = -math.inf
 
-		return self.max_fitness
+		for individual in self.individuals:
+			best_fitness = max(best_fitness, individual.evaluate_fitness(env))
+
+		return best_fitness
 
 	def speciate(self):
 		for individual in self.individuals:
@@ -56,7 +57,7 @@ class Population:
 				continue
 
 			spec.sort()
-			print('\t\tSpecies: {:d}, best fitness: {:.2f}'.format(i, spec.individuals[0].fitness))
+			print('\t\tSpecies: {:d}, species_fitness: {:.2f}, best_adjusted_fitness: {:.2f}'.format(i, spec.species_fitness, spec.individuals[0].fitness))
 
 			# first add best one
 			children = children + [spec.individuals[0]]
@@ -69,4 +70,3 @@ class Population:
 			spec.clear()
 
 		self.individuals = children
-		self.max_fitness = -math.inf
