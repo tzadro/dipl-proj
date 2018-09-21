@@ -13,12 +13,6 @@ class Config:
 		self.compatibility_threshold = 1.0
 		self.crossover_probability = 0.75
 		self.disable_probability = 0.75
-		self.input_keys = [0, 1, 2, 3]
-		self.output_keys = [4, 5]
-		self.actions = {
-			self.output_keys[0]: 0,
-			self.output_keys[1]: 1
-		}
 		self.pop_size = 30
 		self.num_iter = 70
 		self.survival_threshold = 0.8
@@ -28,6 +22,26 @@ class Config:
 		self.step_sigma = 1
 		self.visualize_networks = False
 		self.fixed_topology = True
+
+		self.input_keys = None
+		self.output_keys = None
+		self.action_space_discrete: None
+		self.action_space_high: None
+		self.action_space_low: None
+
+	def update(self, observation_space, action_space):
+		self.action_space_discrete = type(action_space).__name__ == 'Discrete'
+
+		num_inputs = observation_space.shape[0]
+		if self.action_space_discrete:
+			num_outputs = action_space.n
+		else:
+			num_outputs = action_space.shape[0]
+			self.action_space_high = action_space.high
+			self.action_space_low = action_space.low
+
+		self.input_keys = list(range(num_inputs))
+		self.output_keys = list(range(num_inputs, num_inputs + num_outputs))
 
 
 config = Config()

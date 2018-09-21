@@ -53,10 +53,10 @@ class Individual:  # Genome
 
 		while True:
 			env.render()
+			output = phenotype.forward(observation)
+			observation, reward, done, info = env.step(output)
 
-			output_key = phenotype.forward(observation)
-			observation, reward, done, info = env.step(config.actions[output_key])
-			self.fitness = self.fitness + reward
+			self.fitness += reward
 
 			if done:
 				return self.fitness

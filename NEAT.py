@@ -5,7 +5,10 @@ from Config import config
 from Population import Population
 import gym
 
-env = gym.make('CartPole-v0')
+env_name = 'Ant-v2'  # 'CartPole-v0'
+env = gym.make(env_name)
+
+config.update(env.observation_space, env.action_space)
 
 population = Population()
 

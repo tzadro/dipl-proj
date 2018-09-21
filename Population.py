@@ -69,4 +69,4 @@ class Population:
 			spec.clear()
 
 		self.individuals = children
-		self.max_fitness = 0
+		self.max_fitness = -math.inf
