@@ -1,6 +1,5 @@
 from Config import config
 from Individual import crossover
-"""import math"""
 import random
 import copy
 import numpy as np
@@ -9,25 +8,12 @@ import numpy as np
 class Species:
 	def __init__(self, representative):
 		self.representative = copy.deepcopy(representative)
-		"""self.current_closest = (representative, 0)"""
 		self.individuals = [representative]
 		self.species_fitness = 0
 		self.num_children = None
 
 	def add(self, individual):
 		self.individuals.append(individual)
-
-	# todo: what to do with this?
-	"""
-	def set_representative(self):
-		for individual in self.individuals:
-			distance_from_representative = helperfunctions.distance(individual, self.representative)
-			if distance_from_representative < self.current_closest[1]:
-				self.current_closest = (individual, distance_from_representative)
-
-		self.representative = self.current_closest[0]
-		self.current_closest = (None, math.inf)
-	"""
 
 	def adjust_fitness(self):
 		for individual in self.individuals:

@@ -5,7 +5,7 @@ from Config import config
 from Population import Population
 import gym
 
-env_name = 'Ant-v2'  # 'CartPole-v0'
+env_name = 'CartPole-v0'
 env = gym.make(env_name)
 
 config.update(env.observation_space, env.action_space)
@@ -18,4 +18,4 @@ for i in range(config.num_iter):
 	print('Generation: {:d}, num_individuals: {:d}, best fitness: {:.2f}'.format(i, len(population.individuals), best_fitness))
 	population.breed_new_generation()
 
-env.render(close=True)
+env.close()

@@ -21,7 +21,7 @@ class Config:
 		self.step_mu = 0
 		self.step_sigma = 1
 		self.visualize_networks = False
-		self.fixed_topology = True
+		self.fixed_topology = False
 
 		self.input_keys = None
 		self.output_keys = None
