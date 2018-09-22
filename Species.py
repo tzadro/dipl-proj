@@ -9,16 +9,24 @@ class Species:
 	def __init__(self, representative):
 		self.representative = copy.deepcopy(representative)
 		self.individuals = [representative]
-		self.species_fitness = 0
+		self.fitness = None
 		self.num_children = None
 
 	def add(self, individual):
 		self.individuals.append(individual)
 
 	def adjust_fitness(self):
+		self.fitness = 0
 		for individual in self.individuals:
-			individual.fitness = individual.fitness / len(self.individuals)
-			self.species_fitness = self.species_fitness + individual.fitness
+			individual.adjusted_fitness = individual.fitness / len(self.individuals) # has to be done with distances!
+			self.fitness += individual.adjusted_fitness
+
+	# from best to worst
+	def sort(self):
+		def key(element):
+			return -element.adjusted_fitness
+
+		self.individuals.sort(key=key)
 
 	def breed_child(self, generation_innovations):
 		if random.random() < config.crossover_probability and len(self.individuals) > 1:
@@ -34,13 +42,6 @@ class Species:
 		p = [individual.fitness / fitness_sum for individual in self.individuals]
 		return np.random.choice(self.individuals, size, replace, p)
 
-	# from best to worst
-	def sort(self):
-		def key(element):
-			return -element.fitness
-
-		self.individuals.sort(key=key)
-
 	def trim_to(self, n=1):
 		self.individuals = self.individuals[:n]
 
@@ -48,5 +49,4 @@ class Species:
 		# todo: set random individual as representative?
 		self.representative = copy.deepcopy(self.individuals[0])
 		self.individuals = []
-		self.species_fitness = 0
 		self.num_children = None

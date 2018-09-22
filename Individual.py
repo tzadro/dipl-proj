@@ -13,7 +13,8 @@ class Individual:  # Genome
 	def __init__(self, connections=None, nodes=None, node_pairs=None, max_innovation=None, max_node=None):
 		self.nodes = {}
 		self.connections = {}
-		self.fitness = 0
+		self.fitness = None
+		self.adjusted_fitness = None
 		self.max_innovation = 0
 		self.max_node = 0
 		self.node_pairs = []
@@ -51,6 +52,7 @@ class Individual:  # Genome
 
 		observation = env.reset()
 
+		self.fitness = 0
 		while True:
 			env.render()
 			output = phenotype.forward(observation)

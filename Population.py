@@ -12,60 +12,62 @@ class Population:
 
 	def evaluate_fitness(self, env):
 		best_fitness = -math.inf
+		avg_fitness = 0
 
 		for individual in self.individuals:
-			best_fitness = max(best_fitness, individual.evaluate_fitness(env))
+			fitness = individual.evaluate_fitness(env)
+			best_fitness = max(best_fitness, fitness)
+			avg_fitness += fitness
 
-		return best_fitness
+		avg_fitness /= len(self.individuals)
+		return best_fitness, avg_fitness
 
 	def speciate(self):
 		for individual in self.individuals:
 			placed = False
 
 			for spec in self.species:
-				distance_from_representative = helperfunctions.distance(individual, spec.representative)
+				dist_from_repr = helperfunctions.distance(individual, spec.representative)
 
-				if distance_from_representative <= config.compatibility_threshold:
+				if dist_from_repr <= config.compatibility_threshold:
 					spec.add(individual)
 					placed = True
 					break
 
 			if not placed:
-				self.species.append(Species(individual))
+				new_spec = Species(individual)
+				self.species.append(new_spec)
 
-	def adjust_fitness_and_calculate_num_children(self):
-		sum_species_fitness = 0
+		for spec in self.species:
+			if len(spec.individuals) == 0:
+				self.species.remove(spec)
 
+	def adjust_fitness(self):
 		for spec in self.species:
 			spec.adjust_fitness()
-			sum_species_fitness = sum_species_fitness + spec.species_fitness
+			spec.sort()
+
+	def assign_num_children(self):
+		sum_spec_fitness = sum([spec.fitness for spec in self.species])
 
 		for spec in self.species:
-			spec.num_children = math.floor(spec.species_fitness / sum_species_fitness * config.pop_size)
+			spec.num_children = math.floor(spec.fitness / sum_spec_fitness * config.pop_size)
 
-	def breed_new_generation(self):
-		self.adjust_fitness_and_calculate_num_children()
-
-		children = []
-		generation_innovations = {}
-
-		for i, spec in enumerate(self.species):
-			print('\tSpecies: {:d}, num_individuals: {:d}, num_children: {:d}'.format(i, len(spec.individuals), spec.num_children))
-
-			if spec.num_children == 0 or len(spec.individuals) == 0:
+			if spec.num_children == 0:
 				self.species.remove(spec)
-				continue
 
-			spec.sort()
-			print('\t\tSpecies: {:d}, species_fitness: {:.2f}, best_adjusted_fitness: {:.2f}'.format(i, spec.species_fitness, spec.individuals[0].fitness))
-
-			# first add best one
-			children = children + [spec.individuals[0]]
-
+	def remove_worst(self):
+		for spec in self.species:
 			num_surviving = math.floor(len(spec.individuals) * config.survival_threshold) + 1
 			spec.trim_to(num_surviving)
 
-			children = children + [spec.breed_child(generation_innovations) for _ in range(spec.num_children - 1)]
+	def breed_new_generation(self):
+		children = []
+		generation_innovations = {}
+
+		for spec in self.species:
+			# todo: don't add best one for every species?
+			children += [spec.individuals[0]] + [spec.breed_child(generation_innovations) for _ in range(spec.num_children - 1)]
 
 			spec.clear()
 
