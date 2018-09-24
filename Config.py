@@ -12,8 +12,8 @@ class Config:
 		self.compatibility_threshold = 1.0
 		self.crossover_probability = 0.75
 		self.disable_probability = 0.75
-		self.pop_size = 30
-		self.num_iter = 100
+		self.pop_size = 50
+		self.num_iter = 200
 		self.survival_threshold = 0.8
 		self.new_mu = 0
 		self.new_sigma = 1
@@ -24,6 +24,7 @@ class Config:
 		self.min_num_individuals_for_elitism = 5
 		self.max_num_generations_before_improvement = 15
 
+		self.starting_num_connections = None
 		self.innovation_number = None
 		self.input_keys = None
 		self.output_keys = None
@@ -42,7 +43,8 @@ class Config:
 			self.action_space_high = action_space.high
 			self.action_space_low = action_space.low
 
-		self.innovation_number = num_inputs * num_outputs
+		self.starting_num_connections = num_inputs * num_outputs
+		self.innovation_number = self.starting_num_connections
 		self.input_keys = list(range(num_inputs))
 		self.output_keys = list(range(num_inputs, num_inputs + num_outputs))
 

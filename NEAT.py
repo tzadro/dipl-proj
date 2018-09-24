@@ -5,7 +5,7 @@ from Config import config
 from Population import Population
 import gym
 
-env_name = 'CartPole-v0'
+env_name = 'Ant-v2'
 env = gym.make(env_name)
 config.update(env.observation_space, env.action_space)
 
@@ -17,7 +17,7 @@ for i in range(config.num_iter):
 	population.assign_num_children()
 
 	print('Generation: {:d}, num_individuals: {:d}, best_score: {:.2f}, avg_score: {:.2f}'.format(i, len(population.individuals), best_fitness, avg_fitness))
-	print('Num organisms with more than default number of connections: {:d}'.format(sum([len(individual.connections.values()) > 8 for individual in population.individuals])))
+	print('Num organisms with more than default number of connections: {:d}'.format(sum([len(individual.connections.values()) > config.starting_num_connections for individual in population.individuals])))
 	for j, spec in enumerate(population.species):
 		print('\tSpecies: {:d}'.format(j))
 		print('\t\tfitness: {:.2f}'.format(spec.fitness))
