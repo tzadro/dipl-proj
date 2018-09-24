@@ -18,7 +18,8 @@ class Species:
 	def adjust_fitness(self):
 		self.fitness = 0
 		for individual in self.individuals:
-			individual.adjusted_fitness = individual.fitness / len(self.individuals) # has to be done with distances!
+			# todo: should be done with distances!
+			individual.adjusted_fitness = individual.fitness / len(self.individuals)
 			self.fitness += individual.adjusted_fitness
 
 	# from best to worst
@@ -49,4 +50,5 @@ class Species:
 		# todo: set random individual as representative?
 		self.representative = copy.deepcopy(self.individuals[0])
 		self.individuals = []
+		self.fitness = None
 		self.num_children = None
