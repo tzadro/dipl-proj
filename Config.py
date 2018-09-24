@@ -13,7 +13,7 @@ class Config:
 		self.crossover_probability = 0.75
 		self.disable_probability = 0.75
 		self.pop_size = 30
-		self.num_iter = 70
+		self.num_iter = 100
 		self.survival_threshold = 0.8
 		self.new_mu = 0
 		self.new_sigma = 1
@@ -27,9 +27,9 @@ class Config:
 		self.innovation_number = None
 		self.input_keys = None
 		self.output_keys = None
-		self.action_space_discrete: None
-		self.action_space_high: None
-		self.action_space_low: None
+		self.action_space_discrete = None
+		self.action_space_high = None
+		self.action_space_low = None
 
 	def update(self, observation_space, action_space):
 		self.action_space_discrete = type(action_space).__name__ == 'Discrete'
