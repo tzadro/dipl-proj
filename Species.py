@@ -2,6 +2,7 @@ from Config import config
 from Individual import crossover
 import random
 import copy
+import math
 import numpy as np
 
 
@@ -10,6 +11,8 @@ class Species:
 		self.representative = copy.deepcopy(representative)
 		self.individuals = [representative]
 		self.fitness = None
+		self.max_fitness = -math.inf
+		self.num_generations_before_last_improvement = None
 		self.num_children = None
 
 	def add(self, individual):
@@ -21,6 +24,12 @@ class Species:
 			# todo: should be done with distances!
 			individual.adjusted_fitness = individual.fitness / len(self.individuals)
 			self.fitness += individual.adjusted_fitness
+
+		if self.fitness > self.max_fitness:
+			self.max_fitness = self.fitness
+			self.num_generations_before_last_improvement = 0
+		else:
+			self.num_generations_before_last_improvement += 1
 
 	# from best to worst
 	def sort(self):

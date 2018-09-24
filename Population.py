@@ -38,23 +38,23 @@ class Population:
 				new_spec = Species(individual)
 				self.species.append(new_spec)
 
-		for spec in self.species:
-			if len(spec.individuals) == 0:
-				self.species.remove(spec)
+		self.species = [spec for spec in self.species if len(spec.individuals) > 0]
 
 	def adjust_fitness(self):
 		for spec in self.species:
 			spec.adjust_fitness()
 			spec.sort()
 
+		self.species = [spec for spec in self.species if spec.num_generations_before_last_improvement <= config.max_num_generations_before_improvement]
+
 	def assign_num_children(self):
 		sum_spec_fitness = sum([spec.fitness for spec in self.species])
 
 		for spec in self.species:
-			spec.num_children = math.floor(spec.fitness / sum_spec_fitness * config.pop_size)
+			spec.num_children = math.floor(spec.fitness / sum_spec_fitness * (config.pop_size - len(self.species))) + 1
 
-			if spec.num_children == 0:
-				self.species.remove(spec)
+		# todo: this won't ever trigger, either don't give every species at least one spot or remove this
+		self.species = [spec for spec in self.species if spec.num_children > 0]
 
 	def remove_worst(self):
 		for spec in self.species:
@@ -66,8 +66,11 @@ class Population:
 		generation_innovations = {}
 
 		for spec in self.species:
-			# todo: don't add best one for every species?
-			children += [spec.individuals[0]] + [spec.breed_child(generation_innovations) for _ in range(spec.num_children - 1)]
+			if len(spec.individuals) > config.min_num_individuals_for_elitism:
+				children += [spec.individuals[0]]
+				spec.num_children -= 1
+
+			children += [spec.breed_child(generation_innovations) for _ in range(spec.num_children)]
 
 			spec.clear()
 

@@ -5,7 +5,6 @@ class Config:
 		self.new_node_probability = 0.04
 		self.new_connection_probability = 0.08
 		self.step = 0.25
-		self.innovation_number = 8
 		self.node_key = 6
 		self.c1 = 1.0
 		self.c2 = 1.0
@@ -22,7 +21,10 @@ class Config:
 		self.step_sigma = 1
 		self.visualize_networks = False
 		self.fixed_topology = False
+		self.min_num_individuals_for_elitism = 5
+		self.max_num_generations_before_improvement = 15
 
+		self.innovation_number = None
 		self.input_keys = None
 		self.output_keys = None
 		self.action_space_discrete: None
@@ -40,6 +42,7 @@ class Config:
 			self.action_space_high = action_space.high
 			self.action_space_low = action_space.low
 
+		self.innovation_number = num_inputs * num_outputs
 		self.input_keys = list(range(num_inputs))
 		self.output_keys = list(range(num_inputs, num_inputs + num_outputs))
 
