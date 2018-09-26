@@ -231,13 +231,7 @@ def crossover(parents):
 
 			node_pairs.append((new_connection.from_key, new_connection.to_key))
 
-	max_innovation = max(parent1.max_innovation, parent2.max_innovation)
-	max_node = max(parent1.max_node, parent2.max_node)
-	print([connection.innovation_number for connection in child_connections.values()])
-	print([node.key for node in child_nodes.values()])
-	print(node_pairs)
-	print(max_innovation)
-	print(max_node)
-	exit()
-	child = Individual(child_connections, child_nodes, node_pairs, max_innovation, max_node)
+	next_new_innovation = max(parent1.next_new_innovation, parent2.next_new_innovation)
+	next_new_node = max(parent1.next_new_node, parent2.next_new_node)
+	child = Individual(child_connections, child_nodes, node_pairs, next_new_innovation, next_new_node)
 	return child
