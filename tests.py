@@ -1,6 +1,7 @@
 from Config import config
 from Node import Node
 from Connection import Connection
+from Neuron import Neuron
 from Phenotype import Phenotype
 from Individual import Individual
 import helperfunctions
@@ -74,6 +75,36 @@ def test_phenotype(connections):
 	print('Phenotype test:', round(res[0], 2) == 1.07 and round(res[1], 2) == 0.39)
 
 
+def test_neuron():
+	connections = {
+		0: Connection(0, 0, 2, 0.2, True),
+		1: Connection(1, 1, 2, 0.3, True),
+		2: Connection(2, 2, 3, 0.4, True)
+	}
+	neurons = {
+		0: Neuron(0),
+		1: Neuron(1),
+		2: Neuron(2),
+		3: Neuron(3)
+	}
+
+	neurons[0].add_outgoing(2)
+	neurons[1].add_outgoing(2)
+	neurons[2].add_incoming(connections[0], False)
+	neurons[2].add_incoming(connections[1], False)
+	neurons[2].add_outgoing(3)
+	neurons[3].add_incoming(connections[2], False)
+
+	for neuron in neurons.values():
+		neuron.reset()
+
+	neurons[0].set_value(1., neurons)
+	neurons[1].set_value(1., neurons)
+	res = neurons[3].value
+
+	print('Neuron test:', round(res, 2) == 0.56)
+
+
 def run():
 	connections1 = {
 		0: Connection(0, 0, 6, 0.2, True),
@@ -105,9 +136,9 @@ def run():
 		8: Node(8)
 	}
 	node_pairs1 = [(connection.from_key, connection.to_key) for connection in connections1.values()]
-	max_innovation1 = 16
-	max_node1 = 9
-	individual1 = Individual(connections1, nodes1, node_pairs1, max_innovation1, max_node1)
+	next_new_innovation1 = 16
+	next_new_node1 = 9
+	individual1 = Individual(connections1, nodes1, node_pairs1, next_new_innovation1, next_new_node1)
 
 	connections2 = {
 		0: Connection(0, 0, 6, 0.9, True),
@@ -136,15 +167,16 @@ def run():
 		8: Node(8)
 	}
 	node_pairs2 = [(connection.from_key, connection.to_key) for connection in connections2.values()]
-	max_innovation2 = 18
-	max_node2 = 9
-	individual2 = Individual(connections2, nodes2, node_pairs2, max_innovation2, max_node2)
+	next_new_innovation2 = 18
+	next_new_node2 = 9
+	individual2 = Individual(connections2, nodes2, node_pairs2, next_new_innovation2, next_new_node2)
 
 	test_sigmoid()
 	test_check_if_path_exists(connections1)
 	test_check_if_path_exists2(connections1)
 	test_distance(individual1, individual2)
 	test_innovation_numbers_union(connections1, connections2)
+	test_neuron()
 	test_phenotype(connections1)
 
 
