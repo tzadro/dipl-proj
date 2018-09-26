@@ -15,8 +15,8 @@ class Individual:  # Genome
 		self.connections = {}
 		self.fitness = None
 		self.adjusted_fitness = None
-		self.max_innovation = 0
-		self.max_node = 0
+		self.next_new_innovation = 0
+		self.next_new_node = 0
 		self.node_pairs = []
 
 		if connections is None or nodes is None or node_pairs is None or max_innovation is None or max_node is None:
@@ -25,23 +25,23 @@ class Individual:  # Genome
 			self.connections = connections
 			self.nodes = nodes
 			self.node_pairs = node_pairs
-			self.max_innovation = max_innovation
-			self.max_node = max_node
+			self.next_new_innovation = max_innovation
+			self.next_new_node = max_node
 
 	def configure_new(self):
 		for key in config.input_keys:
 			self.nodes[key] = Node(key)
-			self.max_node = self.max_node + 1
+			self.next_new_node = self.next_new_node + 1
 
 		for key in config.output_keys:
 			self.nodes[key] = Node(key)
-			self.max_node = self.max_node + 1
+			self.next_new_node = self.next_new_node + 1
 
 		for input_key in config.input_keys:
 			for output_key in config.output_keys:
-				new_connection = Connection(self.max_innovation, input_key, output_key, random.gauss(config.new_mu, config.new_sigma), True)
-				self.connections[self.max_innovation] = new_connection
-				self.max_innovation = self.max_innovation + 1
+				new_connection = Connection(self.next_new_innovation, input_key, output_key, random.gauss(config.new_mu, config.new_sigma), True)
+				self.connections[self.next_new_innovation] = new_connection
+				self.next_new_innovation = self.next_new_innovation + 1
 				self.node_pairs.append((input_key, output_key))
 
 	def evaluate_fitness(self, env):
@@ -122,18 +122,18 @@ class Individual:  # Genome
 
 			self.node_pairs.append(pair)
 
-			if node2.key in config.input_keys or helperfunctions.check_if_path_exists(node2.key, node1.key, self.connections, {}) or (node2.key, node1.key) in generation_innovations:
+			if node2.key in config.input_keys or helperfunctions.check_if_path_exists(node2.key, node1.key, self.connections) or (node2.key, node1.key) in generation_innovations:
 				temp = node1
 				node1 = node2
 				node2 = temp
 
 			if (node1.key, node2.key) in generation_innovations:
 				innovation_number = generation_innovations[(node1.key, node2.key)]
-				self.max_innovation = max(self.max_innovation, innovation_number)
+				self.next_new_innovation = max(self.next_new_innovation, innovation_number)
 			else:
 				innovation_number = config.innovation_number
 				generation_innovations[(node1.key, node2.key)] = innovation_number
-				self.max_innovation = config.innovation_number
+				self.next_new_innovation = config.innovation_number
 				config.innovation_number = config.innovation_number + 1
 
 			new_connection = Connection(innovation_number, node1.key, node2.key, random.random() * 2 - 1, True)
@@ -147,17 +147,17 @@ class Individual:  # Genome
 		connection.enabled = False
 
 		new_node = Node(config.node_key)
-		self.max_node = config.node_key
+		self.next_new_node = config.node_key
 		config.node_key = config.node_key + 1
 		self.nodes[new_node.key] = new_node
 
 		new_connection1 = Connection(config.innovation_number, connection.from_key, new_node.key, 1.0, True)
-		self.max_innovation = config.innovation_number
+		self.next_new_innovation = config.innovation_number
 		self.connections[config.innovation_number] = new_connection1
 		config.innovation_number = config.innovation_number + 1
 
 		new_connection2 = Connection(config.innovation_number, new_node.key, connection.to_key, connection.weight, True)
-		self.max_innovation = config.innovation_number
+		self.next_new_innovation = config.innovation_number
 		self.connections[config.innovation_number] = new_connection2
 		config.innovation_number = config.innovation_number + 1
 
@@ -233,5 +233,11 @@ def crossover(parents):
 
 	max_innovation = max(parent1.max_innovation, parent2.max_innovation)
 	max_node = max(parent1.max_node, parent2.max_node)
+	print([connection.innovation_number for connection in child_connections.values()])
+	print([node.key for node in child_nodes.values()])
+	print(node_pairs)
+	print(max_innovation)
+	print(max_node)
+	exit()
 	child = Individual(child_connections, child_nodes, node_pairs, max_innovation, max_node)
 	return child

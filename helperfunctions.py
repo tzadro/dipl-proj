@@ -10,7 +10,10 @@ def max_num_edges(num_nodes):
 	return num_nodes * (num_nodes - 1) / 2
 
 
-def check_if_path_exists(from_node, to_node, connections, checked):
+def check_if_path_exists(from_node, to_node, connections, checked=None):
+	if checked is None:
+		checked = {}
+
 	for connection in connections.values():
 		if not connection.enabled:
 			continue
@@ -31,7 +34,10 @@ def check_if_path_exists(from_node, to_node, connections, checked):
 	return False
 
 
-def check_if_path_exists2(from_key, to_key, neurons, checked):
+def check_if_path_exists2(from_key, to_key, neurons, checked=None):
+	if checked is None:
+		checked = {}
+
 	if to_key in neurons[from_key].outgoing_keys:
 		return True
 
@@ -49,8 +55,11 @@ def distance(individual1, individual2):
 	connections1 = individual1.connections
 	connections2 = individual2.connections
 
+	max_innovation1 = individual1.next_new_innovation - 1
+	max_innovation2 = individual2.next_new_innovation - 1
+	max_common = min(max_innovation1, max_innovation2)
+
 	innovation_numbers = innovation_numbers_union(connections1, connections2)
-	max_common = min(individual1.max_innovation, individual1.max_innovation)
 
 	weight_diffs = []
 	E = 0

@@ -22,7 +22,7 @@ class Phenotype:  # Neural network
 
 			to_neuron = self.neurons[connection.to_key]
 			to_neuron.incoming_connections.append(connection)
-			if not helperfunctions.check_if_path_exists2(connection.to_key, connection.from_key, self.neurons, {}):
+			if not helperfunctions.check_if_path_exists2(connection.to_key, connection.from_key, self.neurons):
 				to_neuron.num_accepts_before_firing = to_neuron.num_accepts_before_firing + 1
 
 	def forward(self, inputs):
