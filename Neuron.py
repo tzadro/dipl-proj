@@ -10,6 +10,14 @@ class Neuron:
 		self.count = None
 		self.value = 0
 
+	def add_incoming(self, connection, return_path_exists):
+		self.incoming_connections.append(connection)
+		if not return_path_exists:
+			self.num_accepts_before_firing += 1
+
+	def add_outgoing(self, key):
+		self.outgoing_keys.append(key)
+
 	def reset(self):
 		self.count = self.num_accepts_before_firing
 

@@ -14,16 +14,13 @@ class Phenotype:  # Neural network
 			if connection.from_key not in self.neurons:
 				self.neurons[connection.from_key] = Neuron(connection.from_key)
 
-			from_neuron = self.neurons[connection.from_key]
-			from_neuron.outgoing_keys.append(connection.to_key)
+			self.neurons[connection.from_key].add_outgoing(connection.to_key)
 
 			if connection.to_key not in self.neurons:
 				self.neurons[connection.to_key] = Neuron(connection.to_key)
 
-			to_neuron = self.neurons[connection.to_key]
-			to_neuron.incoming_connections.append(connection)
-			if not helperfunctions.check_if_path_exists2(connection.to_key, connection.from_key, self.neurons):
-				to_neuron.num_accepts_before_firing = to_neuron.num_accepts_before_firing + 1
+			return_path_exists = helperfunctions.check_if_path_exists2(connection.to_key, connection.from_key, self.neurons)
+			self.neurons[connection.to_key].add_incoming(connection, return_path_exists)
 
 	def forward(self, inputs):
 		for neuron in self.neurons.values():
