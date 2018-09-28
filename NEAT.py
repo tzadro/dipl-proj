@@ -3,10 +3,9 @@
 
 from Config import config
 from Population import Population
-import gym
+from Environments import CartPole
 
-env_name = 'CartPole-v0'
-env = gym.make(env_name)
+env = CartPole()
 config.update(env.observation_space, env.action_space)
 
 population = Population()

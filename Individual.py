@@ -49,7 +49,6 @@ class Individual:  # Genome
 
 		self.fitness = 0
 		while True:
-			env.render()
 			output = phenotype.forward(observation)
 			observation, reward, done, info = env.step(output)
 
