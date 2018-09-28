@@ -1,6 +1,7 @@
 from Config import config
 from Individual import Individual
 from Species import Species
+from Interface import Interface
 import helperfunctions
 import math
 
@@ -9,12 +10,16 @@ class Population:
 	def __init__(self):
 		self.individuals = [Individual() for _ in range(config.pop_size)]
 		self.species = []
+		self.interface = Interface()
 
 	def evaluate_fitness(self, env):
 		best_fitness = -math.inf
 		avg_fitness = 0
 
 		for individual in self.individuals:
+			if config.visualize_networks:
+				self.interface.visualize_network(individual.connections, individual.nodes)
+
 			fitness = individual.evaluate_fitness(env)
 			best_fitness = max(best_fitness, fitness)
 			avg_fitness += fitness

@@ -5,8 +5,6 @@ from Phenotype import Phenotype
 import helperfunctions
 import copy
 import random
-import networkx as nx
-import matplotlib.pyplot as plt
 
 
 class Individual:  # Genome
@@ -47,9 +45,6 @@ class Individual:  # Genome
 	def evaluate_fitness(self, env):
 		phenotype = Phenotype(self.connections)
 
-		if config.visualize_networks:
-			self.visualize()
-
 		observation = env.reset()
 
 		self.fitness = 0
@@ -62,18 +57,6 @@ class Individual:  # Genome
 
 			if done:
 				return self.fitness
-
-	def visualize(self):
-		edges = [(connection.from_key, connection.to_key, round(connection.weight, 2)) for connection in self.connections.values()]
-
-		G = nx.DiGraph()
-		G.add_weighted_edges_from(edges)
-		pos = nx.spring_layout(G)
-
-		nx.draw(G, pos)
-		labels = nx.get_edge_attributes(G, 'weight')
-		nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
-		plt.show()
 
 	def mutate(self, generation_innovations):
 		if config.fixed_topology:

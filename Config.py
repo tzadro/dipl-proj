@@ -19,10 +19,13 @@ class Config:
 		self.new_sigma = 1
 		self.step_mu = 0
 		self.step_sigma = 1
-		self.visualize_networks = False
-		self.fixed_topology = False
 		self.min_num_individuals_for_elitism = 5
 		self.max_num_generations_before_improvement = 15
+
+		self.visualize_networks = True
+		self.fixed_topology = False
+		self.network_canvas_height = 100
+		self.network_canvas_width = 100
 
 		self.starting_num_connections = None
 		self.innovation_number = None
