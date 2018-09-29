@@ -3,10 +3,10 @@
 
 from Config import config
 from Population import Population
-from Environments import CartPole
+import Environments
 
-env = CartPole()
-config.update(env.observation_space, env.action_space)
+env = Environments.Pixelcopter()
+config.update(env.num_inputs, env.num_outputs, env.action_space_discrete, env.action_space_high, env.action_space_low)
 
 population = Population()
 for i in range(config.num_iter):

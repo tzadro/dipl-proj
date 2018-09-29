@@ -3,7 +3,10 @@ import math
 
 
 def sigmoid(x):
-	return 1 / (1 + math.exp(-x))
+	try:
+		return 1 / (1 + math.exp(-x))
+	except OverflowError:
+		return 0
 
 
 def max_num_edges(num_nodes):

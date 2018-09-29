@@ -135,10 +135,9 @@ def run():
 		7: Node(7),
 		8: Node(8)
 	}
-	node_pairs1 = [(connection.from_key, connection.to_key) for connection in connections1.values()]
 	next_new_innovation1 = 16
 	next_new_node1 = 9
-	individual1 = Individual(connections1, nodes1, node_pairs1, next_new_innovation1, next_new_node1)
+	individual1 = Individual(connections1, nodes1, next_new_innovation1, next_new_node1)
 
 	connections2 = {
 		0: Connection(0, 0, 6, 0.9, True),
@@ -166,10 +165,9 @@ def run():
 		6: Node(6),
 		8: Node(8)
 	}
-	node_pairs2 = [(connection.from_key, connection.to_key) for connection in connections2.values()]
 	next_new_innovation2 = 18
 	next_new_node2 = 9
-	individual2 = Individual(connections2, nodes2, node_pairs2, next_new_innovation2, next_new_node2)
+	individual2 = Individual(connections2, nodes2, next_new_innovation2, next_new_node2)
 
 	test_sigmoid()
 	test_check_if_path_exists(connections1)

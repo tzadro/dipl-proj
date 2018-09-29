@@ -29,6 +29,8 @@ class Phenotype:  # Neural network
 		for key, value in zip(config.input_keys, inputs):
 			self.neurons[key].set_value(value, self.neurons)
 
+		# todo: should phenotype convert output?
+
 		if not config.action_space_discrete:
 			output = [self.neurons[key].value for key in config.output_keys]
 			return output * (abs(config.action_space_high) + abs(config.action_space_low)) + config.action_space_low

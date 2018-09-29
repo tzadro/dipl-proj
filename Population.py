@@ -50,7 +50,8 @@ class Population:
 			spec.adjust_fitness()
 			spec.sort()
 
-		self.species = [spec for spec in self.species if spec.num_generations_before_last_improvement <= config.max_num_generations_before_improvement]
+		if len(self.species) > 1:
+			self.species = [spec for spec in self.species if spec.num_generations_before_last_improvement <= config.max_num_generations_before_improvement]
 
 	def assign_num_children(self):
 		sum_spec_fitness = sum([spec.fitness for spec in self.species])
