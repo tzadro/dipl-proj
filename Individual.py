@@ -88,10 +88,6 @@ class Individual:  # Genome
 			node1 = nodes_list[random.randrange(num_inputs + num_outputs, num_nodes)]
 			node2 = nodes_list[random.randrange(num_nodes)]
 
-			# todo: enable this
-			if node1.key == node2.key:
-				continue
-
 			existing_connections = [c for c in self.connections.values() if c.from_key == node1.key and c.to_key == node2.key or c.from_key == node2.key and c.to_key == node1.key]
 			if existing_connections:
 				continue
