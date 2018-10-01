@@ -7,12 +7,12 @@ class Config:
 		self.step = 0.25
 		self.c1 = 1.0
 		self.c2 = 1.0
-		self.c3 = 0.8
-		self.compatibility_threshold = 2.6
+		self.c3 = 0.4
+		self.compatibility_threshold = 1.0
 		self.crossover_probability = 0.75
 		self.disable_probability = 0.75
 		self.pop_size = 50
-		self.num_iter = 200
+		self.num_iter = 100
 		self.survival_threshold = 0.8
 		self.new_mu = 0
 		self.new_sigma = 1

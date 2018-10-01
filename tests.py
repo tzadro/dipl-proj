@@ -79,7 +79,8 @@ def test_neuron():
 	connections = {
 		0: Connection(0, 0, 2, 0.2, True),
 		1: Connection(1, 1, 2, 0.3, True),
-		2: Connection(2, 2, 3, 0.4, True)
+		2: Connection(2, 2, 3, 0.4, True),
+		3: Connection(3, 2, 2, 0.5, True)
 	}
 	neurons = {
 		0: Neuron(0),
@@ -90,19 +91,31 @@ def test_neuron():
 
 	neurons[0].add_outgoing(2)
 	neurons[1].add_outgoing(2)
-	neurons[2].add_incoming(connections[0], False)
-	neurons[2].add_incoming(connections[1], False)
+	return_path_exists = helperfunctions.check_if_path_exists2(connections[0].to_key, connections[0].from_key, neurons)
+	neurons[2].add_incoming(connections[0], return_path_exists)
+	return_path_exists = helperfunctions.check_if_path_exists2(connections[1].to_key, connections[1].from_key, neurons)
+	neurons[2].add_incoming(connections[1], return_path_exists)
+	return_path_exists = helperfunctions.check_if_path_exists2(connections[3].to_key, connections[3].from_key, neurons)
+	neurons[2].add_incoming(connections[3], return_path_exists)
 	neurons[2].add_outgoing(3)
-	neurons[3].add_incoming(connections[2], False)
+	return_path_exists = helperfunctions.check_if_path_exists2(connections[2].to_key, connections[2].from_key, neurons)
+	neurons[3].add_incoming(connections[2], return_path_exists)
 
 	for neuron in neurons.values():
 		neuron.reset()
 
 	neurons[0].set_value(1., neurons)
 	neurons[1].set_value(1., neurons)
-	res = neurons[3].value
+	res1 = neurons[3].value
 
-	print('Neuron test:', round(res, 2) == 0.56)
+	for neuron in neurons.values():
+		neuron.reset()
+
+	neurons[0].set_value(1., neurons)
+	neurons[1].set_value(1., neurons)
+	res2 = neurons[3].value
+
+	print('Neuron test:', round(res1, 2) == 0.56 and round(res2, 2) == 0.57)
 
 
 def run():

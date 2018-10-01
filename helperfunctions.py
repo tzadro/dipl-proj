@@ -14,6 +14,9 @@ def max_num_edges(num_nodes):
 
 
 def check_if_path_exists(from_node, to_node, connections, checked=None):
+	if from_node == to_node:
+		return True
+
 	if checked is None:
 		checked = {}
 
@@ -38,6 +41,9 @@ def check_if_path_exists(from_node, to_node, connections, checked=None):
 
 
 def check_if_path_exists2(from_key, to_key, neurons, checked=None):
+	if from_key == to_key:
+		return True
+
 	if checked is None:
 		checked = {}
 
