@@ -21,7 +21,7 @@ class Config:
 		self.min_num_individuals_for_elitism = 5
 		self.max_num_generations_before_improvement = 15
 
-		self.visualize_networks = False
+		self.visualize_best_networks = True
 		self.fixed_topology = True
 		self.network_canvas_height = 100
 		self.network_canvas_width = 100

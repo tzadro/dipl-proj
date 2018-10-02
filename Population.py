@@ -13,19 +13,20 @@ class Population:
 		self.interface = Interface()
 
 	def evaluate_fitness(self, env):
-		best_fitness = -math.inf
+		best_individual = None
 		avg_fitness = 0
 
 		for individual in self.individuals:
-			if config.visualize_networks:
-				self.interface.visualize_network(individual.connections, individual.nodes)
+			avg_fitness += individual.evaluate_fitness(env)
 
-			fitness = individual.evaluate_fitness(env)
-			best_fitness = max(best_fitness, fitness)
-			avg_fitness += fitness
+			if best_individual is None or individual.fitness > best_individual.fitness:
+				best_individual = individual
+
+		if config.visualize_best_networks:
+			self.interface.visualize_network(best_individual.connections, best_individual.nodes)
 
 		avg_fitness /= len(self.individuals)
-		return best_fitness, avg_fitness
+		return best_individual.fitness, avg_fitness
 
 	def speciate(self):
 		for individual in self.individuals:

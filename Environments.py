@@ -61,11 +61,8 @@ class Pixelcopter:
 
 class TestEnvironment:
 	def __init__(self):
-		self.possible_observations = [[1., 0., 0., 0.],
-									  [0., 1., 0., 0.],
-									  [0., 0., 1., 0.],
-									  [0., 0., 0., 1.]]
-		self.last_observation_index = None
+		self.observation = [1., 1., 1., 1.]
+		self.counter = None
 
 		self.num_inputs = 4
 		self.num_outputs = 4
@@ -74,16 +71,15 @@ class TestEnvironment:
 		self.action_space_low = np.array([1., 1., 1., 1.])
 
 	def reset(self):
-		self.last_observation_index = random.randrange(4)
-		observation = self.possible_observations[self.last_observation_index]
-		return observation
+		self.counter = 0
+		return self.observation
 
 	def step(self, output):
-		reward = output[self.last_observation_index]
-		self.last_observation_index = random.randrange(4)
-		observation = self.possible_observations[self.last_observation_index]
-		done = np.argmax(output) != self.last_observation_index
+		reward = np.sum(output)
+		observation = self.observation
+		done = self.counter == 50
 		info = None
+		self.counter += 1
 		return observation, reward, done, info
 
 	def close(self):
