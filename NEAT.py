@@ -6,7 +6,7 @@ from Population import Population
 import Environments
 import matplotlib.pyplot as plt
 
-env = Environments.Pixelcopter()
+env = Environments.TestEnvironment()
 config.update(env.num_inputs, env.num_outputs, env.action_space_discrete, env.action_space_high, env.action_space_low)
 
 best_fitnesses = []

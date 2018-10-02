@@ -1,5 +1,7 @@
 import gym
 import ple
+import random
+import numpy as np
 
 
 class CartPole:
@@ -50,6 +52,37 @@ class Pixelcopter:
 		reward = self.env.act(action)
 		observation = self.game.getGameState().values()
 		done = self.env.game_over()
+		info = None
+		return observation, reward, done, info
+
+	def close(self):
+		return
+
+
+class TestEnvironment:
+	def __init__(self):
+		self.possible_observations = [[1., 0., 0., 0.],
+									  [0., 1., 0., 0.],
+									  [0., 0., 1., 0.],
+									  [0., 0., 0., 1.]]
+		self.last_observation_index = None
+
+		self.num_inputs = 4
+		self.num_outputs = 4
+		self.action_space_discrete = False
+		self.action_space_high = np.array([0., 0., 0., 0.])
+		self.action_space_low = np.array([1., 1., 1., 1.])
+
+	def reset(self):
+		self.last_observation_index = random.randrange(4)
+		observation = self.possible_observations[self.last_observation_index]
+		return observation
+
+	def step(self, output):
+		reward = output[self.last_observation_index]
+		self.last_observation_index = random.randrange(4)
+		observation = self.possible_observations[self.last_observation_index]
+		done = np.argmax(output) != self.last_observation_index
 		info = None
 		return observation, reward, done, info
 
