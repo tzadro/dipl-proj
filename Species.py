@@ -21,7 +21,6 @@ class Species:
 	def adjust_fitness(self):
 		self.fitness = 0
 		for individual in self.individuals:
-			# todo: should be done with distances!
 			individual.adjusted_fitness = individual.fitness / len(self.individuals)
 			self.fitness += individual.adjusted_fitness
 
