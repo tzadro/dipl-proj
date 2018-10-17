@@ -8,7 +8,7 @@ class Config:
 		self.c1 = 1.0
 		self.c2 = 1.0
 		self.c3 = 0.4
-		self.compatibility_threshold = 3.0
+		self.compatibility_threshold = 2.0
 		self.crossover_probability = 0.75
 		self.disable_probability = 0.75
 		self.pop_size = 50
@@ -22,7 +22,8 @@ class Config:
 		self.max_num_generations_before_improvement = 15
 
 		self.visualize_best_networks = True
-		self.fixed_topology = True
+		self.verbose = False
+		self.fixed_topology = False
 		self.network_canvas_height = 100
 		self.network_canvas_width = 100
 

@@ -44,10 +44,11 @@ class Individual:  # Genome
 
 		observation = env.reset()
 
-		self.fitness = 0  # todo: should be 0, set this way so the score is never less than 0 in Pixelcopter game (minimum is -5)
+		weights = [connection.weight for connection in self.connections.values()]  # todo: remove after testing?
+		self.fitness = 6  # todo: should be 0, set this way so the score is never less than 0 in Pixelcopter game (minimum is -5)
 		while True:
 			output = phenotype.forward(observation)
-			observation, reward, done, info = env.step(output)
+			observation, reward, done, info = env.step(output, weights)
 
 			self.fitness += reward
 
@@ -199,4 +200,5 @@ def crossover(parents):
 	next_new_innovation = max(parent1.next_new_innovation, parent2.next_new_innovation)
 	next_new_node = max(parent1.next_new_node, parent2.next_new_node)
 	child = Individual(child_connections, child_nodes, next_new_innovation, next_new_node)
+
 	return child

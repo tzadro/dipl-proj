@@ -1,6 +1,5 @@
 import gym
 import ple
-import random
 import numpy as np
 
 
@@ -46,10 +45,10 @@ class Pixelcopter:
 		observation = self.game.getGameState().values()
 		return observation
 
-	def step(self, action_index):
+	def step(self, action_index, weights):
 		action = self.action_set[action_index]
 
-		reward = self.env.act(action)
+		reward = self.env.act(action) / len(weights)
 		observation = self.game.getGameState().values()
 		done = self.env.game_over()
 		info = None
@@ -62,7 +61,6 @@ class Pixelcopter:
 class TestEnvironment:
 	def __init__(self):
 		self.observation = [1., 1., 1., 1.]
-		self.counter = None
 
 		self.num_inputs = 4
 		self.num_outputs = 4
@@ -71,15 +69,15 @@ class TestEnvironment:
 		self.action_space_low = np.array([1., 1., 1., 1.])
 
 	def reset(self):
-		self.counter = 0
 		return self.observation
 
-	def step(self, output):
-		reward = np.sum(output)
+	def step(self, _, weights):
+		# reward = len(weights)  # fitness = number of connections
+		# reward = max(0.001, float(np.sum(weights)))  # fitness = sum of all weights
+		reward = max(0.001, float(np.sum(weights))) / len(weights)  # fitness = avg weight
 		observation = self.observation
-		done = self.counter == 50
+		done = True
 		info = None
-		self.counter += 1
 		return observation, reward, done, info
 
 	def close(self):

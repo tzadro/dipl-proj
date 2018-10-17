@@ -82,3 +82,6 @@ class Population:
 			spec.clear()
 
 		self.individuals = children
+
+		for individual in self.individuals:
+			self.interface.update_node_positions(individual.connections, individual.nodes)
