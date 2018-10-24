@@ -45,10 +45,10 @@ class Pixelcopter:
 		observation = self.game.getGameState().values()
 		return observation
 
-	def step(self, action_index, weights):
+	def step(self, action_index, _):
 		action = self.action_set[action_index]
 
-		reward = self.env.act(action) / len(weights)
+		reward = self.env.act(action)
 		observation = self.game.getGameState().values()
 		done = self.env.game_over()
 		info = None
