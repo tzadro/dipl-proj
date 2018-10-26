@@ -15,7 +15,8 @@ population = Population()
 for i in range(config.num_iter):
 	population.speciate()
 
-	best_fitness, avg_fitness = population.evaluate_fitness(env)
+	visualize = i % config.visualize_every == 0
+	best_fitness, avg_fitness = population.evaluate_fitness(env, visualize)
 	best_fitnesses.append(best_fitness)
 	avg_fitnesses.append(avg_fitness)
 

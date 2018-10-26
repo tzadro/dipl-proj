@@ -21,7 +21,15 @@ class Interface:
 
 			self.node_positions[key] = (x, y)
 
-	def visualize_network(self, connections, nodes):
+		hidden_start_key = num_inputs + num_outputs
+		hidden_keys = range(hidden_start_key, hidden_start_key + config.num_starting_hidden_nodes)
+		for i, key in enumerate(hidden_keys):
+			x = config.network_canvas_width / 2
+			y = (config.num_starting_hidden_nodes - (i + 1)) * config.network_canvas_height / (config.num_starting_hidden_nodes - 1)
+
+			self.node_positions[key] = (x, y)
+
+	def visualize_network(self, connections):
 		edges = [(connection.from_key, connection.to_key, round(connection.weight, 2)) for connection in connections.values() if connection.enabled]
 
 		G = nx.DiGraph()

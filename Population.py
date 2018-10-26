@@ -12,7 +12,7 @@ class Population:
 		self.species = []
 		self.interface = Interface()
 
-	def evaluate_fitness(self, env):
+	def evaluate_fitness(self, env, visualize):
 		best_individual = None
 		avg_fitness = 0
 
@@ -22,8 +22,8 @@ class Population:
 			if best_individual is None or individual.fitness > best_individual.fitness:
 				best_individual = individual
 
-		if config.visualize_best_networks:
-			self.interface.visualize_network(best_individual.connections, best_individual.nodes)
+		if visualize and config.visualize_best_networks:
+			self.interface.visualize_network(best_individual.connections)
 
 		avg_fitness /= len(self.individuals)
 		return best_individual.fitness, avg_fitness
@@ -70,14 +70,17 @@ class Population:
 
 	def breed_new_generation(self):
 		children = []
-		generation_innovations = {}
+
+		# track new innovations in a generation to prevent giving same structural changes different innovation numbers
+		generation_new_nodes = {}
+		generation_new_connections = {}
 
 		for spec in self.species:
 			if len(spec.individuals) > config.min_num_individuals_for_elitism:
 				children += [spec.individuals[0]]
 				spec.num_children -= 1
 
-			children += [spec.breed_child(generation_innovations) for _ in range(spec.num_children)]
+			children += [spec.breed_child(generation_new_nodes, generation_new_connections) for _ in range(spec.num_children)]
 
 			spec.clear()
 

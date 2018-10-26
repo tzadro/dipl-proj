@@ -64,8 +64,8 @@ def distance(individual1, individual2):
 	connections1 = individual1.connections
 	connections2 = individual2.connections
 
-	max_innovation1 = individual1.next_new_innovation - 1
-	max_innovation2 = individual2.next_new_innovation - 1
+	max_innovation1 = max(individual1.connections.keys())
+	max_innovation2 = max(individual2.connections.keys())
 	max_common = min(max_innovation1, max_innovation2)
 
 	innovation_numbers = innovation_numbers_union(connections1, connections2)
