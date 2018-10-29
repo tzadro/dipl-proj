@@ -27,6 +27,9 @@ class Phenotype:  # Neural network
 			neuron.reset()
 
 		for key, value in zip(config.input_keys, inputs):
+			if key not in self.neurons:  # todo: what if input isn't connected to anything?
+				continue
+
 			self.neurons[key].set_value(value, self.neurons)
 
 		# todo: should phenotype convert output?

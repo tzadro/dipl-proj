@@ -8,11 +8,11 @@ class Config:
 		self.c1 = 1.0
 		self.c2 = 1.0
 		self.c3 = 0.4
-		self.compatibility_threshold = 1.8
+		self.compatibility_threshold = 1.2
 		self.crossover_probability = 0.75
 		self.stay_disabled_probability = 0.75
-		self.pop_size = 100
-		self.num_iter = 101
+		self.pop_size = 60
+		self.num_iter = 201
 		self.survival_threshold = 0.8
 		self.new_mu = 0
 		self.new_sigma = 1.0
@@ -20,10 +20,10 @@ class Config:
 		self.step_sigma = 0.75
 		self.min_num_individuals_for_elitism = 5
 		self.max_num_generations_before_improvement = 15
-		self.num_evaluation_runs = 3
+		self.num_evaluation_runs = 1
 
-		self.num_starting_hidden_nodes = 8
-		self.fixed_topology = True
+		self.num_starting_hidden_nodes = 0
+		self.fixed_topology = False
 
 		self.visualize_best_networks = True
 		self.visualize_every = 20

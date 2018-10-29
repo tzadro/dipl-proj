@@ -167,21 +167,16 @@ class Individual:  # Genome
 
 # todo: move somewhere?
 def crossover(parents):
-	parent1 = parents[0]
-	parent2 = parents[1]
-
-	parent1_connections = parent1.connections
-	parent2_connections = parent2.connections
-
-	innovation_numbers = helperfunctions.innovation_numbers_union(parent1_connections, parent2_connections)
+	fitter_parent, other_parent = (parents[0], parents[1]) if parents[0].adjusted_fitness > parents[1].adjusted_fitness else (parents[1], parents[0])
+	all_innovation_numbers = helperfunctions.innovation_numbers_union(fitter_parent.connections, other_parent.connections)
 
 	child_connections = {}
 	child_nodes = {}
 
-	for innovation_number in innovation_numbers:
-		if innovation_number in parent1_connections and innovation_number in parent2_connections:
-			connection1 = parent1_connections[innovation_number]
-			connection2 = parent2_connections[innovation_number]
+	for innovation_number in all_innovation_numbers:
+		if innovation_number in fitter_parent.connections and innovation_number in other_parent.connections:
+			connection1 = fitter_parent.connections[innovation_number]
+			connection2 = other_parent.connections[innovation_number]
 
 			if random.random() < 0.5:
 				new_connection = copy.deepcopy(connection1)
@@ -193,41 +188,23 @@ def crossover(parents):
 
 			child_connections[innovation_number] = new_connection
 
-			if new_connection.from_key not in child_nodes:
-				child_nodes[new_connection.from_key] = Node(new_connection.from_key)
+			for node_key in [new_connection.from_key, new_connection.to_key]:
+				if node_key not in child_nodes:
+					child_nodes[node_key] = Node(node_key)
 
-			if new_connection.to_key not in child_nodes:
-				child_nodes[new_connection.to_key] = Node(new_connection.to_key)
+		elif innovation_number in fitter_parent.connections and innovation_number not in other_parent.connections:
+			connection = fitter_parent.connections[innovation_number]
 
-		elif innovation_number in parent1_connections and innovation_number not in parent2_connections:
-			connection1 = parent1_connections[innovation_number]
-			new_connection = copy.deepcopy(connection1)
+			new_connection = copy.deepcopy(connection)
 
-			if not connection1.enabled:
+			if not connection.enabled:
 				new_connection.enabled = random.random() > config.stay_disabled_probability
 
 			child_connections[innovation_number] = new_connection
 
-			if new_connection.from_key not in child_nodes:
-				child_nodes[new_connection.from_key] = Node(new_connection.from_key)
-
-			if new_connection.to_key not in child_nodes:
-				child_nodes[new_connection.to_key] = Node(new_connection.to_key)
-
-		elif innovation_number not in parent1_connections and innovation_number in parent2_connections:
-			connection2 = parent2_connections[innovation_number]
-			new_connection = copy.deepcopy(connection2)
-
-			if not connection2.enabled:
-				new_connection.enabled = random.random() > config.stay_disabled_probability
-
-			child_connections[innovation_number] = new_connection
-
-			if new_connection.from_key not in child_nodes:
-				child_nodes[new_connection.from_key] = Node(new_connection.from_key)
-
-			if new_connection.to_key not in child_nodes:
-				child_nodes[new_connection.to_key] = Node(new_connection.to_key)
+			for node_key in [new_connection.from_key, new_connection.to_key]:
+				if node_key not in child_nodes:
+					child_nodes[node_key] = Node(node_key)
 
 	child = Individual(child_connections, child_nodes)
 
