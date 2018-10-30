@@ -35,7 +35,12 @@ class Interface:
 		G = nx.DiGraph()
 		G.add_weighted_edges_from(edges)
 
-		nx.draw(G, self.node_positions, with_labels=True)
+		self_loop_keys = [connection.from_key for connection in connections.values() if connection.enabled and connection.from_key == connection.to_key]
+		node_colors = []
+		for node_key in G:
+			node_colors.append('g' if node_key in self_loop_keys else 'r')
+
+		nx.draw(G, self.node_positions, node_color=node_colors, with_labels=True)
 		labels = nx.get_edge_attributes(G, 'weight')
 		nx.draw_networkx_edge_labels(G, self.node_positions, edge_labels=labels)
 
@@ -43,9 +48,9 @@ class Interface:
 
 	def update_node_positions(self, connections, nodes):
 		# todo: ugly
-		for key in nodes.keys():
+		for key in nodes:
 			if key not in self.node_positions.keys():
-				neighbor_nodes = [connection.to_key if connection.from_key == key else connection.from_key for connection in connections.values() if connection.to_key == key or connection.from_key == key]
+				neighbor_nodes = [connection.to_key if connection.from_key == key else connection.from_key for connection in connections.values() if (connection.to_key == key or connection.from_key == key) and connection.from_key != connection.to_key]
 				x = sum([self.node_positions[node_key][0] for node_key in neighbor_nodes]) / len(neighbor_nodes)
 				y = sum([self.node_positions[node_key][1] for node_key in neighbor_nodes]) / len(neighbor_nodes)
 
@@ -54,7 +59,7 @@ class Interface:
 
 def verbose(i, population, best_fitness, avg_fitness):
 	print('Generation: {:d}, num_individuals: {:d}, best_score: {:.2f}, avg_score: {:.2f}'.format(i, len(population.individuals), best_fitness, avg_fitness))
-	print('Num organisms with more than default number of connections: {:d}'.format(sum([len(individual.connections.values()) > config.starting_num_connections for individual in population.individuals])))
+	print('Num organisms with more than default number of connections: {:d}'.format(sum([len(individual.connections.values()) > config.num_starting_connections for individual in population.individuals])))
 	for j, spec in enumerate(population.species):
 		print('\tSpecies: {:d}'.format(j))
 		print('\t\tfitness: {:.2f}'.format(spec.fitness))

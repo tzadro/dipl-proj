@@ -1,9 +1,9 @@
 from Config import config
-from Node import Node
 from Connection import Connection
 from Neuron import Neuron
 from Phenotype import Phenotype
 from Individual import Individual
+from Interface import Interface
 import helperfunctions
 import numpy as np
 
@@ -118,6 +118,24 @@ def test_neuron():
 	print('Neuron test:', round(res1, 2) == 0.56 and round(res2, 2) == 0.57)
 
 
+def test_interface():
+	config.input_keys = [0, 1]
+	config.output_keys = [2, 3]
+
+	connections = {
+		0: Connection(0, 0, 4, 0.2, True),
+		1: Connection(1, 1, 4, 0.3, True),
+		2: Connection(2, 4, 2, 0.4, True),
+		3: Connection(3, 4, 3, 0.5, True),
+		4: Connection(4, 4, 4, 0.3, True)
+	}
+	nodes = set([0, 1, 2, 3, 4])
+
+	interface = Interface()
+	interface.update_node_positions(connections, nodes)
+	interface.visualize_network(connections)
+
+
 def run():
 	connections1 = {
 		0: Connection(0, 0, 6, 0.2, True),
@@ -137,17 +155,7 @@ def run():
 		14: Connection(14, 8, 3, 0.3, True),
 		15: Connection(15, 8, 5, 0.8, False)
 	}
-	nodes1 = {
-		0: Node(0),
-		1: Node(1),
-		2: Node(2),
-		3: Node(3),
-		4: Node(4),
-		5: Node(5),
-		6: Node(6),
-		7: Node(7),
-		8: Node(8)
-	}
+	nodes1 = set([0, 1, 2, 3, 4, 5, 6, 7, 8])
 	individual1 = Individual(connections1, nodes1)
 
 	connections2 = {
@@ -166,16 +174,7 @@ def run():
 		16: Connection(16, 1, 4, 0.5, True),
 		17: Connection(17, 2, 4, 0.8, True)
 	}
-	nodes2 = {
-		0: Node(0),
-		1: Node(1),
-		2: Node(2),
-		3: Node(3),
-		4: Node(4),
-		5: Node(5),
-		6: Node(6),
-		8: Node(8)
-	}
+	nodes2 = set([0, 1, 2, 3, 4, 5, 6, 8])
 	individual2 = Individual(connections2, nodes2)
 
 	test_sigmoid()
@@ -185,6 +184,7 @@ def run():
 	test_innovation_numbers_union(connections1, connections2)
 	test_neuron()
 	test_phenotype(connections1)
+	test_interface()
 
 
 run()

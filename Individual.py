@@ -1,34 +1,28 @@
 from Config import config
 from Connection import Connection
-from Node import Node
 from Phenotype import Phenotype
 import helperfunctions
 import copy
 import random
 
 
-class Individual:  # Genome
+class Individual:
 	def __init__(self, connections=None, nodes=None):
-		self.nodes = {}
+		self.nodes = set()
 		self.connections = {}
 		self.fitness = None
 		self.adjusted_fitness = None
 
-		if connections is None or nodes is None:
-			self.configure_new()
-		else:
+		if connections and nodes:
 			self.connections = connections
 			self.nodes = nodes
+		else:
+			self.configure_new()
 
 	def configure_new(self):
-		next_node_key = 0
+		self.nodes.update(range(config.num_starting_nodes))
+
 		next_innovation_number = 0
-
-		num_starting_nodes = len(config.input_keys) + len(config.output_keys)
-		for _ in range(num_starting_nodes):
-			self.nodes[next_node_key] = Node(next_node_key)
-			next_node_key += 1
-
 		if config.num_starting_hidden_nodes == 0:
 			for input_key in config.input_keys:
 				for output_key in config.output_keys:
@@ -36,18 +30,16 @@ class Individual:  # Genome
 					self.connections[next_innovation_number] = new_connection
 					next_innovation_number += 1
 		else:
-			for _ in range(config.num_starting_hidden_nodes):
-				hidden_node = Node(next_node_key)
-				self.nodes[next_node_key] = hidden_node
-				next_node_key += 1
+			for hidden_node_key in range(config.num_starting_nodes - config.num_starting_hidden_nodes, config.num_starting_nodes):
+				self.nodes.add(hidden_node_key)
 
 				for input_key in config.input_keys:
-					new_connection = Connection(next_innovation_number, input_key, hidden_node.key, random.gauss(config.new_mu, config.new_sigma), True)
+					new_connection = Connection(next_innovation_number, input_key, hidden_node_key, random.gauss(config.new_mu, config.new_sigma), True)
 					self.connections[next_innovation_number] = new_connection
 					next_innovation_number += 1
 
 				for output_key in config.output_keys:
-					new_connection = Connection(next_innovation_number, hidden_node.key, output_key, random.gauss(config.new_mu, config.new_sigma), True)
+					new_connection = Connection(next_innovation_number, hidden_node_key, output_key, random.gauss(config.new_mu, config.new_sigma), True)
 					self.connections[next_innovation_number] = new_connection
 					next_innovation_number += 1
 
@@ -97,7 +89,7 @@ class Individual:  # Genome
 				connection.weight = random.random() * 2 - 1
 
 	def new_connection(self, generation_new_connections):
-		nodes_list = list(self.nodes.values())
+		nodes_list = list(self.nodes)
 		num_nodes = len(nodes_list)
 		num_connections = len(self.connections.values())
 		num_inputs = len(config.input_keys)
@@ -107,19 +99,19 @@ class Individual:  # Genome
 			return
 
 		while True:
-			node1 = nodes_list[random.randrange(num_inputs + num_outputs, num_nodes)]
-			node2 = nodes_list[random.randrange(num_nodes)]
+			node1_key = random.choice(nodes_list[num_inputs + num_outputs:])
+			node2_key = random.choice(nodes_list)
 
-			existing_connections = [c for c in self.connections.values() if c.from_key == node1.key and c.to_key == node2.key or c.from_key == node2.key and c.to_key == node1.key]
+			existing_connections = [c for c in self.connections.values() if c.from_key == node1_key and c.to_key == node2_key or c.from_key == node2_key and c.to_key == node1_key]
 			if existing_connections:
 				continue
 
-			if node2.key in config.input_keys or helperfunctions.check_if_path_exists(node2.key, node1.key, self.connections) or (node2.key, node1.key) in generation_new_connections:
-				temp = node1
-				node1 = node2
-				node2 = temp
+			if node2_key in config.input_keys or helperfunctions.check_if_path_exists(node2_key, node1_key, self.connections) or (node2_key, node1_key) in generation_new_connections:
+				temp = node1_key
+				node1_key = node2_key
+				node2_key = temp
 
-			key_pair = (node1.key, node2.key)
+			key_pair = (node1_key, node2_key)
 			if key_pair in generation_new_connections:
 				innovation_number = generation_new_connections[key_pair]
 			else:
@@ -127,7 +119,7 @@ class Individual:  # Genome
 				generation_new_connections[key_pair] = innovation_number
 				config.innovation_number += 1
 
-			new_connection = Connection(innovation_number, node1.key, node2.key, random.random() * 2 - 1, True)
+			new_connection = Connection(innovation_number, node1_key, node2_key, random.random() * 2 - 1, True)
 			self.connections[innovation_number] = new_connection
 			return
 
@@ -139,27 +131,30 @@ class Individual:  # Genome
 
 		key_pair = (connection.from_key, connection.to_key)
 		if key_pair in generation_new_nodes:
-			new_node = Node(generation_new_nodes[key_pair])
+			new_node_key = generation_new_nodes[key_pair]
 
-			innovation_number1 = generation_new_connections[(connection.from_key, new_node.key)]
-			new_connection1 = Connection(innovation_number1, connection.from_key, new_node.key, 1.0, True)
+			self.nodes.add(new_node_key)
+
+			innovation_number1 = generation_new_connections[(connection.from_key, new_node_key)]
+			new_connection1 = Connection(innovation_number1, connection.from_key, new_node_key, 1.0, True)
 			self.connections[innovation_number1] = new_connection1
 
-			innovation_number2 = generation_new_connections[(new_node.key, connection.to_key)]
-			new_connection2 = Connection(innovation_number2, new_node.key, connection.to_key, connection.weight, True)
+			innovation_number2 = generation_new_connections[(new_node_key, connection.to_key)]
+			new_connection2 = Connection(innovation_number2, new_node_key, connection.to_key, connection.weight, True)
 			self.connections[innovation_number2] = new_connection2
 		else:
-			new_node = Node(config.next_node_key)
-			generation_new_nodes[key_pair] = new_node.key
+			new_node_key = config.next_node_key
 			config.next_node_key += 1
-			self.nodes[new_node.key] = new_node
 
-			new_connection1 = Connection(config.innovation_number, connection.from_key, new_node.key, 1.0, True)
+			generation_new_nodes[key_pair] = new_node_key
+			self.nodes.add(new_node_key)
+
+			new_connection1 = Connection(config.innovation_number, connection.from_key, new_node_key, 1.0, True)
 			self.connections[config.innovation_number] = new_connection1
 			generation_new_connections[(new_connection1.from_key, new_connection1.to_key)] = new_connection1.innovation_number
 			config.innovation_number += 1
 
-			new_connection2 = Connection(config.innovation_number, new_node.key, connection.to_key, connection.weight, True)
+			new_connection2 = Connection(config.innovation_number, new_node_key, connection.to_key, connection.weight, True)
 			self.connections[config.innovation_number] = new_connection2
 			generation_new_connections[(new_connection2.from_key, new_connection2.to_key)] = new_connection2.innovation_number
 			config.innovation_number += 1
@@ -171,7 +166,7 @@ def crossover(parents):
 	all_innovation_numbers = helperfunctions.innovation_numbers_union(fitter_parent.connections, other_parent.connections)
 
 	child_connections = {}
-	child_nodes = {}
+	child_nodes = set()
 
 	for innovation_number in all_innovation_numbers:
 		if innovation_number in fitter_parent.connections and innovation_number in other_parent.connections:
@@ -190,7 +185,7 @@ def crossover(parents):
 
 			for node_key in [new_connection.from_key, new_connection.to_key]:
 				if node_key not in child_nodes:
-					child_nodes[node_key] = Node(node_key)
+					child_nodes.add(node_key)
 
 		elif innovation_number in fitter_parent.connections and innovation_number not in other_parent.connections:
 			connection = fitter_parent.connections[innovation_number]
@@ -204,7 +199,7 @@ def crossover(parents):
 
 			for node_key in [new_connection.from_key, new_connection.to_key]:
 				if node_key not in child_nodes:
-					child_nodes[node_key] = Node(node_key)
+					child_nodes.add(node_key)
 
 	child = Individual(child_connections, child_nodes)
 

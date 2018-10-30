@@ -17,7 +17,7 @@ def check_if_path_exists(from_node, to_node, connections, checked=None):
 	if from_node == to_node:
 		return True
 
-	if checked is None:
+	if not checked:
 		checked = {}
 
 	for connection in connections.values():
@@ -44,7 +44,7 @@ def check_if_path_exists2(from_key, to_key, neurons, checked=None):
 	if from_key == to_key:
 		return True
 
-	if checked is None:
+	if not checked:
 		checked = {}
 
 	if to_key in neurons[from_key].outgoing_keys:

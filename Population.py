@@ -19,7 +19,7 @@ class Population:
 		for individual in self.individuals:
 			avg_fitness += individual.evaluate_fitness(env)
 
-			if best_individual is None or individual.fitness > best_individual.fitness:
+			if not best_individual or individual.fitness > best_individual.fitness:
 				best_individual = individual
 
 		if visualize and config.visualize_best_networks:
