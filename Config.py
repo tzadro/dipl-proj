@@ -7,12 +7,13 @@ class Config:
 		self.step = 0.25
 		self.c1 = 1.0
 		self.c2 = 1.0
-		self.c3 = 1.0
+		self.c3 = 0.4
+		self.normalize = True
 		self.compatibility_threshold = 2.0
 		self.crossover_probability = 0.75
 		self.stay_disabled_probability = 0.75
-		self.pop_size = 50
-		self.num_iter = 201
+		self.pop_size = 500
+		self.num_iter = 101
 		self.survival_threshold = 0.9
 		self.new_mu = 0
 		self.new_sigma = 1.0
@@ -20,14 +21,14 @@ class Config:
 		self.step_sigma = 0.75
 		self.min_num_individuals_for_elitism = 5
 		self.max_num_generations_before_improvement = 30
-		self.num_evaluation_runs = 3
+		self.num_evaluation_runs = 1
 
 		self.num_starting_hidden_nodes = 0
 		self.fixed_topology = False
 
 		self.visualize_best_networks = True
 		self.visualize_every = 100
-		self.verbose = False
+		self.verbose = True
 		self.network_canvas_height = 100
 		self.network_canvas_width = 100
 

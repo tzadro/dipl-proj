@@ -1,5 +1,6 @@
 import gym
 import ple
+import math
 import numpy as np
 
 
@@ -27,7 +28,7 @@ class CartPole:
 
 class Pixelcopter:
 	def __init__(self):
-		self.game = ple.games.pixelcopter.Pixelcopter()
+		self.game = ple.games.pixelcopter.Pixelcopter(width=148, height=148)
 		self.env = ple.PLE(self.game, fps=60, display_screen=True, force_fps=True)
 		self.env.init()
 
@@ -38,6 +39,11 @@ class Pixelcopter:
 		self.action_space_low = None
 
 		self.action_set = self.env.getActionSet()
+
+		self.avg_observations = np.array([0., 0., 0., 0., 0., 0., 0.])
+		self.min_observations = np.array([math.inf, math.inf, math.inf, math.inf, math.inf, math.inf, math.inf])
+		self.max_observations = np.array([-math.inf, -math.inf, -math.inf, -math.inf, -math.inf, -math.inf, -math.inf])
+		self.num_runs = 0
 
 	def reset(self):
 		self.env.reset_game()
@@ -50,11 +56,19 @@ class Pixelcopter:
 
 		reward = self.env.act(action)
 		observation = self.game.getGameState().values()
+		for i, value in enumerate(observation):
+			self.avg_observations[i] += value
+			self.min_observations[i] = min(value, self.min_observations[i])
+			self.max_observations[i] = max(value, self.max_observations[i])
+		self.num_runs += 1
 		done = self.env.game_over()
 		info = None
 		return observation, reward, done, info
 
 	def close(self):
+		self.avg_observations /= self.num_runs
+		for i, key in enumerate(list(self.game.getGameState().keys())):
+			print('avg_value: {:.2f}, \tmin_value: {:.2f}, \tmax_value: {:.2f}, \tkey: '.format(self.avg_observations[i], self.min_observations[i], self.max_observations[i]) + key)
 		return
 
 

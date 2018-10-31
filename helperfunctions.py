@@ -59,40 +59,30 @@ def check_if_path_exists2(from_key, to_key, neurons, checked=None):
 	return False
 
 
-# todo: are disabled genes included?
-def distance(individual1, individual2):
+def distance(individual1, individual2):  # todo: are disabled genes included?
 	connections1 = individual1.connections
 	connections2 = individual2.connections
 
-	max_innovation1 = max(individual1.connections.keys())
-	max_innovation2 = max(individual2.connections.keys())
-	max_common = min(max_innovation1, max_innovation2)
+	max_innovation_number1 = max(individual1.connections.keys())
+	max_innovation_number2 = max(individual2.connections.keys())
+	max_common_innovation_number = min(max_innovation_number1, max_innovation_number2)
 
-	innovation_numbers = innovation_numbers_union(connections1, connections2)
+	all_innovation_numbers = set(connections1.keys()).union(set(connections2.keys()))
 
 	weight_diffs = []
 	E = 0
 	D = 0
-	N = max(len(connections1), len(connections2))
+	N = max(len(connections1), len(connections2)) if config.normalize else 1
 
-	for innovation_number in innovation_numbers:
+	for innovation_number in all_innovation_numbers:
 		if innovation_number in connections1 and innovation_number in connections2:
 			weight_diff = abs(connections1[innovation_number].weight - connections2[innovation_number].weight)
 			weight_diffs.append(weight_diff)
 		else:
-			if innovation_number > max_common:
+			if innovation_number > max_common_innovation_number:
 				E = E + 1
 			else:
 				D = D + 1
 
 	delta = (config.c1 * E) / N + (config.c2 * D) / N + config.c3 * sum(weight_diffs) / len(weight_diffs)
 	return delta
-
-
-def innovation_numbers_union(connections1, connections2):
-	innovation_numbers1 = [connection.innovation_number for connection in connections1.values()]
-	innovation_numbers2 = [connection.innovation_number for connection in connections2.values()]
-
-	innovation_numbers = set().union(innovation_numbers1).union(innovation_numbers2)
-	return innovation_numbers
-

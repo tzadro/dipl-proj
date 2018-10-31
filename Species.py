@@ -30,8 +30,7 @@ class Species:
 		else:
 			self.num_generations_before_last_improvement += 1
 
-	# from best to worst
-	def sort(self):
+	def sort(self):  # from best to worst
 		def key(element):
 			return -element.adjusted_fitness
 
@@ -55,8 +54,8 @@ class Species:
 		self.individuals = self.individuals[:n]
 
 	def clear(self):
-		# todo: set random individual as representative?
-		self.representative = copy.deepcopy(self.individuals[0])
+		random_individual = random.choice(self.individuals)
+		self.representative = copy.deepcopy(random_individual)
 		self.individuals = []
 		self.fitness = None
 		self.num_children = None

@@ -49,18 +49,6 @@ def test_distance(individual1, individual2):
 	print('Distance test:', round(res, 2) == 2.3)
 
 
-def test_innovation_numbers_union(connections1, connections2):
-	union = helperfunctions.innovation_numbers_union(connections1, connections2)
-
-	res = True
-	for innovation_number in range(18):
-		if innovation_number not in union:
-			res = False
-			break
-
-	print('Innovation_numbers_union test:', res)
-
-
 def test_phenotype(connections):
 	config.input_keys = [0, 1, 2]
 	config.output_keys = [3, 4]
@@ -181,7 +169,6 @@ def run():
 	test_check_if_path_exists(connections1)
 	test_check_if_path_exists2(connections1)
 	test_distance(individual1, individual2)
-	test_innovation_numbers_union(connections1, connections2)
 	test_neuron()
 	test_phenotype(connections1)
 	test_interface()

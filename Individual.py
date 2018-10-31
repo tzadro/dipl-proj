@@ -163,7 +163,7 @@ class Individual:
 # todo: move somewhere?
 def crossover(parents):
 	fitter_parent, other_parent = (parents[0], parents[1]) if parents[0].adjusted_fitness > parents[1].adjusted_fitness else (parents[1], parents[0])
-	all_innovation_numbers = helperfunctions.innovation_numbers_union(fitter_parent.connections, other_parent.connections)
+	all_innovation_numbers = set(fitter_parent.connections.keys()).union(set(other_parent.connections.keys()))
 
 	child_connections = {}
 	child_nodes = set()
