@@ -37,10 +37,10 @@ class Species:
 		self.individuals.sort(key=key)
 
 	def breed_child(self, generation_new_nodes, generation_new_connections):
-		if random.random() < config.crossover_probability and len(self.individuals) > 1:
-			child = crossover(self.select(2))
-		else:
+		if len(self.individuals) == 1 or random.random() < config.skip_crossover_probability:
 			child = copy.deepcopy(self.select())
+		else:
+			child = crossover(self.select(2))
 
 		child.mutate(generation_new_nodes, generation_new_connections)
 		return child
