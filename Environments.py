@@ -28,7 +28,7 @@ class CartPole:
 
 class Pixelcopter:
 	def __init__(self):
-		self.game = ple.games.pixelcopter.Pixelcopter(width=148, height=148)
+		self.game = ple.games.pixelcopter.Pixelcopter(width=144, height=144)
 		self.env = ple.PLE(self.game, fps=60, display_screen=True, force_fps=True)
 		self.env.init()
 

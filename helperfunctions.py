@@ -4,7 +4,7 @@ import math
 
 def sigmoid(x):
 	try:
-		return 1 / (1 + math.exp(-x))
+		return 1 / (1 + math.exp(-config.sigmoid_coef * x))
 	except OverflowError:
 		return 0
 
