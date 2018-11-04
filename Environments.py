@@ -72,6 +72,47 @@ class Pixelcopter:
 		return
 
 
+class XORProblem:
+	def __init__(self):
+		self.observations = [[0., 0., 1.],
+							 [0., 1., 1.],
+							 [1., 0., 1.],
+							 [1., 1., 1.]]
+		self.solutions = [0., 1., 1., 0.]
+		self.progress = None
+		self.error_sum = None
+
+		self.num_inputs = 3
+		self.num_outputs = 1
+		self.action_space_discrete = False
+		self.action_space_high = np.array([1.])
+		self.action_space_low = np.array([0.])
+
+	def reset(self):
+		self.progress = 0
+		self.error_sum = 0
+		return self.observations[self.progress]
+
+	def step(self, output, _):
+		self.error_sum += abs(self.solutions[self.progress] - output[0])
+
+		if self.progress == 3:
+			reward = (4 - self.error_sum)**2
+			observation = None
+			done = True
+		else:
+			self.progress += 1
+			reward = 0
+			observation = self.observations[self.progress]
+			done = False
+
+		info = None
+		return observation, reward, done, info
+
+	def close(self):
+		return
+
+
 class TestEnvironment:
 	def __init__(self):
 		self.observation = [1., 1., 1., 1.]

@@ -10,14 +10,20 @@ class Interface:
 		num_inputs = len(config.input_keys)
 		for i, key in enumerate(config.input_keys):
 			x = 0
-			y = (num_inputs - (i + 1)) * config.network_canvas_height / (num_inputs - 1)
+			if num_inputs == 1:
+				y = config.network_canvas_height / 2.
+			else:
+				y = (num_inputs - (i + 1)) * config.network_canvas_height / (num_inputs - 1)
 
 			self.node_positions[key] = (x, y)
 
 		num_outputs = len(config.output_keys)
 		for i, key in enumerate(config.output_keys):
 			x = config.network_canvas_width
-			y = (num_outputs - (i + 1)) * config.network_canvas_height / (num_outputs - 1)
+			if num_outputs == 1:
+				y = config.network_canvas_height / 2.
+			else:
+				y = (num_outputs - (i + 1)) * config.network_canvas_height / (num_outputs - 1)
 
 			self.node_positions[key] = (x, y)
 
@@ -25,7 +31,10 @@ class Interface:
 		hidden_keys = range(hidden_start_key, hidden_start_key + config.num_starting_hidden_nodes)
 		for i, key in enumerate(hidden_keys):
 			x = config.network_canvas_width / 2
-			y = (config.num_starting_hidden_nodes - (i + 1)) * config.network_canvas_height / (config.num_starting_hidden_nodes - 1)
+			if config.num_starting_hidden_nodes == 1:
+				y = config.num_starting_hidden_nodes / 2.
+			else:
+				y = (config.num_starting_hidden_nodes - (i + 1)) * config.network_canvas_height / (config.num_starting_hidden_nodes - 1)
 
 			self.node_positions[key] = (x, y)
 

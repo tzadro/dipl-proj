@@ -49,7 +49,7 @@ class Individual:
 
 		runs = []
 		for _ in range(config.num_evaluation_runs):
-			fitness = 6  # todo: should be 0, set this way so the score is never less than 0 in Pixelcopter game (minimum is -5)
+			fitness = 0  # todo: should be 0, set to 6 so the score is never less than 0 in Pixelcopter game (minimum is -5)
 
 			observation = env.reset()
 			while True:

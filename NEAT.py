@@ -5,7 +5,7 @@ from Population import Population
 import Environments
 import Interface
 
-env = Environments.Pixelcopter()
+env = Environments.XORProblem()
 config.update(env.num_inputs, env.num_outputs, env.action_space_discrete, env.action_space_high, env.action_space_low)
 
 best_fitnesses = []

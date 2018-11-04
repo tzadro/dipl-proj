@@ -1,36 +1,36 @@
 class Config:
 	def __init__(self):
-		self.pop_size = 200
+		self.pop_size = 150
 		self.c1 = 1.0
 		self.c2 = 1.0
 		self.c3 = 0.4
-		self.compatibility_threshold = 2.0
-		self.max_num_generations_before_improvement = 30
+		self.compatibility_threshold = 3.0
+		self.max_num_generations_before_improvement = 15
 		self.min_num_individuals_for_elitism = 5
 		self.connection_mutation_probability = 0.5
 		self.perturbation_probability = 0.9
 		self.stay_disabled_probability = 0.75
 		self.skip_crossover_probability = 0.25
-		self.new_node_probability = 0.003
-		self.new_connection_probability = 0.005
-		self.sigmoid_coef = 1.0
+		self.new_node_probability = 0.03
+		self.new_connection_probability = 0.05
+		self.sigmoid_coef = 4.9
 
-		self.num_iter = 501
-		self.step = 0.25
+		self.num_iter = 101
 		self.survival_threshold = 0.9
 		self.new_mu = 0.0
 		self.new_sigma = 1.0
+		self.step = 0.25
 		self.step_mu = 0.0
 		self.step_sigma = 0.75
 		self.num_evaluation_runs = 1
-		self.normalize = True
+		self.normalize = False
 
-		self.num_starting_hidden_nodes = 8
-		self.fixed_topology = True
+		self.num_starting_hidden_nodes = 0
+		self.fixed_topology = False
 
 		self.network_canvas_height = 100
 		self.network_canvas_width = 100
-		self.visualize_every = 100
+		self.visualize_every = 10
 		self.visualize_best_networks = True
 		self.verbose = True
 
