@@ -34,6 +34,11 @@ class Phenotype:  # Neural network
 
 		# todo: should phenotype convert output?
 
+		# avoids cases when individual has all connections to one of output nodes disabled
+		for key in config.output_keys:
+			if key not in self.neurons:
+				return None
+
 		if not config.action_space_discrete:
 			output = [self.neurons[key].value for key in config.output_keys]
 			return output * (abs(config.action_space_high) + abs(config.action_space_low)) + config.action_space_low

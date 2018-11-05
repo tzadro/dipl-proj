@@ -7,7 +7,7 @@ class Config:
 		self.compatibility_threshold = 3.0
 		self.max_num_generations_before_improvement = 15
 		self.min_num_individuals_for_elitism = 5
-		self.connection_mutation_probability = 0.5
+		self.connection_mutation_probability = 0.8
 		self.perturbation_probability = 0.9
 		self.stay_disabled_probability = 0.75
 		self.skip_crossover_probability = 0.25
