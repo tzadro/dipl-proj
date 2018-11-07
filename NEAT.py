@@ -20,14 +20,15 @@ for i in range(config.num_iter):
 	best_fitnesses.append(best_fitness)
 	avg_fitnesses.append(avg_fitness)
 
+	population.adjust_fitness()
+	population.assign_num_children()
+
 	if config.verbose:
 		Interface.verbose(i, population, best_fitness, avg_fitness)
 
 	if env.solved:
 		break
 
-	population.adjust_fitness()
-	population.assign_num_children()
 	population.remove_worst()
 	population.breed_new_generation()
 
