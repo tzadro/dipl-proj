@@ -31,6 +31,6 @@ for i in range(config.num_iter):
 	population.remove_worst()
 	population.breed_new_generation()
 
-Interface.plot_overall_fitness(config.num_iter, best_fitnesses, avg_fitnesses)
+Interface.plot_overall_fitness(best_fitnesses, avg_fitnesses)
 
 env.close()

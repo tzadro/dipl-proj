@@ -81,6 +81,8 @@ class XORProblem:
 							 [1., 0., 1.],
 							 [1., 1., 1.]]
 		self.solutions = [0., 1., 1., 0.]
+
+		self.outputs = None
 		self.progress = None
 		self.error_sum = None
 
@@ -92,18 +94,22 @@ class XORProblem:
 		self.action_space_low = np.array([0.])
 
 	def reset(self):
+		self.outputs = []
 		self.progress = 0
 		self.error_sum = 0
 		return self.observations[self.progress]
 
 	def step(self, output, _):
-		self.solved = [e > 0.5 for e in output] == self.solutions
+		self.outputs.append(output[0])
 		self.error_sum += abs(self.solutions[self.progress] - output[0])
 
 		if self.progress == 3:
 			reward = (4 - self.error_sum)**2
 			observation = None
 			done = True
+
+			correct = [e > 0.5 for e in self.outputs] == self.solutions
+			self.solved = self.solved or correct
 		else:
 			self.progress += 1
 			reward = 0

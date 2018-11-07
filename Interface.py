@@ -78,11 +78,11 @@ def verbose(i, population, best_fitness, avg_fitness):
 		print('\t\tbest_adjusted_fitness: {:.2f}, avg_adjusted_fitness: {:.2f}'.format(best_adjusted_fitness, avg_adjusted_fitness))
 
 
-def plot_overall_fitness(num_iter, best_fitnesses, avg_fitnesses):
-	generation_range = range(num_iter)
+def plot_overall_fitness(best_fitnesses, avg_fitnesses):
+	generations = range(len(best_fitnesses))
 
-	plt.plot(generation_range, best_fitnesses, color='red', label='Best score')
-	plt.plot(generation_range, avg_fitnesses, color='blue', label='Average score')
+	plt.plot(generations, best_fitnesses, color='red', label='Best score')
+	plt.plot(generations, avg_fitnesses, color='blue', label='Average score')
 	plt.title('Fitness over generations')
 	plt.xlabel('Generation')
 	plt.ylabel('Score')
