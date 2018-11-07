@@ -32,6 +32,7 @@ class Pixelcopter:
 		self.env = ple.PLE(self.game, fps=60, display_screen=True, force_fps=True)
 		self.env.init()
 
+		self.solved = False
 		self.num_inputs = 7
 		self.num_outputs = 2
 		self.action_space_discrete = True
@@ -40,6 +41,7 @@ class Pixelcopter:
 
 		self.action_set = self.env.getActionSet()
 
+		# todo: remove after implemented normalized inputs
 		self.avg_observations = np.array([0., 0., 0., 0., 0., 0., 0.])
 		self.min_observations = np.array([math.inf, math.inf, math.inf, math.inf, math.inf, math.inf, math.inf])
 		self.max_observations = np.array([-math.inf, -math.inf, -math.inf, -math.inf, -math.inf, -math.inf, -math.inf])
@@ -82,6 +84,7 @@ class XORProblem:
 		self.progress = None
 		self.error_sum = None
 
+		self.solved = False
 		self.num_inputs = 3
 		self.num_outputs = 1
 		self.action_space_discrete = False
@@ -94,6 +97,7 @@ class XORProblem:
 		return self.observations[self.progress]
 
 	def step(self, output, _):
+		self.solved = [e > 0.5 for e in output] == self.solutions
 		self.error_sum += abs(self.solutions[self.progress] - output[0])
 
 		if self.progress == 3:
@@ -117,6 +121,7 @@ class TestEnvironment:
 	def __init__(self):
 		self.observation = [1., 1., 1., 1.]
 
+		self.solved = False
 		self.num_inputs = 4
 		self.num_outputs = 4
 		self.action_space_discrete = False

@@ -4,6 +4,7 @@ from Species import Species
 from Interface import Interface
 import helperfunctions
 import math
+import copy
 
 
 class Population:
@@ -77,7 +78,7 @@ class Population:
 
 		for spec in self.species:
 			if len(spec.individuals) > config.min_num_individuals_for_elitism:
-				children += [spec.individuals[0]]
+				children += [copy.deepcopy(spec.individuals[0])]
 				spec.num_children -= 1
 
 			children += [spec.breed_child(generation_new_nodes, generation_new_connections) for _ in range(spec.num_children)]

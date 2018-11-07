@@ -6,7 +6,7 @@ class Config:
 		self.c3 = 0.4
 		self.compatibility_threshold = 3.0
 		self.max_num_generations_before_improvement = 15
-		self.min_num_individuals_for_elitism = 5
+		self.min_num_individuals_for_elitism = 1  # 5
 		self.connection_mutation_probability = 0.8
 		self.perturbation_probability = 0.9
 		self.stay_disabled_probability = 0.75
@@ -16,12 +16,11 @@ class Config:
 		self.sigmoid_coef = 4.9
 
 		self.num_iter = 101
-		self.survival_threshold = 0.9
+		self.survival_threshold = 0.2
 		self.new_mu = 0.0
 		self.new_sigma = 1.0
-		self.step = 0.25
 		self.step_mu = 0.0
-		self.step_sigma = 0.75
+		self.step_sigma = 1.0
 		self.num_evaluation_runs = 1
 		self.normalize = False
 
@@ -32,7 +31,7 @@ class Config:
 		self.network_canvas_width = 100
 		self.visualize_every = 10
 		self.visualize_best_networks = True
-		self.verbose = True
+		self.verbose = False
 
 		self.num_starting_nodes = None
 		self.next_node_key = None
