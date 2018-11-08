@@ -1,37 +1,47 @@
-# todo: add interspecies mating probability;
-
 from Config import config
 from Population import Population
-import Environments
 import Interface
 
-env = Environments.XORProblem()
-config.update(env.num_inputs, env.num_outputs, env.action_space_discrete, env.action_space_high, env.action_space_low)
 
-best_fitnesses = []
-avg_fitnesses = []
+class NEAT:
+	def __init__(self, env):
+		self.env = env
+		self.env.evaluations = 0
+		self.env.solved = False
 
-population = Population()
-for i in range(config.num_iter):
-	population.speciate()
+		self.best_fitnesses = []
+		self.avg_fitnesses = []
 
-	visualize = i % config.visualize_every == 0
-	best_fitness, avg_fitness = population.evaluate_fitness(env, visualize)
-	best_fitnesses.append(best_fitness)
-	avg_fitnesses.append(avg_fitness)
+		self.population = Population()
 
-	population.adjust_fitness()
-	population.assign_num_children()
+	def run(self):
+		for i in range(config.num_iter):
+			self.population.speciate()
 
-	if config.verbose:
-		Interface.verbose(i, population, best_fitness, avg_fitness)
+			visualize = i % config.visualize_every == 0
+			best_fitness, avg_fitness = self.population.evaluate_fitness(self.env, visualize)
+			self.best_fitnesses.append(best_fitness)
+			self.avg_fitnesses.append(avg_fitness)
 
-	if env.solved:
-		break
+			self.population.adjust_fitness()
+			self.population.assign_num_children()
 
-	population.remove_worst()
-	population.breed_new_generation()
+			if config.verbose:
+				Interface.verbose(i, self.population, best_fitness, avg_fitness)
 
-Interface.plot_overall_fitness(best_fitnesses, avg_fitnesses)
+			if self.env.solved:
+				return self.env.evaluations
 
-env.close()
+			self.population.remove_worst()
+			self.population.breed_new_generation()
+
+		return None
+
+	def reset(self):
+		self.env.evaluations = 0
+		self.env.solved = False
+
+		self.best_fitnesses = []
+		self.avg_fitnesses = []
+
+		self.population = Population()

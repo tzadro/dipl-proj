@@ -9,6 +9,8 @@ class CartPole:
 		env_name = 'CartPole-v0'
 		self.env = gym.make(env_name)
 
+		self.solved = False
+		self.evaluations = 0
 		self.num_inputs = self.env.observation_space.shape[0]
 		self.num_outputs = self.env.action_space.n
 		self.action_space_discrete = True
@@ -16,6 +18,7 @@ class CartPole:
 		self.action_space_low = None
 
 	def reset(self):
+		self.evaluations += 1
 		return self.env.reset()
 
 	def step(self, action):
@@ -33,6 +36,7 @@ class Pixelcopter:
 		self.env.init()
 
 		self.solved = False
+		self.evaluations = 0
 		self.num_inputs = 7
 		self.num_outputs = 2
 		self.action_space_discrete = True
@@ -49,6 +53,7 @@ class Pixelcopter:
 
 	def reset(self):
 		self.env.reset_game()
+		self.evaluations += 1
 
 		observation = self.game.getGameState().values()
 		return observation
@@ -87,6 +92,7 @@ class XORProblem:
 		self.error_sum = None
 
 		self.solved = False
+		self.evaluations = 0
 		self.num_inputs = 3
 		self.num_outputs = 1
 		self.action_space_discrete = False
@@ -97,6 +103,7 @@ class XORProblem:
 		self.outputs = []
 		self.progress = 0
 		self.error_sum = 0
+		self.evaluations += 1
 		return self.observations[self.progress]
 
 	def step(self, output, _):
@@ -109,7 +116,8 @@ class XORProblem:
 			done = True
 
 			correct = [e > 0.5 for e in self.outputs] == self.solutions
-			self.solved = self.solved or correct
+			if correct:
+				self.solved = True
 		else:
 			self.progress += 1
 			reward = 0
@@ -128,6 +136,7 @@ class TestEnvironment:
 		self.observation = [1., 1., 1., 1.]
 
 		self.solved = False
+		self.evaluations = 0
 		self.num_inputs = 4
 		self.num_outputs = 4
 		self.action_space_discrete = False
@@ -135,6 +144,7 @@ class TestEnvironment:
 		self.action_space_low = np.array([1., 1., 1., 1.])
 
 	def reset(self):
+		self.evaluations += 1
 		return self.observation
 
 	def step(self, _, weights):
