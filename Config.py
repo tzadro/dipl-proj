@@ -5,7 +5,8 @@ class Config:
 		self.c2 = 1.0
 		self.c3 = 0.4
 		self.compatibility_threshold = 3.0
-		self.max_num_generations_before_improvement = 15
+		self.max_num_generations_before_species_improvement = 15
+		self.max_num_generations_before_population_improvement = 20
 		self.min_num_individuals_for_elitism = 5
 		self.connection_mutation_probability = 0.8
 		self.perturbation_probability = 0.9
@@ -15,8 +16,8 @@ class Config:
 		self.new_connection_probability = 0.05
 		self.sigmoid_coef = 4.9
 
-		self.num_iter = 301
-		self.num_runs = 10
+		self.num_iter = 201
+		self.num_runs = 100
 		self.survival_threshold = 0.2
 		self.new_mu = 0.0
 		self.new_sigma = 1.0

@@ -13,7 +13,9 @@ algorithm = NEAT(env)
 
 num_evaluations = []
 for run in range(config.num_runs):
-	num_evaluations.append(algorithm.run())
+	num_evals = algorithm.run()
+	if num_evals:
+		num_evaluations.append(num_evals)
 	Interface.plot_overall_fitness(algorithm.best_fitnesses, algorithm.avg_fitnesses)
 	algorithm.reset()
 

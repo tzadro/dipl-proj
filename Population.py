@@ -11,6 +11,8 @@ class Population:
 	def __init__(self):
 		self.individuals = [Individual() for _ in range(config.pop_size)]
 		self.species = []
+		self.max_fitness = -math.inf
+		self.num_generations_before_last_improvement = None
 		self.interface = Interface()
 
 	def evaluate_fitness(self, env, visualize):
@@ -53,7 +55,26 @@ class Population:
 			spec.sort()
 
 		if len(self.species) > 1:
-			self.species = [spec for spec in self.species if spec.num_generations_before_last_improvement <= config.max_num_generations_before_improvement]
+			self.species = [spec for spec in self.species if spec.num_generations_before_last_improvement <= config.max_num_generations_before_species_improvement]
+
+		self.sort()
+		if self.species[0].fitness > self.max_fitness:
+			self.max_fitness = self.species[0].fitness
+			self.num_generations_before_last_improvement = 0
+		else:
+			self.num_generations_before_last_improvement += 1
+
+			if self.num_generations_before_last_improvement > config.max_num_generations_before_population_improvement:
+				self.species = self.species[:2]
+
+				self.max_fitness = -math.inf
+				self.num_generations_before_last_improvement = 0
+
+	def sort(self):  # from best to worst
+		def key(element):
+			return -element.fitness
+
+		self.species.sort(key=key)
 
 	def assign_num_children(self):
 		sum_spec_fitness = sum([spec.fitness for spec in self.species])
