@@ -115,7 +115,7 @@ class XORProblem:
 			observation = None
 			done = True
 
-			correct = [e > 0.5 for e in self.outputs] == self.solutions
+			correct = [e >= 0.5 for e in self.outputs] == self.solutions
 			if correct:
 				self.solved = True
 		else:

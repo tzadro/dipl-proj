@@ -53,26 +53,27 @@ class Population:
 		for spec in self.species:
 			spec.adjust_fitness()
 			spec.sort()
+		self.sort()
 
 		if len(self.species) > 1:
-			self.species = [spec for spec in self.species if spec.num_generations_before_last_improvement <= config.max_num_generations_before_species_improvement]
+			self.species = [spec for spec in self.species if spec.num_generations_before_last_improvement <= config.max_num_generations_before_species_improvement or spec == self.species[0]]
 
-		self.sort()
-		if self.species[0].fitness > self.max_fitness:
-			self.max_fitness = self.species[0].fitness
-			self.num_generations_before_last_improvement = 0
-		else:
-			self.num_generations_before_last_improvement += 1
-
-			if self.num_generations_before_last_improvement > config.max_num_generations_before_population_improvement:
-				self.species = self.species[:2]
-
-				self.max_fitness = -math.inf
+		if len(self.species) > 2:
+			if self.species[0].individuals[0].fitness > self.max_fitness:
+				self.max_fitness = self.species[0].individuals[0].fitness
 				self.num_generations_before_last_improvement = 0
+			else:
+				self.num_generations_before_last_improvement += 1
+
+				if self.num_generations_before_last_improvement > config.max_num_generations_before_population_improvement:
+					self.species = self.species[:2]
+
+					self.max_fitness = -math.inf
+					self.num_generations_before_last_improvement = 0
 
 	def sort(self):  # from best to worst
 		def key(element):
-			return -element.fitness
+			return -element.individuals[0].fitness
 
 		self.species.sort(key=key)
 

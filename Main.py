@@ -22,6 +22,6 @@ for run in range(config.num_runs):
 if config.num_runs > 1:
 	avg_num_evaluations = sum(num_evaluations) / len(num_evaluations)
 	stdev_num_evaluations = statistics.stdev(num_evaluations)
-	print('Num iterations:\tavg: {:.2f},\tstdev: {:.2f}'.format(avg_num_evaluations, stdev_num_evaluations))
+	print('Num iterations:\tavg: {:.2f},\tstdev: {:.2f},\tfrom: {:d} runs'.format(avg_num_evaluations, stdev_num_evaluations, len(num_evaluations)))
 
 env.close()
