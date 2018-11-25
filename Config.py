@@ -23,7 +23,7 @@ class Config:
 		self.new_sigma = 1.0
 		self.step_mu = 0.0
 		self.step_sigma = 1.0
-		self.num_evaluation_runs = 1
+		self.num_evaluations = 1
 		self.normalize = False
 
 		self.num_starting_hidden_nodes = 0

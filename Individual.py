@@ -48,7 +48,7 @@ class Individual:
 		phenotype = Phenotype(self.connections)
 
 		runs = []
-		for _ in range(config.num_evaluation_runs):
+		for _ in range(config.num_evaluations):
 			# 0.001 so roulette wheel does not divide by zero
 			fitness = 0.001  # todo: should be 0, set to 6 so the score is never less than 0 in Pixelcopter game (minimum is -5)
 
