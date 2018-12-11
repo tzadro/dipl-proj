@@ -3,7 +3,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
-class Interface:
+class NetworkVisualizer:
 	def __init__(self):
 		self.node_positions = {}
 

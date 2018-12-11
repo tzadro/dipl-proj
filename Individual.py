@@ -47,29 +47,24 @@ class Individual:
 		weights = [connection.weight for connection in self.connections.values()]  # todo: remove after testing?
 		phenotype = Phenotype(self.connections)
 
-		runs = []
-		for _ in range(config.num_evaluations):
-			# 0.001 so roulette wheel does not divide by zero
-			fitness = 0.001  # todo: should be 0, set to 6 so the score is never less than 0 in Pixelcopter game (minimum is -5)
+		# 0.001 so roulette wheel does not divide by zero
+		fitness = 0.001  # todo: should be 0, set to 6 so the score is never less than 0 in Pixelcopter game (minimum is -5)
 
-			observation = env.reset()
-			while True:
-				output = phenotype.forward(observation)
+		observation = env.reset()
+		while True:
+			output = phenotype.forward(observation)
 
-				if not output:
-					runs.append(0.001)
-					break
+			if not output:
+				self.fitness = 0.001
+				return self.fitness
 
-				observation, reward, done, info = env.step(output, weights)
+			observation, reward, done, info = env.step(output, weights)
 
-				fitness += reward
+			fitness += reward
 
-				if done:
-					runs.append(fitness)
-					break
-
-		self.fitness = sum(runs) / len(runs)
-		return self.fitness
+			if done:
+				self.fitness = fitness
+				return self.fitness
 
 	def mutate(self, generation_new_nodes, generation_new_connections):
 		if random.random() < config.connection_mutation_probability:

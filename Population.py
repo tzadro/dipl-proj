@@ -1,7 +1,6 @@
 from Config import config
 from Individual import Individual
 from Species import Species
-from Interface import Interface
 import helperfunctions
 import math
 import copy
@@ -9,13 +8,13 @@ import copy
 
 class Population:
 	def __init__(self):
+		self.generation = 0
 		self.individuals = [Individual() for _ in range(config.pop_size)]
 		self.species = []
 		self.max_fitness = -math.inf
 		self.num_generations_before_last_improvement = None
-		self.interface = Interface()
 
-	def evaluate_fitness(self, env, visualize):
+	def evaluate_fitness(self, env):
 		best_individual = None
 		avg_fitness = 0
 
@@ -25,11 +24,8 @@ class Population:
 			if not best_individual or individual.fitness > best_individual.fitness:
 				best_individual = individual
 
-		if visualize and config.visualize_best_networks:
-			self.interface.visualize_network(best_individual.connections)
-
 		avg_fitness /= len(self.individuals)
-		return best_individual.fitness, avg_fitness
+		return best_individual, best_individual.fitness, avg_fitness
 
 	def speciate(self):
 		for individual in self.individuals:
@@ -108,6 +104,4 @@ class Population:
 			spec.clear()
 
 		self.individuals = children
-
-		for individual in self.individuals:
-			self.interface.update_node_positions(individual.connections, individual.nodes)
+		self.generation += 1

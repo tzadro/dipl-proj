@@ -16,14 +16,13 @@ class Config:
 		self.new_connection_probability = 0.05
 		self.sigmoid_coef = 4.9
 
-		self.num_iter = 201
+		self.num_iter = 101
 		self.num_runs = 100
 		self.survival_threshold = 0.2
 		self.new_mu = 0.0
 		self.new_sigma = 1.0
 		self.step_mu = 0.0
 		self.step_sigma = 1.0
-		self.num_evaluations = 1
 		self.normalize = False
 
 		self.num_starting_hidden_nodes = 0
@@ -31,8 +30,8 @@ class Config:
 
 		self.network_canvas_height = 100
 		self.network_canvas_width = 100
-		self.visualize_every = 10
-		self.visualize_best_networks = False
+		self.visualize_every = 20
+		self.visualize_best_networks = True
 		self.verbose = False
 
 		self.num_starting_nodes = None
