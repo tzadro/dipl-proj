@@ -8,7 +8,6 @@ import copy
 
 class Population:
 	def __init__(self):
-		self.generation = 0
 		self.individuals = [Individual() for _ in range(config.pop_size)]
 		self.species = []
 		self.max_fitness = -math.inf
@@ -53,22 +52,26 @@ class Population:
 		self.sort()
 
 		if len(self.species) > 1:
-			self.species = [spec for spec in self.species if spec.num_generations_before_last_improvement <= config.max_num_generations_before_species_improvement or spec == self.species[0]]
+			for spec in self.species[1:]:
+				if spec.num_generations_before_last_improvement <= config.max_num_generations_before_species_improvement:
+					self.species.remove(spec)
 
-		if len(self.species) > 2:
-			if self.species[0].individuals[0].fitness > self.max_fitness:
-				self.max_fitness = self.species[0].individuals[0].fitness
-				self.num_generations_before_last_improvement = 0
-			else:
-				self.num_generations_before_last_improvement += 1
+		# todo: do this but sort species by species fitness, not by best fitted individual in the species
+		if self.species[0].individuals[0].fitness > self.max_fitness:
+			self.max_fitness = self.species[0].individuals[0].fitness
+			self.num_generations_before_last_improvement = 0
+		else:
+			self.num_generations_before_last_improvement += 1
 
+			if len(self.species) > 2:
 				if self.num_generations_before_last_improvement > config.max_num_generations_before_population_improvement:
 					self.species = self.species[:2]
 
 					self.max_fitness = -math.inf
 					self.num_generations_before_last_improvement = 0
 
-	def sort(self):  # from best to worst
+	# from best to worst
+	def sort(self):
 		def key(element):
 			return -element.individuals[0].fitness
 
@@ -105,4 +108,3 @@ class Population:
 			spec.clear()
 
 		self.individuals = children
-		self.generation += 1

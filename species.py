@@ -20,8 +20,10 @@ class Species:
 
 	def adjust_fitness(self):
 		self.fitness = 0
+
+		num_individuals = len(self.individuals)
 		for individual in self.individuals:
-			individual.adjusted_fitness = individual.fitness / len(self.individuals)
+			individual.adjusted_fitness = individual.fitness / num_individuals
 			self.fitness += individual.adjusted_fitness
 
 		if self.fitness > self.max_fitness:
@@ -30,7 +32,8 @@ class Species:
 		else:
 			self.num_generations_before_last_improvement += 1
 
-	def sort(self):  # from best to worst
+	# from best to worst
+	def sort(self):
 		def key(element):
 			return -element.adjusted_fitness
 
@@ -46,9 +49,9 @@ class Species:
 		return child
 
 	def select(self, size=None, replace=False):
-		fitness_sum = sum([individual.fitness for individual in self.individuals])
-		p = [individual.fitness / fitness_sum for individual in self.individuals]
-		return np.random.choice(self.individuals, size, replace, p)
+		p = [individual.adjusted_fitness / self.fitness for individual in self.individuals]
+		individual = np.random.choice(self.individuals, size, replace, p)
+		return individual
 
 	def trim_to(self, n=1):
 		self.individuals = self.individuals[:n]

@@ -104,37 +104,40 @@ class Individual:
 		if key_pair in generation_new_nodes:
 			new_node_key = generation_new_nodes[key_pair]
 
-			self.nodes.add(new_node_key)
-
 			innovation_number1 = generation_new_connections[(connection.from_key, new_node_key)]
-			new_connection1 = Connection(innovation_number1, connection.from_key, new_node_key, 1.0, True)
-			self.connections[innovation_number1] = new_connection1
 
 			innovation_number2 = generation_new_connections[(new_node_key, connection.to_key)]
-			new_connection2 = Connection(innovation_number2, new_node_key, connection.to_key, connection.weight, True)
-			self.connections[innovation_number2] = new_connection2
 		else:
 			new_node_key = config.next_node_key
+			generation_new_nodes[key_pair] = new_node_key
 			config.next_node_key += 1
 
-			generation_new_nodes[key_pair] = new_node_key
-			self.nodes.add(new_node_key)
-
-			new_connection1 = Connection(config.innovation_number, connection.from_key, new_node_key, 1.0, True)
-			self.connections[config.innovation_number] = new_connection1
-			generation_new_connections[(new_connection1.from_key, new_connection1.to_key)] = new_connection1.innovation_number
+			innovation_number1 = config.innovation_number
+			generation_new_connections[(connection.from_key, new_node_key)] = innovation_number1
 			config.innovation_number += 1
 
-			new_connection2 = Connection(config.innovation_number, new_node_key, connection.to_key, connection.weight, True)
-			self.connections[config.innovation_number] = new_connection2
-			generation_new_connections[(new_connection2.from_key, new_connection2.to_key)] = new_connection2.innovation_number
+			innovation_number2 = config.innovation_number
+			generation_new_connections[(new_node_key, connection.to_key)] = innovation_number2
 			config.innovation_number += 1
 
+		self.nodes.add(new_node_key)
 
-# todo: move somewhere?
+		new_connection1 = Connection(innovation_number1, connection.from_key, new_node_key, 1.0, True)
+		self.connections[innovation_number1] = new_connection1
+
+		new_connection2 = Connection(innovation_number2, new_node_key, connection.to_key, connection.weight, True)
+		self.connections[innovation_number2] = new_connection2
+
+
 def crossover(parents):
-	fitter_parent, other_parent = (parents[0], parents[1]) if parents[0].adjusted_fitness > parents[1].adjusted_fitness else (parents[1], parents[0])
-	all_innovation_numbers = set(fitter_parent.connections.keys()).union(set(other_parent.connections.keys()))
+	if parents[0].adjusted_fitness > parents[1].adjusted_fitness:
+		fitter_parent, other_parent = (parents[0], parents[1])
+	else:
+		fitter_parent, other_parent = (parents[1], parents[0])
+
+	innovation_numbers1 = fitter_parent.connections.keys()
+	innovation_numbers2 = other_parent.connections.keys()
+	all_innovation_numbers = set(innovation_numbers1).union(set(innovation_numbers2))
 
 	child_connections = {}
 	child_nodes = set()
