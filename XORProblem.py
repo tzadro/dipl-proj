@@ -1,16 +1,13 @@
-# todo: add interspecies mating probability;
-
-from Config import config
-from NEAT import NEAT
-import Environments
-import Interface
+from config import config
+from environments import XORProblem
+from neat import NEAT
+import interface
 import statistics
 
-env = Environments.XORProblem()
-config.update(env.num_inputs, env.num_outputs, env.action_space_discrete, env.action_space_high, env.action_space_low)
-
-algorithm = NEAT(env)
-networkVisualizer = Interface.NetworkVisualizer()
+env = XORProblem()
+config.update(env.num_inputs, env.num_outputs)
+algorithm = NEAT(env.evaluate)
+networkVisualizer = interface.NetworkVisualizer()
 
 num_evaluations = []
 best_fitnesses = []
@@ -27,23 +24,20 @@ for run in range(config.num_runs):
 				networkVisualizer.update_node_positions(individual.connections, individual.nodes)
 
 		if env.solved:
-			if config.visualize_best_networks:
-				networkVisualizer.visualize_network(best_individual.connections)
-
 			num_evaluations.append(env.evaluations)
 			break
 
-	Interface.plot_overall_fitness(best_fitnesses, avg_fitnesses)
+	if config.visualize_best_networks:
+		networkVisualizer.visualize_network(best_individual.connections)
 
-	env.evaluations = 0
-	env.solved = False
+	interface.plot_overall_fitness(best_fitnesses, avg_fitnesses)
+
+	env.reset()
+
 	best_fitnesses = []
 	avg_fitnesses = []
 	algorithm.reset()
 
-if config.num_runs > 1:
-	avg_num_evaluations = sum(num_evaluations) / len(num_evaluations)
-	stdev_num_evaluations = statistics.stdev(num_evaluations)
-	print('Num iterations:\tavg: {:.2f},\tstdev: {:.2f},\tfrom: {:d} runs'.format(avg_num_evaluations, stdev_num_evaluations, len(num_evaluations)))
-
-env.close()
+avg_num_evaluations = sum(num_evaluations) / len(num_evaluations)
+stdev_num_evaluations = statistics.stdev(num_evaluations)
+print('Num evaluations:\tavg: {:.2f} (~{:d} generations),\tstdev: {:.2f},\tfrom: {:d} runs'.format(avg_num_evaluations, round(avg_num_evaluations / config.pop_size), stdev_num_evaluations, len(num_evaluations)))

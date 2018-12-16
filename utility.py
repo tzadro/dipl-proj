@@ -1,4 +1,4 @@
-from Config import config
+from config import config
 import math
 
 
@@ -13,12 +13,12 @@ def max_num_edges(num_nodes):
 	return num_nodes * (num_nodes - 1) / 2
 
 
-def check_if_path_exists(from_node, to_node, connections, checked=None):
-	if from_node == to_node:
-		return True
-
+def check_if_path_exists_by_connections(from_node, to_node, connections, checked=None):
 	if not checked:
 		checked = {}
+
+	if from_node == to_node:
+		return True
 
 	for connection in connections.values():
 		if not connection.enabled:
@@ -33,27 +33,24 @@ def check_if_path_exists(from_node, to_node, connections, checked=None):
 		if not connection.enabled:
 			continue
 
-		if connection.from_key == from_node and connection.to_key not in checked and check_if_path_exists(
-				connection.to_key, to_node, connections, checked):
+		if connection.from_key == from_node and connection.to_key not in checked \
+			and check_if_path_exists_by_connections(connection.to_key, to_node, connections, checked):
 			return True
 
 	return False
 
 
-def check_if_path_exists2(from_key, to_key, neurons, checked=None):
-	if from_key == to_key:
-		return True
-
+def check_if_path_exists_by_neurons(from_key, to_key, neurons, checked=None):
 	if not checked:
 		checked = {}
 
-	if to_key in neurons[from_key].outgoing_keys:
+	if from_key == to_key or to_key in neurons[from_key].outgoing_keys:
 		return True
 
 	checked[from_key] = True
 
 	for key in neurons[from_key].outgoing_keys:
-		if key not in checked and check_if_path_exists2(key, to_key, neurons, checked):
+		if key not in checked and check_if_path_exists_by_neurons(key, to_key, neurons, checked):
 			return True
 
 	return False
@@ -80,9 +77,14 @@ def distance(individual1, individual2):  # todo: are disabled genes included?
 			weight_diffs.append(weight_diff)
 		else:
 			if innovation_number > max_common_innovation_number:
-				E = E + 1
+				E += 1
 			else:
-				D = D + 1
+				D += 1
 
 	delta = (config.c1 * E) / N + (config.c2 * D) / N + config.c3 * sum(weight_diffs) / len(weight_diffs)
 	return delta
+
+
+# assumes output is [0, 1]
+def scale(output, action_space_low, action_space_high):
+	return output * (abs(action_space_high) + abs(action_space_low)) + action_space_low

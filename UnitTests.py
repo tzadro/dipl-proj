@@ -1,69 +1,63 @@
-from Config import config
-from Connection import Connection
-from Neuron import Neuron
-from Phenotype import Phenotype
-from Individual import Individual
-from Interface import Interface
-import helperfunctions
+from config import config
+from connection import Connection
+from neuron import Neuron
+from phenotype import Phenotype
+from individual import Individual
+from interface import NetworkVisualizer
+import utility
 import numpy as np
 
 
 def test_sigmoid():
-	res = helperfunctions.sigmoid(2.5)
+	config.sigmoid_coef = 1
+
+	res = utility.sigmoid(2.5)
 	print('Sigmoid test:', round(res, 2) == 0.92)
 
 
-def test_check_if_path_exists(connections):
+def test_check_if_path_exists_by_connections(connections):
 	from_node = 5
 	to_node = 8
-	res1 = helperfunctions.check_if_path_exists(from_node, to_node, connections)
+	res1 = utility.check_if_path_exists_by_connections(from_node, to_node, connections)
 
 	from_node = 8
 	to_node = 5
-	res2 = helperfunctions.check_if_path_exists(from_node, to_node, connections)
+	res2 = utility.check_if_path_exists_by_connections(from_node, to_node, connections)
 
-	print('Check_if_path_exists test:', res1 is True and res2 is False)
+	print('Check_if_path_exists_by_connections test:', res1 is True and res2 is False)
 
 
-def test_check_if_path_exists2(connections):
-	phenotype = Phenotype(connections)
+def test_check_if_path_exists_by_neurons(connections):
+	config.input_keys = [0, 1, 2]
+	config.output_keys = [3, 4]
+
+	phenotype = Phenotype(connections.values())
 
 	from_node = 5
 	to_node = 8
-	res1 = helperfunctions.check_if_path_exists2(from_node, to_node, phenotype.neurons)
+	res1 = utility.check_if_path_exists_by_neurons(from_node, to_node, phenotype.neurons)
 
 	from_node = 8
 	to_node = 5
-	res2 = helperfunctions.check_if_path_exists2(from_node, to_node, phenotype.neurons)
+	res2 = utility.check_if_path_exists_by_neurons(from_node, to_node, phenotype.neurons)
 
-	print('Check_if_path_exists2 test:', res1 is True and res2 is False)
+	print('Check_if_path_exists_by_neurons test:', res1 is True and res2 is False)
 
 
 def test_distance(individual1, individual2):
 	config.c1 = 8
 	config.c2 = 4
 	config.c3 = 1
+	config.normalize = True
 
-	res = helperfunctions.distance(individual1, individual2)
+	res = utility.distance(individual1, individual2)
 
 	print('Distance test:', round(res, 2) == 2.3)
 
 
-def test_phenotype(connections):
-	config.input_keys = [0, 1, 2]
-	config.output_keys = [3, 4]
-	config.action_space_discrete = False
-	config.action_space_high = np.array([2., 1.])
-	config.action_space_low = np.array([-1., -1.])
-
-	inputs = [1., 1., 1.]
-	phenotype = Phenotype(connections)
-	res = phenotype.forward(inputs)
-
-	print('Phenotype test:', round(res[0], 2) == 1.07 and round(res[1], 2) == 0.39)
-
-
 def test_neuron():
+	config.sigmoid_coef = 1
+
 	connections = {
 		0: Connection(0, 0, 2, 0.2, True),
 		1: Connection(1, 1, 2, 0.3, True),
@@ -79,14 +73,14 @@ def test_neuron():
 
 	neurons[0].add_outgoing(2)
 	neurons[1].add_outgoing(2)
-	return_path_exists = helperfunctions.check_if_path_exists2(connections[0].to_key, connections[0].from_key, neurons)
+	return_path_exists = utility.check_if_path_exists_by_neurons(connections[0].to_key, connections[0].from_key, neurons)
 	neurons[2].add_incoming(connections[0], return_path_exists)
-	return_path_exists = helperfunctions.check_if_path_exists2(connections[1].to_key, connections[1].from_key, neurons)
+	return_path_exists = utility.check_if_path_exists_by_neurons(connections[1].to_key, connections[1].from_key, neurons)
 	neurons[2].add_incoming(connections[1], return_path_exists)
-	return_path_exists = helperfunctions.check_if_path_exists2(connections[3].to_key, connections[3].from_key, neurons)
+	return_path_exists = utility.check_if_path_exists_by_neurons(connections[3].to_key, connections[3].from_key, neurons)
 	neurons[2].add_incoming(connections[3], return_path_exists)
 	neurons[2].add_outgoing(3)
-	return_path_exists = helperfunctions.check_if_path_exists2(connections[2].to_key, connections[2].from_key, neurons)
+	return_path_exists = utility.check_if_path_exists_by_neurons(connections[2].to_key, connections[2].from_key, neurons)
 	neurons[3].add_incoming(connections[2], return_path_exists)
 
 	for neuron in neurons.values():
@@ -106,6 +100,22 @@ def test_neuron():
 	print('Neuron test:', round(res1, 2) == 0.56 and round(res2, 2) == 0.57)
 
 
+def test_phenotype(connections):
+	config.sigmoid_coef = 1
+	config.input_keys = [0, 1, 2]
+	config.output_keys = [3, 4]
+
+	action_space_high = np.array([2., 1.])
+	action_space_low = np.array([-1., -1.])
+
+	inputs = [1., 1., 1.]
+	phenotype = Phenotype(connections.values())
+	output = phenotype.forward(inputs)
+	res = utility.scale(output, action_space_low, action_space_high)
+
+	print('Phenotype test:', round(res[0], 2) == 1.07 and round(res[1], 2) == 0.39)
+
+
 def test_interface():
 	config.input_keys = [0, 1]
 	config.output_keys = [2, 3]
@@ -119,9 +129,9 @@ def test_interface():
 	}
 	nodes = set([0, 1, 2, 3, 4])
 
-	interface = Interface()
-	interface.update_node_positions(connections, nodes)
-	interface.visualize_network(connections)
+	networkVisualizer = NetworkVisualizer()
+	networkVisualizer.update_node_positions(connections, nodes)
+	networkVisualizer.visualize_network(connections)
 
 
 def run():
@@ -166,8 +176,8 @@ def run():
 	individual2 = Individual(connections2, nodes2)
 
 	test_sigmoid()
-	test_check_if_path_exists(connections1)
-	test_check_if_path_exists2(connections1)
+	test_check_if_path_exists_by_connections(connections1)
+	test_check_if_path_exists_by_neurons(connections1)
 	test_distance(individual1, individual2)
 	test_neuron()
 	test_phenotype(connections1)

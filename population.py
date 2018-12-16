@@ -1,7 +1,7 @@
-from Config import config
-from Individual import Individual
-from Species import Species
-import helperfunctions
+from config import config
+from individual import Individual
+from species import Species
+import utility
 import math
 import copy
 
@@ -14,12 +14,13 @@ class Population:
 		self.max_fitness = -math.inf
 		self.num_generations_before_last_improvement = None
 
-	def evaluate_fitness(self, env):
+	def evaluate_fitness(self, evaluate):
 		best_individual = None
 		avg_fitness = 0
 
 		for individual in self.individuals:
-			avg_fitness += individual.evaluate_fitness(env)
+			individual.fitness = evaluate(individual.connections.values())
+			avg_fitness += individual.fitness
 
 			if not best_individual or individual.fitness > best_individual.fitness:
 				best_individual = individual
@@ -32,7 +33,7 @@ class Population:
 			placed = False
 
 			for spec in self.species:
-				dist_from_repr = helperfunctions.distance(individual, spec.representative)
+				dist_from_repr = utility.distance(individual, spec.representative)
 
 				if dist_from_repr <= config.compatibility_threshold:
 					spec.add(individual)

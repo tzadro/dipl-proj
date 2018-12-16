@@ -1,7 +1,6 @@
-from Config import config
-from Connection import Connection
-from Phenotype import Phenotype
-import helperfunctions
+from config import config
+from connection import Connection
+import utility
 import copy
 import random
 
@@ -31,8 +30,6 @@ class Individual:
 					next_innovation_number += 1
 		else:
 			for hidden_node_key in range(config.num_starting_nodes - config.num_starting_hidden_nodes, config.num_starting_nodes):
-				self.nodes.add(hidden_node_key)
-
 				for input_key in config.input_keys:
 					new_connection = Connection(next_innovation_number, input_key, hidden_node_key, random.gauss(config.new_mu, config.new_sigma), True)
 					self.connections[next_innovation_number] = new_connection
@@ -42,29 +39,6 @@ class Individual:
 					new_connection = Connection(next_innovation_number, hidden_node_key, output_key, random.gauss(config.new_mu, config.new_sigma), True)
 					self.connections[next_innovation_number] = new_connection
 					next_innovation_number += 1
-
-	def evaluate_fitness(self, env):
-		weights = [connection.weight for connection in self.connections.values()]  # todo: remove after testing?
-		phenotype = Phenotype(self.connections)
-
-		# 0.001 so roulette wheel does not divide by zero
-		fitness = 0.001  # todo: should be 0, set to 6 so the score is never less than 0 in Pixelcopter game (minimum is -5)
-
-		observation = env.reset()
-		while True:
-			output = phenotype.forward(observation)
-
-			if not output:
-				self.fitness = 0.001
-				return self.fitness
-
-			observation, reward, done, info = env.step(output, weights)
-
-			fitness += reward
-
-			if done:
-				self.fitness = fitness
-				return self.fitness
 
 	def mutate(self, generation_new_nodes, generation_new_connections):
 		if random.random() < config.connection_mutation_probability:
@@ -81,9 +55,6 @@ class Individual:
 
 	def mutate_connections(self):
 		for connection in self.connections.values():
-			if not connection.enabled:
-				continue
-
 			if random.random() < config.perturbation_probability:
 				connection.weight = connection.weight + random.gauss(config.step_mu, config.step_sigma)
 			else:
@@ -96,7 +67,7 @@ class Individual:
 		num_inputs = len(config.input_keys)
 		num_outputs = len(config.output_keys)
 
-		if num_connections == helperfunctions.max_num_edges(num_nodes) - (helperfunctions.max_num_edges(num_inputs) + helperfunctions.max_num_edges(num_outputs)):
+		if num_connections == utility.max_num_edges(num_nodes) - (utility.max_num_edges(num_inputs) + utility.max_num_edges(num_outputs)):
 			return
 
 		while True:
@@ -107,7 +78,7 @@ class Individual:
 			if existing_connections:
 				continue
 
-			if node2_key in config.input_keys or helperfunctions.check_if_path_exists(node2_key, node1_key, self.connections) or (node2_key, node1_key) in generation_new_connections:
+			if node2_key in config.input_keys or utility.check_if_path_exists_by_connections(node2_key, node1_key, self.connections) or (node2_key, node1_key) in generation_new_connections:
 				temp = node1_key
 				node1_key = node2_key
 				node2_key = temp
@@ -120,14 +91,13 @@ class Individual:
 				generation_new_connections[key_pair] = innovation_number
 				config.innovation_number += 1
 
-			new_connection = Connection(innovation_number, node1_key, node2_key, random.random() * 2 - 1, True)
+			new_connection = Connection(innovation_number, node1_key, node2_key, random.gauss(config.new_mu, config.new_sigma), True)
 			self.connections[innovation_number] = new_connection
 			return
 
 	def new_node(self, generation_new_nodes, generation_new_connections):
 		connections_values = list(self.connections.values())
-		random_index = random.randrange(len(connections_values))
-		connection = connections_values[random_index]
+		connection = random.choice(connections_values)
 		connection.enabled = False
 
 		key_pair = (connection.from_key, connection.to_key)

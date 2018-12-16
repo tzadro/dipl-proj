@@ -1,4 +1,4 @@
-class Connection:  # Gene
+class Connection:
 	def __init__(self, innovation_number, from_key, to_key, weight, enabled):
 		self.innovation_number = innovation_number
 		self.from_key = from_key

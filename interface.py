@@ -1,4 +1,4 @@
-from Config import config
+from config import config
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -45,9 +45,7 @@ class NetworkVisualizer:
 		G.add_weighted_edges_from(edges)
 
 		self_loop_keys = [connection.from_key for connection in connections.values() if connection.enabled and connection.from_key == connection.to_key]
-		node_colors = []
-		for node_key in G:
-			node_colors.append('g' if node_key in self_loop_keys else 'r')
+		node_colors = ['g' if node_key in self_loop_keys else 'r' for node_key in G]
 
 		nx.draw(G, self.node_positions, node_color=node_colors, with_labels=True)
 		labels = nx.get_edge_attributes(G, 'weight')
@@ -56,9 +54,8 @@ class NetworkVisualizer:
 		plt.show()
 
 	def update_node_positions(self, connections, nodes):
-		# todo: ugly
 		for key in nodes:
-			if key not in self.node_positions.keys():
+			if key not in self.node_positions:
 				neighbor_nodes = [connection.to_key if connection.from_key == key else connection.from_key for connection in connections.values() if (connection.to_key == key or connection.from_key == key) and connection.from_key != connection.to_key]
 				x = sum([self.node_positions[node_key][0] for node_key in neighbor_nodes]) / len(neighbor_nodes)
 				y = sum([self.node_positions[node_key][1] for node_key in neighbor_nodes]) / len(neighbor_nodes)
@@ -79,6 +76,8 @@ def verbose(i, population, best_fitness, avg_fitness):
 
 
 def plot_overall_fitness(best_fitnesses, avg_fitnesses):
+	assert len(best_fitnesses) == len(avg_fitnesses), "best_fitnesses and avg_fitnesses must be the same length"
+
 	generations = range(len(best_fitnesses))
 
 	plt.plot(generations, best_fitnesses, color='red', label='Best score')

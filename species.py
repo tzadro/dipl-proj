@@ -1,5 +1,5 @@
-from Config import config
-from Individual import crossover
+from config import config
+from individual import crossover
 import random
 import copy
 import math

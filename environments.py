@@ -1,9 +1,12 @@
+from phenotype import Phenotype
+import utility
 import gym
-import ple
+# import ple
 import math
 import numpy as np
 
 
+# todo: needs refactor
 class CartPole:
 	def __init__(self):
 		env_name = 'CartPole-v0'
@@ -29,6 +32,7 @@ class CartPole:
 		self.env.close()
 
 
+# todo: needs refactor
 class Pixelcopter:
 	def __init__(self):
 		self.game = ple.games.pixelcopter.Pixelcopter(width=144, height=144)
@@ -87,74 +91,65 @@ class XORProblem:
 							 [1., 1., 1.]]
 		self.solutions = [0., 1., 1., 0.]
 
-		self.outputs = None
-		self.progress = None
-		self.error_sum = None
-
-		self.solved = False
-		self.evaluations = 0
 		self.num_inputs = 3
 		self.num_outputs = 1
-		self.action_space_discrete = False
-		self.action_space_high = np.array([1.])
-		self.action_space_low = np.array([0.])
 
-	def reset(self):
-		self.outputs = []
-		self.progress = 0
-		self.error_sum = 0
-		self.evaluations += 1
-		return self.observations[self.progress]
-
-	def step(self, output, _):
-		self.outputs.append(output[0])
-		self.error_sum += abs(self.solutions[self.progress] - output[0])
-
-		if self.progress == 3:
-			reward = (4 - self.error_sum)**2
-			observation = None
-			done = True
-
-			correct = [e >= 0.5 for e in self.outputs] == self.solutions
-			if correct:
-				self.solved = True
-		else:
-			self.progress += 1
-			reward = 0
-			observation = self.observations[self.progress]
-			done = False
-
-		info = None
-		return observation, reward, done, info
-
-	def close(self):
-		return
-
-
-class TestEnvironment:
-	def __init__(self):
-		self.observation = [1., 1., 1., 1.]
-
-		self.solved = False
 		self.evaluations = 0
-		self.num_inputs = 4
-		self.num_outputs = 4
-		self.action_space_discrete = False
-		self.action_space_high = np.array([0., 0., 0., 0.])
-		self.action_space_low = np.array([1., 1., 1., 1.])
+		self.solved = False
+
+	def evaluate(self, connections):
+		self.evaluations += 1
+
+		phenotype = Phenotype(connections)
+
+		correct_solutions = True
+		error_sum = 0
+
+		for observation, solution in zip(self.observations, self.solutions):
+			output = phenotype.forward(observation)
+			result = output[0]
+
+			correct_solutions = correct_solutions and round(result) == solution
+			error_sum += abs(solution - result)
+
+		self.solved = self.solved or correct_solutions
+		fitness = (4 - error_sum)**2
+		return fitness
 
 	def reset(self):
-		self.evaluations += 1
-		return self.observation
+		self.evaluations = 0
+		self.solved = False
 
-	def step(self, _, weights):
-		# reward = len(weights)  # fitness = number of connections
-		# reward = max(0.001, float(np.sum(weights)))  # fitness = sum of all weights
-		reward = max(0.001, float(np.sum(weights))) / len(weights)  # fitness = avg weight
-		observation = self.observation
-		done = True
-		info = None
-		return observation, reward, done, info
+
+class HalfCheetah:
+	def __init__(self):
+		self.env = gym.make('HalfCheetah-v2')
+
+		self.num_inputs = 17
+		self.num_outputs = 6
+
+	def evaluate(self, connections):
+		phenotype = Phenotype(connections)
+
+		# todo: fix problem of negative fitness
+		fitness = 1000
+
+		observation = self.env.reset()
+		while True:
+			self.env.render()
+
+			output = phenotype.forward(observation)
+			action = utility.scale(output, self.env.action_space.low, self.env.action_space.high)
+			observation, reward, done, info = self.env.step(action)
+
+			fitness += reward
+
+			if done:
+				break
+
+		# clips fitness so it's never negative
+		fitness = max(fitness, 0.001)
+		return fitness
 
 	def close(self):
-		return
+		self.env.close()

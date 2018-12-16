@@ -30,7 +30,7 @@ class Config:
 
 		self.network_canvas_height = 100
 		self.network_canvas_width = 100
-		self.visualize_every = 20
+		self.visualize_every = 50
 		self.visualize_best_networks = True
 		self.verbose = False
 
@@ -40,18 +40,12 @@ class Config:
 		self.innovation_number = None
 		self.input_keys = None
 		self.output_keys = None
-		self.action_space_discrete = None
-		self.action_space_high = None
-		self.action_space_low = None
 
-	def update(self, num_inputs, num_outputs, action_space_discrete, action_space_high, action_space_low):
+	def update(self, num_inputs, num_outputs):
 		self.num_starting_nodes = num_inputs + num_outputs + self.num_starting_hidden_nodes
 		self.next_node_key = self.num_starting_nodes
 		self.num_starting_connections = (self.num_starting_hidden_nodes * (num_inputs + num_outputs)) if self.num_starting_hidden_nodes else (num_inputs * num_outputs)
 		self.innovation_number = self.num_starting_connections
-		self.action_space_discrete = action_space_discrete
-		self.action_space_high = action_space_high
-		self.action_space_low = action_space_low
 		self.input_keys = list(range(num_inputs))
 		self.output_keys = list(range(num_inputs, num_inputs + num_outputs))
 
