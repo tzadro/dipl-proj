@@ -4,6 +4,7 @@ from species import Species
 import utility
 import math
 import copy
+import random
 
 
 class Population:
@@ -102,6 +103,30 @@ class Population:
 
 			children += [spec.breed_child(generation_new_nodes, generation_new_connections) for _ in range(spec.num_children)]
 
+			spec.clear()
+
+		self.individuals = children
+
+	def breed_new_generation_by_tournament_selection(self):
+		children = []
+
+		# track new innovations in a generation to prevent giving same structural changes different innovation numbers
+		generation_new_nodes = {}
+		generation_new_connections = {}
+
+		for spec in self.species:
+			children += [copy.deepcopy(spec.individuals[0])]
+
+		while len(children) < config.pop_size:
+			if len(self.species) == 1:
+				spec = self.species[0]
+			else:
+				specs = random.sample(self.species, 2)
+				spec = specs[0] if specs[0].fitness > specs[1].fitness else specs[1]
+
+			children += [spec.breed_child_by_tournament_selection(generation_new_nodes, generation_new_connections)]
+
+		for spec in self.species:
 			spec.clear()
 
 		self.individuals = children

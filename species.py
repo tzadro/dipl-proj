@@ -48,6 +48,22 @@ class Species:
 		child.mutate(generation_new_nodes, generation_new_connections)
 		return child
 
+	def breed_child_by_tournament_selection(self, generation_new_nodes, generation_new_connections):
+		def key(element):
+			return -element.adjusted_fitness
+
+		if len(self.individuals) == 1 or random.random() < config.skip_crossover_probability:
+			child = copy.deepcopy(random.choice(self.individuals))
+		elif len(self.individuals) == 2:
+			child = crossover(random.sample(self.individuals, 2))
+		else:
+			tournament = random.sample(self.individuals, 3)
+			tournament.sort(key=key)
+			child = crossover(tournament[:2])
+
+		child.mutate(generation_new_nodes, generation_new_connections)
+		return child
+
 	def select(self, size=None, replace=False):
 		fitness_sum = sum([individual.fitness for individual in self.individuals])
 		p = [individual.fitness / fitness_sum for individual in self.individuals]

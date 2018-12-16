@@ -1,12 +1,12 @@
 from config import config
 from environments import XORProblem
-from neat import NEAT
+import neat
 import interface
 import statistics
 
 env = XORProblem()
 config.update(env.num_inputs, env.num_outputs)
-algorithm = NEAT(env.evaluate)
+algorithm = neat.NEAT(env.evaluate)
 networkVisualizer = interface.NetworkVisualizer()
 
 num_evaluations = []
