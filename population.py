@@ -51,19 +51,15 @@ class Population:
 			spec.sort()
 		self.sort()
 
+		# todo: check if ordering is ok
 		if len(self.species) > 1:
-			for spec in self.species[1:]:
-				if spec.num_generations_before_last_improvement <= config.max_num_generations_before_species_improvement:
-					self.species.remove(spec)
-
-		# todo: do this but sort species by species fitness, not by best fitted individual in the species
-		if self.species[0].individuals[0].fitness > self.max_fitness:
-			self.max_fitness = self.species[0].individuals[0].fitness
-			self.num_generations_before_last_improvement = 0
-		else:
-			self.num_generations_before_last_improvement += 1
-
-			if len(self.species) > 2:
+			self.species = [spec for spec in self.species if spec.num_generations_before_last_improvement <= config.max_num_generations_before_species_improvement or spec == self.species[0]]
+		if len(self.species) > 2:
+			if self.species[0].individuals[0].fitness > self.max_fitness:
+				self.max_fitness = self.species[0].individuals[0].fitness
+				self.num_generations_before_last_improvement = 0
+			else:
+				self.num_generations_before_last_improvement += 1
 				if self.num_generations_before_last_improvement > config.max_num_generations_before_population_improvement:
 					self.species = self.species[:2]
 
@@ -75,6 +71,7 @@ class Population:
 		def key(element):
 			return -element.individuals[0].fitness
 
+		# todo: sort species by species fitness, not by best fitted individual in the species
 		self.species.sort(key=key)
 
 	def assign_num_children(self):

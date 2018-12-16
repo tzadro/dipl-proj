@@ -49,9 +49,9 @@ class Species:
 		return child
 
 	def select(self, size=None, replace=False):
-		p = [individual.adjusted_fitness / self.fitness for individual in self.individuals]
-		individual = np.random.choice(self.individuals, size, replace, p)
-		return individual
+		fitness_sum = sum([individual.fitness for individual in self.individuals])
+		p = [individual.fitness / fitness_sum for individual in self.individuals]
+		return np.random.choice(self.individuals, size, replace, p)
 
 	def trim_to(self, n=1):
 		self.individuals = self.individuals[:n]
