@@ -34,3 +34,7 @@ class Phenotype:
 
 		output = [self.neurons[key].value for key in config.output_keys]
 		return output
+
+	def flush(self):
+		for neuron in self.neurons.values():
+			neuron.value = 0

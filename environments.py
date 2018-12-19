@@ -106,6 +106,7 @@ class XORProblem:
 		error_sum = 0
 
 		for observation, solution in zip(self.observations, self.solutions):
+			phenotype.flush()
 			output = phenotype.forward(observation)
 			result = output[0]
 
