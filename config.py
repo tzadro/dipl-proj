@@ -24,6 +24,7 @@ class Config:
 		self.step_mu = 0.0
 		self.step_sigma = 1.0
 		self.normalize = False
+		self.disable_self_loops = True
 
 		self.num_starting_hidden_nodes = 0
 		self.fixed_topology = False

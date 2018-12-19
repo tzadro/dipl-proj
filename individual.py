@@ -74,6 +74,9 @@ class Individual:
 			node1_key = random.choice(nodes_list[num_inputs + num_outputs:])
 			node2_key = random.choice(nodes_list)
 
+			if config.disable_self_loops and node1_key == node2_key:
+				continue
+
 			existing_connections = [c for c in self.connections.values() if c.from_key == node1_key and c.to_key == node2_key or c.from_key == node2_key and c.to_key == node1_key]
 			if existing_connections:
 				continue
