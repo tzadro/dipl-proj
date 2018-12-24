@@ -6,7 +6,7 @@ import statistics
 
 env = XORProblem()
 config.update(env.num_inputs, env.num_outputs)
-algorithm = neat.StanleyNEATNEAT(env.evaluate)
+algorithm = neat.StanleyNEAT(env.evaluate)
 networkVisualizer = interface.NetworkVisualizer()
 
 num_evaluations = []
