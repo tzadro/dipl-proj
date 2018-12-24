@@ -26,6 +26,11 @@ class Config:
 		self.normalize = False
 		self.disable_self_loops = True
 
+		self.stagnation_penalization = 0.01
+		self.youth_threshold = 10
+		self.youth_boost = 1.0
+		self.mate_only_probability = 0.2
+
 		self.num_starting_hidden_nodes = 0
 		self.fixed_topology = False
 

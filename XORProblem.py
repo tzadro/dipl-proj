@@ -6,7 +6,7 @@ import statistics
 
 env = XORProblem()
 config.update(env.num_inputs, env.num_outputs)
-algorithm = neat.NEAT(env.evaluate)
+algorithm = neat.StanleyNEATNEAT(env.evaluate)
 networkVisualizer = interface.NetworkVisualizer()
 
 num_evaluations = []
@@ -15,6 +15,8 @@ avg_fitnesses = []
 
 for run in range(config.num_runs):
 	for i in range(config.num_iter):
+		if config.verbose: print("Generation", i)
+
 		best_individual, best_fitness, avg_fitness = algorithm.epoch()
 		best_fitnesses.append(best_fitness)
 		avg_fitnesses.append(avg_fitness)
