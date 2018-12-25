@@ -3,7 +3,6 @@ from individual import Individual
 from species import Species
 import utility
 import math
-import copy
 import random
 
 
@@ -98,7 +97,7 @@ class Population:
 
 		for spec in self.species:
 			if len(spec.individuals) > config.min_num_individuals_for_elitism:
-				children += [copy.deepcopy(spec.individuals[0])]
+				children += [spec.individuals[0].duplicate()]
 				spec.num_children -= 1
 
 			children += [spec.breed_child(generation_new_nodes, generation_new_connections) for _ in range(spec.num_children)]
@@ -115,7 +114,7 @@ class Population:
 		generation_new_connections = {}
 
 		for spec in self.species:
-			children += [copy.deepcopy(spec.individuals[0])]
+			children += [spec.individuals[0].duplicate()]
 
 		while len(children) < config.pop_size:
 			if len(self.species) == 1:

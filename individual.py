@@ -12,6 +12,10 @@ class Individual:
 		self.fitness = None
 		self.adjusted_fitness = None
 
+		# used only for stanley neat
+		self.expected_num_offsprings = None
+		self.eliminate = False
+
 		if connections and nodes:
 			self.connections = connections
 			self.nodes = nodes
@@ -52,6 +56,14 @@ class Individual:
 
 		if random.random() < config.new_node_probability:
 			self.new_node(generation_new_nodes, generation_new_connections)
+
+	def stanley_mutate(self, generation_new_nodes, generation_new_connections):
+		if random.random() < config.new_node_probability:
+			self.new_node(generation_new_nodes, generation_new_connections)
+		elif random.random() < config.new_connection_probability:
+			self.new_connection(generation_new_connections)
+		else:
+			self.mutate_connections()
 
 	def mutate_connections(self):
 		for connection in self.connections.values():
@@ -131,10 +143,26 @@ class Individual:
 		new_connection2 = Connection(innovation_number2, new_node_key, connection.to_key, connection.weight, True)
 		self.connections[innovation_number2] = new_connection2
 
+	def duplicate(self):
+		clone = copy.deepcopy(self)
+
+		clone.fitness = None
+		clone.adjusted_fitness = None
+
+		clone.expected_num_offsprings = None
+		clone.eliminate = False
+
+		return clone
+
 
 def crossover(parents):
 	if parents[0].adjusted_fitness > parents[1].adjusted_fitness:
 		fitter_parent, other_parent = (parents[0], parents[1])
+	elif parents[0].adjusted_fitness == parents[1].adjusted_fitness:
+		if len(parents[0].connections) < len(parents[1].connections):
+			fitter_parent, other_parent = (parents[0], parents[1])
+		else:
+			fitter_parent, other_parent = (parents[1], parents[0])
 	else:
 		fitter_parent, other_parent = (parents[1], parents[0])
 

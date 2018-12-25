@@ -63,6 +63,11 @@ class NetworkVisualizer:
 				self.node_positions[key] = (x, y)
 
 
+def log(message):
+	if config.verbose:
+		print(message)
+
+
 def verbose(i, population, best_fitness, avg_fitness):
 	print('Generation: {:d}, num_individuals: {:d}, best_score: {:.2f}, avg_score: {:.2f}'.format(i, len(population.individuals), best_fitness, avg_fitness))
 	print('Num organisms with more than default number of connections: {:d}'.format(sum([len(individual.connections.values()) > config.num_starting_connections for individual in population.individuals])))
