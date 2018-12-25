@@ -26,6 +26,7 @@ class Config:
 		self.normalize = False
 		self.disable_self_loops = True
 
+		# used only for stanley neat
 		self.stagnation_penalization = 0.01
 		self.youth_threshold = 10
 		self.youth_boost = 1.0

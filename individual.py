@@ -12,6 +12,7 @@ class Individual:
 		self.fitness = None
 		self.adjusted_fitness = None
 
+		# used only for stanley neat
 		self.expected_num_offsprings = None
 		self.eliminate = False
 
@@ -56,7 +57,6 @@ class Individual:
 		if random.random() < config.new_node_probability:
 			self.new_node(generation_new_nodes, generation_new_connections)
 
-	# todo: check
 	def stanley_mutate(self, generation_new_nodes, generation_new_connections):
 		if random.random() < config.new_node_probability:
 			self.new_node(generation_new_nodes, generation_new_connections)

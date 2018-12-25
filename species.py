@@ -15,6 +15,7 @@ class Species:
 		self.num_generations_before_last_improvement = 0
 		self.num_children = None
 
+		# used only for stanley neat
 		self.obliterate = False
 		self.age = 0
 
@@ -44,9 +45,9 @@ class Species:
 
 	def breed_child(self, generation_new_nodes, generation_new_connections):
 		if len(self.individuals) == 1 or random.random() < config.skip_crossover_probability:
-			child = self.select().duplicate()
+			child = self.roulette_select().duplicate()
 		else:
-			child = crossover(self.select(2))
+			child = crossover(self.roulette_select(2))
 
 		child.mutate(generation_new_nodes, generation_new_connections)
 		return child
@@ -56,32 +57,39 @@ class Species:
 			return -element.adjusted_fitness
 
 		if len(self.individuals) == 1 or random.random() < config.skip_crossover_probability:
-			child = random.choice(self.individuals).duplicate()
+			child = self.random_select().duplicate()
 		elif len(self.individuals) == 2:
-			child = crossover(random.sample(self.individuals, 2))
+			child = crossover(self.random_select(2))
 		else:
-			tournament = random.sample(self.individuals, 3)
+			tournament = self.random_select(3)
 			tournament.sort(key=key)
 			child = crossover(tournament[:2])
 
 		child.mutate(generation_new_nodes, generation_new_connections)
 		return child
 
-	def select(self, size=None, replace=False):
+	# roulette wheel selection
+	def roulette_select(self, size=None, replace=False):
 		fitness_sum = sum([individual.fitness for individual in self.individuals])
 		p = [individual.fitness / fitness_sum for individual in self.individuals]
 		return np.random.choice(self.individuals, size, replace, p)
+
+	# random selection
+	def random_select(self, size=1):
+		if size == 1:
+			return random.choice(self.individuals)
+		else:
+			return random.sample(self.individuals, size)
 
 	def trim_to(self, n=1):
 		self.individuals = self.individuals[:n]
 
 	def clear(self):
-		random_individual = random.choice(self.individuals)
+		random_individual = self.random_select()
 		self.representative = random_individual.duplicate()
 		self.individuals = []
 		self.fitness = None
 		self.num_children = None
-
 		self.age += 1
 
 	def stanley_adjust_fitness(self):
@@ -105,14 +113,7 @@ class Species:
 			if self.age <= config.youth_threshold:
 				individual.adjusted_fitness *= config.youth_boost
 
-		# todo: we don't need sort?
-		# sort individuals
-		def key(element):
-			return -element.adjusted_fitness
-
-		self.individuals.sort(key=key)
-
-		# update age of last improvement
+		# update age of last improvement, assumes individuals are already sorted
 		best_individual = self.individuals[0]
 		if best_individual.fitness > self.max_fitness_ever:
 			self.max_fitness_ever = best_individual.fitness
@@ -144,12 +145,12 @@ class Species:
 		while self.num_children > 0:
 			# todo: check mutations
 			if num_individuals == 1 or random.random() < config.skip_crossover_probability:
-				child = random.choice(self.individuals).duplicate()
+				child = self.random_select().duplicate()
 				child.stanley_mutate(generation_new_nodes, generation_new_connections)
 			else:
 				# todo: add interspecies mating rate
 				# todo: check crossovers
-				child = crossover(self.select(2))
+				child = crossover(self.random_select(2))
 
 				if random.random() > config.mate_only_probability:
 					child.stanley_mutate(generation_new_nodes, generation_new_connections)
