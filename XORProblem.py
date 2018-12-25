@@ -14,8 +14,10 @@ best_fitnesses = []
 avg_fitnesses = []
 
 for run in range(config.num_runs):
+	interface.log("Run {:d}".format(run))
+
 	for i in range(config.num_iter):
-		interface.log("Generation {:d}".format(i))
+		interface.log("\tGeneration {:d}".format(i))
 
 		best_individual, best_fitness, avg_fitness = algorithm.epoch()
 		best_fitnesses.append(best_fitness)

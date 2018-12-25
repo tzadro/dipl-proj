@@ -128,14 +128,14 @@ class Species:
 			individual.eliminate = True
 
 	def stanley_reproduce(self, generation_new_nodes, generation_new_connections):
-		log("\t\tNum children {:d}".format(self.num_children))
+		log("\t\t\t\tNum children {:d}".format(self.num_children))
 		if self.num_children == 0:
 			return []
 
 		num_individuals = len(self.individuals)
 
 		if num_individuals >= config.min_num_individuals_for_elitism:
-			log("\t\tBest individual copied (Elitism)")
+			log("\t\t\t\tBest individual copied (Elitism)")
 			children = [self.individuals[0].duplicate()]
 			self.num_children -= 1
 		else:
