@@ -1,6 +1,7 @@
 from config import config
 from population import Population
 from species import Species
+from interface import log
 import utility
 import math
 import random
@@ -55,7 +56,7 @@ class StanleyNEAT:
 
 	def epoch(self):
 		# evaluate
-		if config.verbose: print("\tEvaluate")
+		log("\tEvaluate")
 		avg_fitness = 0
 		for individual in self.population.individuals:
 			individual.fitness = self.evaluate(individual.connections.values())
@@ -63,7 +64,7 @@ class StanleyNEAT:
 		avg_fitness /= len(self.population.individuals)
 
 		# speciate
-		if config.verbose: print("\tSpeciate")
+		log("\tSpeciate")
 		for individual in self.population.individuals:
 			placed = False
 
@@ -83,7 +84,7 @@ class StanleyNEAT:
 		self.population.species = [spec for spec in self.population.species if len(spec.individuals) > 0]
 
 		# sort species by max unadjusted fitness
-		if config.verbose: print("\tSort")
+		log("\tSort")
 
 		def key(element):
 			return -element.fitness
@@ -100,7 +101,7 @@ class StanleyNEAT:
 		best_individual = self.population.species[0].individuals[0]
 
 		# flag the lowest performing species over age 20 every 30 generations
-		if config.verbose: print("\tSpecies stagnation")
+		log("\tSpecies stagnation")
 		if self.generation % 30 == 0:
 			for spec in reversed(self.population.species):
 				if spec.age >= 20:
@@ -108,37 +109,37 @@ class StanleyNEAT:
 					break
 
 		# penalize old, boost young, adjust fitness and mark for death
-		if config.verbose: print("\tAdjust fitness")
+		log("\tAdjust fitness")
 		for spec in self.population.species:
 			spec.stanley_adjust_fitness()
 
 		# compute overall average fitness
-		if config.verbose: print("\tAvg adjusted fitness")
+		log("\tAvg adjusted fitness")
 		total_adjusted_fitness = sum([individual.adjusted_fitness for individual in self.population.individuals])
 		num_individuals = len(self.population.individuals)
 		overall_average = total_adjusted_fitness / num_individuals
 
 		# compute expected number of offsprings for each individual organism
-		if config.verbose: print("\tExpected num children")
+		log("\tExpected num children")
 		for individual in self.population.individuals:
 			individual.expected_num_offsprings = individual.adjusted_fitness / overall_average
 
 		# sum expected number of offsprings for every species
-		if config.verbose: print("\tNum children per species")
+		log("\tNum children per species")
 		total_expected = 0
 		for spec in self.population.species:
 			spec.num_children = math.floor(sum([individual.expected_num_offsprings for individual in spec.individuals]))
 			total_expected += spec.num_children
 
 		# distribute children from loss in decimal points to random species by tournament selection
-		if config.verbose: print("\tTotal expected", total_expected)
+		log("\tTotal expected {:d}".format(total_expected))
 		while total_expected < config.pop_size:
 			spec = random.choice(self.population.species)
 			spec.num_children += 1
 			total_expected += 1
 
 		# check for population-level stagnation
-		if config.verbose: print("\tPopulation stagnation")
+		log("\tPopulation stagnation")
 		if best_individual.fitness > self.population.max_fitness:
 			self.population.max_fitness = best_individual.fitness
 			self.population.num_generations_before_last_improvement = 0
@@ -147,7 +148,7 @@ class StanleyNEAT:
 
 		# if there is stagnation allow only first two species to reproduce
 		if self.population.num_generations_before_last_improvement > config.max_num_generations_before_population_improvement:
-			if config.verbose: print("\tStagnation detected")
+			log("\tStagnation detected")
 			self.population.num_generations_before_last_improvement = 0
 
 			if len(self.population.species) == 1:
@@ -163,24 +164,24 @@ class StanleyNEAT:
 					spec.num_children = 0
 
 		# delete all individuals marked for death
-		if config.verbose: print("\tDelete all marked for death")
+		log("\tDelete all marked for death")
 		for spec in self.population.species:
 			spec.individuals = [individual for individual in spec.individuals if not individual.eliminate]
 
 		# reproduce
-		if config.verbose: print("\tReproduce")
+		log("\tReproduce")
 		generation_new_nodes = {}
 		generation_new_connections = {}
 
 		children = []
 		for spec in self.population.species:
-			if config.verbose: print("\t\tSpec", self.population.species.index(spec))
+			log("\t\tSpec {:d}".format(self.population.species.index(spec)))
 			children += spec.stanley_reproduce(generation_new_nodes, generation_new_connections)
 
 		self.population.individuals = children
 
 		# end
-		if config.verbose: print("\tEnd epoch")
+		log("\tEnd epoch")
 		self.generation += 1
 		return best_individual, best_individual.fitness, avg_fitness
 

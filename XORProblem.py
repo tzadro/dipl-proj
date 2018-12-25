@@ -15,7 +15,7 @@ avg_fitnesses = []
 
 for run in range(config.num_runs):
 	for i in range(config.num_iter):
-		if config.verbose: print("Generation", i)
+		interface.log("Generation {:d}".format(i))
 
 		best_individual, best_fitness, avg_fitness = algorithm.epoch()
 		best_fitnesses.append(best_fitness)

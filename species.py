@@ -1,5 +1,6 @@
 from config import config
 from individual import crossover
+from interface import log
 import random
 import math
 import numpy as np
@@ -127,14 +128,14 @@ class Species:
 			individual.eliminate = True
 
 	def stanley_reproduce(self, generation_new_nodes, generation_new_connections):
-		if config.verbose: print("\t\tNum children", self.num_children)
+		log("\t\tNum children {:d}".format(self.num_children))
 		if self.num_children == 0:
 			return []
 
 		num_individuals = len(self.individuals)
 
 		if num_individuals >= config.min_num_individuals_for_elitism:
-			if config.verbose: print("\t\tBest individual copied (Elitism)")
+			log("\t\tBest individual copied (Elitism)")
 			children = [self.individuals[0].duplicate()]
 			self.num_children -= 1
 		else:
