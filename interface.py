@@ -73,7 +73,7 @@ def verbose(i, population, best_fitness, avg_fitness):
 	print('Num organisms with more than default number of connections: {:d}'.format(sum([len(individual.connections.values()) > config.num_starting_connections for individual in population.individuals])))
 	for j, spec in enumerate(population.species):
 		print('\tSpecies: {:d}'.format(j))
-		print('\t\tfitness: {:.2f}'.format(spec.fitness))
+		print('\t\tfitness: {:.2f}'.format(spec.adjusted_fitness))
 		print('\t\tnum_individuals: {:d}, num_children: {:d}'.format(len(spec.individuals), spec.num_children))
 		best_adjusted_fitness = spec.individuals[0].adjusted_fitness
 		avg_adjusted_fitness = sum([individual.adjusted_fitness for individual in spec.individuals]) / len(spec.individuals)

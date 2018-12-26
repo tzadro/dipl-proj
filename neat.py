@@ -1,8 +1,7 @@
 from config import config
 from population import Population
-from species import Species
+from individual import crossover
 from interface import log
-import utility
 import math
 import random
 
@@ -24,6 +23,137 @@ class NEAT:
 		self.population.breed_new_generation()
 
 		return best_individual, best_fitness, avg_fitness
+
+	def reset(self):
+		self.population = Population()
+
+
+class NewNEAT:
+	def __init__(self, evaluate):
+		self.evaluate = evaluate
+		self.population = Population()
+
+	def epoch(self):
+		# evaluate population
+		best_individual, best_individual.fitness, avg_fitness = self.population.evaluate_fitness(self.evaluate)
+
+		# sort by max unadjusted fitness
+		for spec in self.population.species:
+			spec.individuals.sort(key=lambda x: -x.fitness)
+		self.population.species.sort(key=lambda x: -x.individuals[0].fitness)
+
+		# remove stagnant species
+		for spec in reversed(self.population.species):
+			if len(self.population.species) <= config.species_elitism:
+				break
+
+			best_fitness = spec.individuals[0].fitness
+			if best_fitness > spec.max_fitness_ever:
+				spec.num_generations_before_last_improvement = 0
+				spec.max_fitness_ever = best_fitness
+			else:
+				spec.num_generations_before_last_improvement += 1
+
+				if spec.num_generations_before_last_improvement > config.max_num_generations_before_species_improvement:
+					self.population.species.remove(spec)
+
+		# find min and max for normalization
+		min_fitness = math.inf
+		max_fitness = -math.inf
+
+		for spec in self.population.species:
+			for individual in spec.individuals:
+				if individual.fitness < min_fitness:
+					min_fitness = individual.fitness
+
+				if individual.fitness > max_fitness:
+					max_fitness = individual.fitness
+
+		fitness_range = abs(max_fitness - min_fitness)
+
+		# compute adjusted fitness for every species
+		adjusted_fitness_sum = 0
+
+		for spec in self.population.species:
+			mean_fitness = sum([individual.fitness for individual in spec.individuals]) / len(spec.individuals)
+			spec.adjusted_fitness = (mean_fitness - min_fitness) / fitness_range
+			adjusted_fitness_sum += spec.adjusted_fitness
+
+		# compute num children
+		total_spawn = 0
+
+		# todo: weird formula
+		for spec in self.population.species:
+			adjusted_fitness = spec.adjusted_fitness
+			size = len(spec.individuals)
+
+			s = max(config.elitism, adjusted_fitness / adjusted_fitness_sum * config.pop_size)
+
+			d = (s - size) * 0.5
+			c = int(round(d))
+
+			spawn = size
+			if abs(c) > 0:
+				spawn += c
+			elif d > 0:
+				spawn += 1
+			elif d < 0:
+				spawn -= 1
+
+			spec.num_children = spawn
+			total_spawn += spec.num_children
+
+		norm = config.pop_size / total_spawn
+
+		for spec in self.population.species:
+			spec.num_children = max(config.elitism, round(spec.num_children * norm))
+
+		# reproduce
+		generation_new_nodes = {}
+		generation_new_connections = {}
+
+		children = []
+		for spec in self.population.species:
+			size = len(spec.individuals)
+
+			# elitism
+			num_elites = min(config.elitism, size)
+			for i in range(num_elites):
+				child = spec.individuals[i].duplicate()
+				children.append(child)
+				spec.num_children -= 1
+
+			# survival threshold
+			num_surviving = max(2, math.ceil(config.survival_threshold * size))
+			spec.individuals = spec.individuals[:num_surviving]
+
+			while spec.num_children > 0:
+				# randomly select two parents
+				parent1 = random.choice(spec.individuals)
+				parent2 = random.choice(spec.individuals)
+
+				# crossover or duplicate
+				if parent1 == parent2:
+					child = parent1.duplicate()
+				else:
+					# todo: check
+					child = crossover([parent1, parent2])
+
+				# mutate
+				# todo: check
+				child.mutate(generation_new_nodes, generation_new_connections)
+
+				children.append(child)
+				spec.num_children -= 1
+
+			spec.clear()
+
+		self.population.individuals = children
+
+		# speciate and remove empty species
+		self.population.speciate()
+
+		return best_individual, best_individual.fitness, avg_fitness
 
 	def reset(self):
 		self.population = Population()
@@ -63,25 +193,9 @@ class StanleyNEAT:
 			avg_fitness += individual.fitness
 		avg_fitness /= len(self.population.individuals)
 
-		# speciate
+		# speciate and remove empty species
 		log("\t\tSpeciate")
-		for individual in self.population.individuals:
-			placed = False
-
-			for spec in self.population.species:
-				dist_from_repr = utility.distance(individual, spec.representative)
-
-				if dist_from_repr <= config.compatibility_threshold:
-					spec.add(individual)
-					placed = True
-					break
-
-			if not placed:
-				new_spec = Species(individual)
-				self.population.species.append(new_spec)
-
-		# remove empty species
-		self.population.species = [spec for spec in self.population.species if len(spec.individuals) > 0]
+		self.population.speciate()
 
 		# sort species by max unadjusted fitness
 		log("\t\tSort")

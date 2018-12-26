@@ -156,9 +156,9 @@ class Individual:
 
 
 def crossover(parents):
-	if parents[0].adjusted_fitness > parents[1].adjusted_fitness:
+	if parents[0].fitness > parents[1].fitness:
 		fitter_parent, other_parent = (parents[0], parents[1])
-	elif parents[0].adjusted_fitness == parents[1].adjusted_fitness:
+	elif parents[0].fitness == parents[1].fitness:
 		if len(parents[0].connections) < len(parents[1].connections):
 			fitter_parent, other_parent = (parents[0], parents[1])
 		else:
