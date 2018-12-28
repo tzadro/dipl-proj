@@ -85,25 +85,25 @@ class Pixelcopter:
 
 class XORProblem:
 	def __init__(self):
-		self.observations = [[0., 0., 1.],
-							 [0., 1., 1.],
-							 [1., 0., 1.],
-							 [1., 1., 1.]]
+		self.observations = [[0., 0.],
+							 [0., 1.],
+							 [1., 0.],
+							 [1., 1.]]
 		self.solutions = [0., 1., 1., 0.]
 
-		self.num_inputs = 3
+		self.num_inputs = 2
 		self.num_outputs = 1
 
 		self.evaluations = 0
 		self.solved = False
 
-	def evaluate(self, connections):
+	def evaluate(self, individual):
 		self.evaluations += 1
 
-		phenotype = Phenotype(connections)
+		phenotype = Phenotype(individual.connections.values(), individual.nodes.values())
 
 		correct_solutions = True
-		error_sum = 0
+		fitness = 4
 
 		for observation, solution in zip(self.observations, self.solutions):
 			phenotype.flush()
@@ -111,10 +111,9 @@ class XORProblem:
 			result = output[0]
 
 			correct_solutions = correct_solutions and round(result) == solution
-			error_sum += abs(solution - result)
+			fitness -= (solution - result)**2
 
 		self.solved = self.solved or correct_solutions
-		fitness = (4 - error_sum)**2
 		return fitness
 
 	def reset(self):
@@ -129,11 +128,11 @@ class HalfCheetah:
 		self.num_inputs = 17
 		self.num_outputs = 6
 
-	def evaluate(self, connections):
-		phenotype = Phenotype(connections)
+	def evaluate(self, individual):
+		phenotype = Phenotype(individual.connections.values(), individual.nodes.values())
 
-		# todo: fix problem of negative fitness
-		fitness = 1000
+		# todo: fix problem of negative fitness (with NewNEAT it's ok)
+		fitness = 0
 
 		observation = self.env.reset()
 		while True:

@@ -12,8 +12,6 @@ class NEAT:
 		self.population = Population()
 
 	def epoch(self):
-		self.population.speciate()
-
 		best_individual, best_fitness, avg_fitness = self.population.evaluate_fitness(self.evaluate)
 
 		self.population.adjust_fitness()
@@ -21,6 +19,8 @@ class NEAT:
 
 		self.population.remove_worst()
 		self.population.breed_new_generation()
+
+		self.population.speciate()
 
 		return best_individual, best_fitness, avg_fitness
 
@@ -69,7 +69,7 @@ class NewNEAT:
 				if individual.fitness > max_fitness:
 					max_fitness = individual.fitness
 
-		fitness_range = abs(max_fitness - min_fitness)
+		fitness_range = max(abs(max_fitness - min_fitness), 1.0)
 
 		# compute adjusted fitness for every species
 		adjusted_fitness_sum = 0
@@ -189,13 +189,9 @@ class StanleyNEAT:
 		log("\t\tEvaluate")
 		avg_fitness = 0
 		for individual in self.population.individuals:
-			individual.fitness = self.evaluate(individual.connections.values())
+			individual.fitness = self.evaluate(individual)
 			avg_fitness += individual.fitness
 		avg_fitness /= len(self.population.individuals)
-
-		# speciate and remove empty species
-		log("\t\tSpeciate")
-		self.population.speciate()
 
 		# sort species by max unadjusted fitness
 		log("\t\tSort")
@@ -293,6 +289,10 @@ class StanleyNEAT:
 			children += spec.stanley_reproduce(generation_new_nodes, generation_new_connections)
 
 		self.population.individuals = children
+
+		# speciate and remove empty species
+		log("\t\tSpeciate")
+		self.population.speciate()
 
 		# end
 		log("\t\tEnd epoch")

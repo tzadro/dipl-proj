@@ -20,7 +20,7 @@ class Population:
 		avg_fitness = 0
 
 		for individual in self.individuals:
-			individual.fitness = evaluate(individual.connections.values())
+			individual.fitness = evaluate(individual)
 			avg_fitness += individual.fitness
 
 			if not best_individual or individual.fitness > best_individual.fitness:

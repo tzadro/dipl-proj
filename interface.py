@@ -54,7 +54,7 @@ class NetworkVisualizer:
 		plt.show()
 
 	def update_node_positions(self, connections, nodes):
-		for key in nodes:
+		for key in nodes.keys():
 			if key not in self.node_positions:
 				neighbor_nodes = [connection.to_key if connection.from_key == key else connection.from_key for connection in connections.values() if (connection.to_key == key or connection.from_key == key) and connection.from_key != connection.to_key]
 				x = sum([self.node_positions[node_key][0] for node_key in neighbor_nodes]) / len(neighbor_nodes)

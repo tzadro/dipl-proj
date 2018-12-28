@@ -1,9 +1,11 @@
 from config import config
 from connection import Connection
+from node import Node
 from neuron import Neuron
 from phenotype import Phenotype
 from individual import Individual
 from interface import NetworkVisualizer
+from environments import XORProblem
 import utility
 import numpy as np
 
@@ -129,9 +131,41 @@ def test_interface():
 	}
 	nodes = set([0, 1, 2, 3, 4])
 
-	networkVisualizer = NetworkVisualizer()
-	networkVisualizer.update_node_positions(connections, nodes)
-	networkVisualizer.visualize_network(connections)
+	network_visualizer = NetworkVisualizer()
+	network_visualizer.update_node_positions(connections, nodes)
+	network_visualizer.visualize_network(connections)
+
+
+def test_xor_env():
+	config.sigmoid_coef = 1
+	config.input_keys = [0, 1]
+	config.output_keys = [2]
+
+	connections = {
+		0: Connection(0, 0, 2, -0.72728, True),
+		1: Connection(1, 0, 4, 2.03608, True),
+		2: Connection(2, 1, 2, -0.80148, True),
+		3: Connection(3, 1, 4, -2.30036, True),
+		4: Connection(4, 1, 3, 1.32945, True),
+		5: Connection(5, 4, 2, 3.07868, True),
+		6: Connection(6, 3, 2, 1.17385, True)
+	}
+	nodes = {
+		0: Node(0, 0),
+		1: Node(1, 0),
+		2: Node(2, -0.55619),
+		3: Node(3, -1.09330),
+		4: Node(4, -1.37079)
+	}
+	individual = Individual(connections, nodes)
+
+	env = XORProblem()
+	fitness = env.evaluate(individual)
+	print(fitness)
+
+	network_visualizer = NetworkVisualizer()
+	network_visualizer.update_node_positions(connections, nodes)
+	network_visualizer.visualize_network(connections)
 
 
 def run():
@@ -175,6 +209,8 @@ def run():
 	nodes2 = set([0, 1, 2, 3, 4, 5, 6, 8])
 	individual2 = Individual(connections2, nodes2)
 
+	# todo: adjust test so it reflects newly implemented nodes
+	"""
 	test_sigmoid()
 	test_check_if_path_exists_by_connections(connections1)
 	test_check_if_path_exists_by_neurons(connections1)
@@ -182,6 +218,8 @@ def run():
 	test_neuron()
 	test_phenotype(connections1)
 	test_interface()
+	"""
+	test_xor_env()
 
 
 run()

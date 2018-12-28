@@ -7,7 +7,7 @@ import statistics
 env = XORProblem()
 config.update(env.num_inputs, env.num_outputs)
 algorithm = neat.NewNEAT(env.evaluate)
-networkVisualizer = interface.NetworkVisualizer()
+network_visualizer = interface.NetworkVisualizer()
 
 num_evaluations = []
 best_fitnesses = []
@@ -25,14 +25,14 @@ for run in range(config.num_runs):
 
 		if config.visualize_best_networks:
 			for individual in algorithm.population.individuals:
-				networkVisualizer.update_node_positions(individual.connections, individual.nodes)
+				network_visualizer.update_node_positions(individual.connections, individual.nodes)
 
 		if env.solved:
 			num_evaluations.append(env.evaluations)
 			break
 
 	if config.visualize_best_networks:
-		networkVisualizer.visualize_network(best_individual.connections)
+		network_visualizer.visualize_network(best_individual.connections)
 
 	interface.plot_overall_fitness(best_fitnesses, avg_fitnesses)
 
