@@ -131,7 +131,6 @@ class HalfCheetah:
 	def evaluate(self, individual):
 		phenotype = Phenotype(individual.connections.values(), individual.nodes.values())
 
-		# todo: fix problem of negative fitness (with NewNEAT it's ok)
 		fitness = 0
 
 		observation = self.env.reset()
@@ -147,8 +146,6 @@ class HalfCheetah:
 			if done:
 				break
 
-		# clips fitness so it's never negative
-		fitness = max(fitness, 0.001)
 		return fitness
 
 	def close(self):
