@@ -52,7 +52,7 @@ class Config:
 
 		self.network_canvas_height = 100
 		self.network_canvas_width = 100
-		self.visualize_every = 50
+		self.visualize_every = 20
 		self.visualize_best_networks = True
 		self.verbose = False
 
