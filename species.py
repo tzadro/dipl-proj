@@ -10,7 +10,7 @@ class Species:
 	def __init__(self, representative):
 		self.representative = representative.duplicate()
 		self.individuals = [representative]
-		self.fitness = None
+		self.adjusted_fitness = None
 		self.max_fitness_ever = -math.inf
 		self.num_generations_before_last_improvement = 0
 		self.num_children = None
@@ -23,15 +23,15 @@ class Species:
 		self.individuals.append(individual)
 
 	def adjust_fitness(self):
-		self.fitness = 0
+		self.adjusted_fitness = 0
 
 		num_individuals = len(self.individuals)
 		for individual in self.individuals:
 			individual.adjusted_fitness = individual.fitness / num_individuals
-			self.fitness += individual.adjusted_fitness
+			self.adjusted_fitness += individual.adjusted_fitness
 
-		if self.fitness > self.max_fitness_ever:
-			self.max_fitness_ever = self.fitness
+		if self.adjusted_fitness > self.max_fitness_ever:
+			self.max_fitness_ever = self.adjusted_fitness
 			self.num_generations_before_last_improvement = 0
 		else:
 			self.num_generations_before_last_improvement += 1
@@ -88,7 +88,7 @@ class Species:
 		random_individual = self.random_select()
 		self.representative = random_individual.duplicate()
 		self.individuals = []
-		self.fitness = None
+		self.adjusted_fitness = None
 		self.num_children = None
 		self.age += 1
 

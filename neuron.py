@@ -2,8 +2,9 @@ import utility
 
 
 class Neuron:
-	def __init__(self, key):
+	def __init__(self, key, bias):
 		self.key = key
+		self.bias = bias
 		self.incoming_connections = []
 		self.outgoing_keys = []
 		self.num_non_recurrent_incoming = 0
@@ -30,7 +31,7 @@ class Neuron:
 			self.trigger_outgoing(neurons)
 
 	def calculate_value(self, neurons):
-		score = 0
+		score = self.bias
 
 		for connection in self.incoming_connections:
 			from_neuron = neurons[connection.from_key]

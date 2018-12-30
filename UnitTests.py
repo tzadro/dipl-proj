@@ -1,5 +1,6 @@
 from config import config
 from connection import Connection
+from node import Node
 from neuron import Neuron
 from phenotype import Phenotype
 from individual import Individual
@@ -27,11 +28,11 @@ def test_check_if_path_exists_by_connections(connections):
 	print('Check_if_path_exists_by_connections test:', res1 is True and res2 is False)
 
 
-def test_check_if_path_exists_by_neurons(connections):
+def test_check_if_path_exists_by_neurons(connections, nodes):
 	config.input_keys = [0, 1, 2]
 	config.output_keys = [3, 4]
 
-	phenotype = Phenotype(connections.values())
+	phenotype = Phenotype(connections.values(), nodes.values())
 
 	from_node = 5
 	to_node = 8
@@ -65,10 +66,10 @@ def test_neuron():
 		3: Connection(3, 2, 2, 0.5, True)
 	}
 	neurons = {
-		0: Neuron(0),
-		1: Neuron(1),
-		2: Neuron(2),
-		3: Neuron(3)
+		0: Neuron(0, 0),
+		1: Neuron(1, 0),
+		2: Neuron(2, 0.2),
+		3: Neuron(3, 0.3)
 	}
 
 	neurons[0].add_outgoing(2)
@@ -97,10 +98,10 @@ def test_neuron():
 	neurons[1].set_value(1., neurons)
 	res2 = neurons[3].value
 
-	print('Neuron test:', round(res1, 2) == 0.56 and round(res2, 2) == 0.57)
+	print('Neuron test:', round(res1, 4) == 0.6381 and round(res2, 4) == 0.6445)
 
 
-def test_phenotype(connections):
+def test_phenotype(connections, nodes):
 	config.sigmoid_coef = 1
 	config.input_keys = [0, 1, 2]
 	config.output_keys = [3, 4]
@@ -109,7 +110,7 @@ def test_phenotype(connections):
 	action_space_low = np.array([-1., -1.])
 
 	inputs = [1., 1., 1.]
-	phenotype = Phenotype(connections.values())
+	phenotype = Phenotype(connections.values(), nodes.values())
 	output = phenotype.forward(inputs)
 	res = utility.scale(output, action_space_low, action_space_high)
 
@@ -127,11 +128,17 @@ def test_interface():
 		3: Connection(3, 4, 3, 0.5, True),
 		4: Connection(4, 4, 4, 0.3, True)
 	}
-	nodes = set([0, 1, 2, 3, 4])
+	nodes = {
+		0: Node(0, 0),
+		1: Node(1, 0),
+		2: Node(2, 0),
+		3: Node(3, 0),
+		4: Node(4, 0)
+	}
 
-	networkVisualizer = NetworkVisualizer()
-	networkVisualizer.update_node_positions(connections, nodes)
-	networkVisualizer.visualize_network(connections)
+	network_visualizer = NetworkVisualizer()
+	network_visualizer.update_node_positions(connections, nodes)
+	network_visualizer.visualize_network(connections)
 
 
 def run():
@@ -153,7 +160,17 @@ def run():
 		14: Connection(14, 8, 3, 0.3, True),
 		15: Connection(15, 8, 5, 0.8, False)
 	}
-	nodes1 = set([0, 1, 2, 3, 4, 5, 6, 7, 8])
+	nodes1 = {
+		0: Node(0, 0),
+		1: Node(1, 0),
+		2: Node(2, 0),
+		3: Node(3, 0),
+		4: Node(4, 0),
+		5: Node(5, 0),
+		6: Node(6, 0),
+		7: Node(7, 0),
+		8: Node(8, 0)
+	}
 	individual1 = Individual(connections1, nodes1)
 
 	connections2 = {
@@ -172,15 +189,25 @@ def run():
 		16: Connection(16, 1, 4, 0.5, True),
 		17: Connection(17, 2, 4, 0.8, True)
 	}
-	nodes2 = set([0, 1, 2, 3, 4, 5, 6, 8])
+	nodes2 = {
+		0: Node(0, 0),
+		1: Node(1, 0),
+		2: Node(2, 0),
+		3: Node(3, 0),
+		4: Node(4, 0),
+		5: Node(5, 0),
+		6: Node(6, 0),
+		7: Node(7, 0),
+		8: Node(8, 0)
+	}
 	individual2 = Individual(connections2, nodes2)
 
 	test_sigmoid()
 	test_check_if_path_exists_by_connections(connections1)
-	test_check_if_path_exists_by_neurons(connections1)
+	test_check_if_path_exists_by_neurons(connections1, nodes1)
 	test_distance(individual1, individual2)
 	test_neuron()
-	test_phenotype(connections1)
+	test_phenotype(connections1, nodes1)
 	test_interface()
 
 

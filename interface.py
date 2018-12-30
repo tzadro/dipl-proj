@@ -54,7 +54,7 @@ class NetworkVisualizer:
 		plt.show()
 
 	def update_node_positions(self, connections, nodes):
-		for key in nodes:
+		for key in nodes.keys():
 			if key not in self.node_positions:
 				neighbor_nodes = [connection.to_key if connection.from_key == key else connection.from_key for connection in connections.values() if (connection.to_key == key or connection.from_key == key) and connection.from_key != connection.to_key]
 				x = sum([self.node_positions[node_key][0] for node_key in neighbor_nodes]) / len(neighbor_nodes)
@@ -73,7 +73,7 @@ def verbose(i, population, best_fitness, avg_fitness):
 	print('Num organisms with more than default number of connections: {:d}'.format(sum([len(individual.connections.values()) > config.num_starting_connections for individual in population.individuals])))
 	for j, spec in enumerate(population.species):
 		print('\tSpecies: {:d}'.format(j))
-		print('\t\tfitness: {:.2f}'.format(spec.fitness))
+		print('\t\tfitness: {:.2f}'.format(spec.adjusted_fitness))
 		print('\t\tnum_individuals: {:d}, num_children: {:d}'.format(len(spec.individuals), spec.num_children))
 		best_adjusted_fitness = spec.individuals[0].adjusted_fitness
 		avg_adjusted_fitness = sum([individual.adjusted_fitness for individual in spec.individuals]) / len(spec.individuals)
