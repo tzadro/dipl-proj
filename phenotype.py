@@ -1,10 +1,11 @@
-from config import config
 from neuron import Neuron
 import utility
 
 
 class Phenotype:
-	def __init__(self, connections, nodes):
+	def __init__(self, connections, nodes, config):
+		self.input_keys = config.input_keys
+		self.output_keys = config.output_keys
 		self.neurons = {}
 
 		for node in nodes:
@@ -23,10 +24,10 @@ class Phenotype:
 		for neuron in self.neurons.values():
 			neuron.reset()
 
-		for key, value in zip(config.input_keys, inputs):
+		for key, value in zip(self.input_keys, inputs):
 			self.neurons[key].set_value(value, self.neurons)
 
-		output = [self.neurons[key].value for key in config.output_keys]
+		output = [self.neurons[key].value for key in self.output_keys]
 		return output
 
 	def flush(self):

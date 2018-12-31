@@ -29,13 +29,13 @@ class NEAT:
 
 
 class NewNEAT:
-	def __init__(self, evaluate):
-		self.evaluate = evaluate
+	def __init__(self, evaluate_all):
+		self.evaluate_all = evaluate_all
 		self.population = Population()
 
 	def epoch(self):
 		# evaluate population
-		best_individual, best_individual.fitness, avg_fitness = self.population.evaluate_fitness(self.evaluate)
+		best_individual, best_individual.fitness, avg_fitness = self.evaluate_all(self.population.individuals)
 
 		# sort by max unadjusted fitness
 		for spec in self.population.species:
@@ -189,7 +189,7 @@ class StanleyNEAT:
 		log("\t\tEvaluate")
 		avg_fitness = 0
 		for individual in self.population.individuals:
-			individual.fitness = self.evaluate(individual)
+			individual.fitness = self.evaluate(individual, config)
 			avg_fitness += individual.fitness
 		avg_fitness /= len(self.population.individuals)
 

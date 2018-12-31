@@ -15,20 +15,6 @@ class Population:
 		self.max_fitness_ever = -math.inf
 		self.num_generations_before_last_improvement = None
 
-	def evaluate_fitness(self, evaluate):
-		best_individual = None
-		avg_fitness = 0
-
-		for individual in self.individuals:
-			individual.fitness = evaluate(individual)
-			avg_fitness += individual.fitness
-
-			if not best_individual or individual.fitness > best_individual.fitness:
-				best_individual = individual
-
-		avg_fitness /= len(self.individuals)
-		return best_individual, best_individual.fitness, avg_fitness
-
 	def speciate(self):
 		for individual in self.individuals:
 			placed = False

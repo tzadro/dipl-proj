@@ -97,10 +97,8 @@ class XORProblem:
 		self.evaluations = 0
 		self.solved = False
 
-	def evaluate(self, individual):
-		self.evaluations += 1
-
-		phenotype = Phenotype(individual.connections.values(), individual.nodes.values())
+	def evaluate(self, individual, config):
+		phenotype = Phenotype(individual.connections.values(), individual.nodes.values(), config)
 
 		correct_solutions = True
 		fitness = 4
@@ -113,8 +111,7 @@ class XORProblem:
 			correct_solutions = correct_solutions and round(result) == solution
 			fitness -= (solution - result)**2
 
-		self.solved = self.solved or correct_solutions
-		return fitness
+		return fitness, correct_solutions
 
 	def reset(self):
 		self.evaluations = 0
@@ -128,8 +125,11 @@ class HalfCheetah:
 		self.num_inputs = 17
 		self.num_outputs = 6
 
-	def evaluate(self, individual):
-		phenotype = Phenotype(individual.connections.values(), individual.nodes.values())
+		self.evaluations = 0
+		self.solved = False
+
+	def evaluate(self, individual, config):
+		phenotype = Phenotype(individual.connections.values(), individual.nodes.values(), config)
 
 		fitness = 0
 
@@ -146,7 +146,7 @@ class HalfCheetah:
 			if done:
 				break
 
-		return fitness
+		return fitness, False
 
 	def __del__(self):
 		self.env.close()

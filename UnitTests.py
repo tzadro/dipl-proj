@@ -32,7 +32,7 @@ def test_check_if_path_exists_by_neurons(connections, nodes):
 	config.input_keys = [0, 1, 2]
 	config.output_keys = [3, 4]
 
-	phenotype = Phenotype(connections.values(), nodes.values())
+	phenotype = Phenotype(connections.values(), nodes.values(), config)
 
 	from_node = 5
 	to_node = 8
@@ -110,7 +110,7 @@ def test_phenotype(connections, nodes):
 	action_space_low = np.array([-1., -1.])
 
 	inputs = [1., 1., 1.]
-	phenotype = Phenotype(connections.values(), nodes.values())
+	phenotype = Phenotype(connections.values(), nodes.values(), config)
 	output = phenotype.forward(inputs)
 	res = utility.scale(output, action_space_low, action_space_high)
 
