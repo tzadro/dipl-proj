@@ -26,5 +26,3 @@ for i in range(config.num_iter):
 			networkVisualizer.visualize_network(best_individual.connections)
 
 interface.plot_overall_fitness(best_fitnesses, avg_fitnesses)
-
-env.close()

@@ -148,5 +148,5 @@ class HalfCheetah:
 
 		return fitness
 
-	def close(self):
+	def __del__(self):
 		self.env.close()
