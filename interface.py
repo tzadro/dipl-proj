@@ -1,6 +1,7 @@
 from config import config
 import networkx as nx
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class NetworkVisualizer:
@@ -91,4 +92,20 @@ def plot_overall_fitness(best_fitnesses, avg_fitnesses):
 	plt.xlabel('Generation')
 	plt.ylabel('Score')
 	plt.legend()
+	plt.show()
+
+
+def plot_species_sizes(species_sizes):
+	num_generations = len(species_sizes)
+	num_species = len(species_sizes[-1])
+
+	curves = np.zeros((num_species, num_generations))
+	for i, row in enumerate(species_sizes):
+		for j, element in enumerate(row):
+			curves[j][i] = element
+
+	plt.stackplot(range(num_generations), curves)
+	plt.title('Species sizes over generations')
+	plt.xlabel('Generation')
+	plt.ylabel('Size')
 	plt.show()

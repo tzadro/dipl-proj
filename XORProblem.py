@@ -12,6 +12,7 @@ network_visualizer = interface.NetworkVisualizer()
 num_evaluations = []
 best_fitnesses = []
 avg_fitnesses = []
+species_sizes = []
 
 for run in range(config.num_runs):
 	interface.log("Run {:d}".format(run))
@@ -22,6 +23,12 @@ for run in range(config.num_runs):
 		best_individual, best_fitness, avg_fitness = algorithm.epoch()
 		best_fitnesses.append(best_fitness)
 		avg_fitnesses.append(avg_fitness)
+
+		num_species = algorithm.population.next_species_key
+		generation_sizes = [0] * num_species
+		for spec in algorithm.population.species:
+			generation_sizes[spec.key] = len(spec.individuals)
+		species_sizes.append(generation_sizes)
 
 		if config.visualize_best_networks:
 			for individual in algorithm.population.individuals:
@@ -35,11 +42,13 @@ for run in range(config.num_runs):
 		network_visualizer.visualize_network(best_individual.connections)
 
 	interface.plot_overall_fitness(best_fitnesses, avg_fitnesses)
+	interface.plot_species_sizes(species_sizes)
 
 	env.reset()
 
 	best_fitnesses = []
 	avg_fitnesses = []
+	species_sizes = []
 	algorithm.reset()
 
 if config.num_runs > 1 and len(num_evaluations) > 1:

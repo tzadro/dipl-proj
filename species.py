@@ -7,7 +7,8 @@ import numpy as np
 
 
 class Species:
-	def __init__(self, representative):
+	def __init__(self, key, representative):
+		self.key = key
 		self.representative = representative.duplicate()
 		self.individuals = [representative]
 		self.adjusted_fitness = None

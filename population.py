@@ -10,6 +10,7 @@ class Population:
 	def __init__(self):
 		self.individuals = [Individual() for _ in range(config.pop_size)]
 		self.species = []
+		self.next_species_key = 0
 		self.speciate()
 
 		self.max_fitness_ever = -math.inf
@@ -42,8 +43,9 @@ class Population:
 					break
 
 			if not placed:
-				new_spec = Species(individual)
+				new_spec = Species(self.next_species_key, individual)
 				self.species.append(new_spec)
+				self.next_species_key += 1
 
 		self.species = [spec for spec in self.species if len(spec.individuals) > 0]
 
