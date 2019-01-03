@@ -6,7 +6,7 @@ import math
 import random
 
 
-class NEAT:
+class AbstractNEAT:
 	def __init__(self, evaluate, stats):
 		self.evaluate = evaluate
 		self.stats = stats
@@ -20,7 +20,7 @@ class NEAT:
 		self.population = Population()
 
 
-class FirstNEAT(NEAT):
+class NEAT(AbstractNEAT):
 	def epoch(self):
 		best_individual = self.population.evaluate_fitness(self.evaluate)
 		self.stats.update_generation(self.population)
@@ -36,7 +36,7 @@ class FirstNEAT(NEAT):
 		return best_individual
 
 
-class NewNEAT(NEAT):
+class NewNEAT(AbstractNEAT):
 	def epoch(self):
 		# evaluate population
 		best_individual = self.population.evaluate_fitness(self.evaluate)
@@ -161,7 +161,7 @@ class NewNEAT(NEAT):
 		return best_individual
 
 
-class tsNEAT(NEAT):
+class tsNEAT(AbstractNEAT):
 	def epoch(self):
 		self.population.speciate()
 
@@ -174,7 +174,7 @@ class tsNEAT(NEAT):
 		return best_individual
 
 
-class StanleyNEAT(NEAT):
+class StanleyNEAT(AbstractNEAT):
 	def __init__(self, evaluate, stats):
 		self.evaluate = evaluate
 		self.stats = stats

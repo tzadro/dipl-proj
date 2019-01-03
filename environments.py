@@ -1,10 +1,11 @@
+from config import config
 from phenotype import Phenotype
 import utility
 import gym
-# import ple
+"""
+import ple
 import math
 import numpy as np
-
 
 # todo: needs refactor
 class CartPole:
@@ -80,18 +81,33 @@ class Pixelcopter:
 		self.avg_observations /= self.num_runs
 		for i, key in enumerate(list(self.game.getGameState().keys())):
 			print('avg_value: {:.2f}, \tmin_value: {:.2f}, \tmax_value: {:.2f}, \tkey: '.format(self.avg_observations[i], self.min_observations[i], self.max_observations[i]) + key)
+"""
 
 
-class XORProblem:
+class AbstractEnvironment:
 	def __init__(self):
+		num_inputs, num_outputs = 0, 0
+		config.update(num_inputs, num_outputs)
+
+		pass
+
+	def evaluate(self, individual):
+		pass
+
+	def reset(self):
+		pass
+
+
+class XORProblem(AbstractEnvironment):
+	def __init__(self):
+		num_inputs, num_outputs = 2, 1
+		config.update(num_inputs, num_outputs)
+
 		self.observations = [[0., 0.],
 							 [0., 1.],
 							 [1., 0.],
 							 [1., 1.]]
 		self.solutions = [0., 1., 1., 0.]
-
-		self.num_inputs = 2
-		self.num_outputs = 1
 
 		self.evaluations = 0
 		self.solved = False
@@ -120,12 +136,12 @@ class XORProblem:
 		self.solved = False
 
 
-class HalfCheetah:
+class HalfCheetah(AbstractEnvironment):
 	def __init__(self):
-		self.env = gym.make('HalfCheetah-v2')
+		num_inputs, num_outputs = 17, 6
+		config.update(num_inputs, num_outputs)
 
-		self.num_inputs = 17
-		self.num_outputs = 6
+		self.env = gym.make('HalfCheetah-v2')
 
 	def evaluate(self, individual):
 		phenotype = Phenotype(individual.connections.values(), individual.nodes.values())

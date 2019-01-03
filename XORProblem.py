@@ -5,7 +5,6 @@ import neat
 import interface
 
 env = XORProblem()
-config.update(env.num_inputs, env.num_outputs)
 stats = Statistics()
 algorithm = neat.NewNEAT(env.evaluate, stats)
 network_visualizer = interface.NetworkVisualizer()
@@ -33,7 +32,6 @@ for run in range(config.num_runs):
 	interface.plot_species_sizes(stats.species_sizes)
 
 	env.reset()
-
 	algorithm.reset()
 
 if config.num_runs > 1 and len(stats.num_evaluations) > 1:
