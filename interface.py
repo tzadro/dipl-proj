@@ -129,4 +129,4 @@ def print_evaluation_stats(num_evaluations, num_hidden_nodes, num_connections):
 	print('Structure:')
 	print('\tavg num hidden nodes: {:.2f}'.format(avg_hidden))
 	print('\tavg num connections: {:.2f}'.format(avg_conn))
-	print('From: {:d} finished runs (of {:d} actual runs)'.format(num_finished_runs, config.num_runs))
+	print('From: {:d} finished runs (of {:d} total runs)'.format(num_finished_runs, config.num_runs))
