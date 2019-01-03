@@ -81,13 +81,16 @@ def verbose(i, population, best_fitness, avg_fitness):
 		print('\t\tbest_adjusted_fitness: {:.2f}, avg_adjusted_fitness: {:.2f}'.format(best_adjusted_fitness, avg_adjusted_fitness))
 
 
-def plot_overall_fitness(best_fitnesses, avg_fitnesses):
-	assert len(best_fitnesses) == len(avg_fitnesses), "best_fitnesses and avg_fitnesses must be the same length"
-
+def plot_overall_fitness(best_fitnesses, avg_fitnesses, stdev_fitnesses):
 	generations = range(len(best_fitnesses))
+	best = np.array(best_fitnesses)
+	avg = np.array(avg_fitnesses)
+	stdev = np.array(stdev_fitnesses)
 
-	plt.plot(generations, best_fitnesses, color='red', label='Best score')
-	plt.plot(generations, avg_fitnesses, color='blue', label='Average score')
+	plt.plot(generations, best, color='red', label='Best score')
+	plt.plot(generations, avg, color='blue', label='Average score')
+	plt.plot(generations, avg + stdev, color='blue', linestyle='dashed')
+	plt.plot(generations, avg - stdev, color='blue', linestyle='dashed')
 	plt.title('Fitness over generations')
 	plt.xlabel('Generation')
 	plt.ylabel('Score')
@@ -109,3 +112,21 @@ def plot_species_sizes(species_sizes):
 	plt.xlabel('Generation')
 	plt.ylabel('Size')
 	plt.show()
+
+
+def print_evaluation_stats(num_evaluations, num_hidden_nodes, num_connections):
+	num_finished_runs = len(num_evaluations)
+	avg_ev = sum(num_evaluations) / num_finished_runs
+	avg_gen = avg_ev / config.pop_size
+	std_ev = np.std(num_evaluations)
+	std_gen = std_ev / config.pop_size
+	avg_hidden = sum(num_hidden_nodes) / num_finished_runs
+	avg_conn = sum(num_connections) / num_finished_runs
+
+	print('Num evaluations:')
+	print('\tavg: {:.2f} (~{:d} generations)'.format(avg_ev, int(avg_gen)))
+	print('\tstdev: {:.2f} (~{:d} generations)'.format(std_ev, int(std_gen)))
+	print('Structure:')
+	print('\tavg num hidden nodes: {:.2f}'.format(avg_hidden))
+	print('\tavg num connections: {:.2f}'.format(avg_conn))
+	print('From: {:d} finished runs (of {:d} actual runs)'.format(num_finished_runs, config.num_runs))

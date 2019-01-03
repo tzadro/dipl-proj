@@ -80,7 +80,6 @@ class Pixelcopter:
 		self.avg_observations /= self.num_runs
 		for i, key in enumerate(list(self.game.getGameState().keys())):
 			print('avg_value: {:.2f}, \tmin_value: {:.2f}, \tmax_value: {:.2f}, \tkey: '.format(self.avg_observations[i], self.min_observations[i], self.max_observations[i]) + key)
-		return
 
 
 class XORProblem:

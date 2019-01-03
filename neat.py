@@ -7,12 +7,23 @@ import random
 
 
 class NEAT:
-	def __init__(self, evaluate):
+	def __init__(self, evaluate, stats):
 		self.evaluate = evaluate
+		self.stats = stats
 		self.population = Population()
 
 	def epoch(self):
-		best_individual, best_fitness, avg_fitness = self.population.evaluate_fitness(self.evaluate)
+		pass
+
+	def reset(self):
+		self.stats.reset_generation()
+		self.population = Population()
+
+
+class FirstNEAT(NEAT):
+	def epoch(self):
+		best_individual = self.population.evaluate_fitness(self.evaluate)
+		self.stats.update_generation(self.population)
 
 		self.population.adjust_fitness()
 		self.population.assign_num_children()
@@ -22,20 +33,14 @@ class NEAT:
 
 		self.population.speciate()
 
-		return best_individual, best_fitness, avg_fitness
-
-	def reset(self):
-		self.population = Population()
+		return best_individual
 
 
-class NewNEAT:
-	def __init__(self, evaluate):
-		self.evaluate = evaluate
-		self.population = Population()
-
+class NewNEAT(NEAT):
 	def epoch(self):
 		# evaluate population
-		best_individual, best_individual.fitness, avg_fitness = self.population.evaluate_fitness(self.evaluate)
+		best_individual = self.population.evaluate_fitness(self.evaluate)
+		self.stats.update_generation(self.population)
 
 		# sort by max unadjusted fitness
 		for spec in self.population.species:
@@ -146,52 +151,42 @@ class NewNEAT:
 				children.append(child)
 				spec.num_children -= 1
 
-			spec.clear()
+			spec.reset()
 
 		self.population.individuals = children
 
 		# speciate and remove empty species
 		self.population.speciate()
 
-		return best_individual, best_individual.fitness, avg_fitness
-
-	def reset(self):
-		self.population = Population()
+		return best_individual
 
 
-class tsNEAT:
-	def __init__(self, evaluate):
-		self.evaluate = evaluate
-		self.population = Population()
-
+class tsNEAT(NEAT):
 	def epoch(self):
 		self.population.speciate()
 
-		best_individual, best_fitness, avg_fitness = self.population.evaluate_fitness(self.evaluate)
+		best_individual = self.population.evaluate_fitness(self.evaluate)
+		self.stats.update_generation(self.population)
 
 		self.population.adjust_fitness()
 		self.population.breed_new_generation_by_tournament_selection()
 
-		return best_individual, best_fitness, avg_fitness
-
-	def reset(self):
-		self.population = Population()
+		return best_individual
 
 
-class StanleyNEAT:
-	def __init__(self, evaluate):
+class StanleyNEAT(NEAT):
+	def __init__(self, evaluate, stats):
 		self.evaluate = evaluate
+		self.stats = stats
 		self.population = Population()
 		self.generation = 0
 
 	def epoch(self):
 		# evaluate
 		log("\t\tEvaluate")
-		avg_fitness = 0
 		for individual in self.population.individuals:
 			individual.fitness = self.evaluate(individual)
-			avg_fitness += individual.fitness
-		avg_fitness /= len(self.population.individuals)
+		self.stats.update_generation(self.population)
 
 		# sort species by max unadjusted fitness
 		log("\t\tSort")
@@ -250,8 +245,8 @@ class StanleyNEAT:
 
 		# check for population-level stagnation
 		log("\t\tPopulation stagnation")
-		if best_individual.fitness > self.population.max_fitness:
-			self.population.max_fitness = best_individual.fitness
+		if best_individual.fitness > self.population.max_fitness_ever:
+			self.population.max_fitness_ever = best_individual.fitness
 			self.population.num_generations_before_last_improvement = 0
 		else:
 			self.population.num_generations_before_last_improvement += 1
@@ -297,8 +292,9 @@ class StanleyNEAT:
 		# end
 		log("\t\tEnd epoch")
 		self.generation += 1
-		return best_individual, best_individual.fitness, avg_fitness
+		return best_individual
 
 	def reset(self):
+		self.stats.reset_generation()
 		self.population = Population()
 		self.generation = 0

@@ -18,17 +18,14 @@ class Population:
 
 	def evaluate_fitness(self, evaluate):
 		best_individual = None
-		avg_fitness = 0
 
 		for individual in self.individuals:
 			individual.fitness = evaluate(individual)
-			avg_fitness += individual.fitness
 
 			if not best_individual or individual.fitness > best_individual.fitness:
 				best_individual = individual
 
-		avg_fitness /= len(self.individuals)
-		return best_individual, best_individual.fitness, avg_fitness
+		return best_individual
 
 	def speciate(self):
 		for individual in self.individuals:
@@ -106,7 +103,7 @@ class Population:
 
 			children += [spec.breed_child(generation_new_nodes, generation_new_connections) for _ in range(spec.num_children)]
 
-			spec.clear()
+			spec.reset()
 
 		self.individuals = children
 
@@ -130,6 +127,6 @@ class Population:
 			children += [spec.breed_child_by_tournament_selection(generation_new_nodes, generation_new_connections)]
 
 		for spec in self.species:
-			spec.clear()
+			spec.reset()
 
 		self.individuals = children
