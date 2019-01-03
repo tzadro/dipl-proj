@@ -2,6 +2,7 @@ from core.config import config
 from core.phenotype import Phenotype
 from core import utility
 import gym
+import numpy as np
 """
 import ple
 import math
@@ -134,6 +135,39 @@ class XORProblem(AbstractEnvironment):
 	def reset(self):
 		self.evaluations = 0
 		self.solved = False
+
+
+class MountainCarContinuous(AbstractEnvironment):
+	def __init__(self):
+		num_inputs, num_outputs = 2, 1
+		config.update(num_inputs, num_outputs)
+
+		self.env = gym.make('MountainCarContinuous-v0')
+
+	def evaluate(self, individual):
+		phenotype = Phenotype(individual.connections.values(), individual.nodes.values())
+
+		fitness = 0
+
+		observation = self.env.reset()
+		observation = utility.normalize(observation, self.env.observation_space.low, self.env.observation_space.high)
+		while True:
+			self.env.render()
+
+			output = phenotype.forward(observation)
+			action = utility.scale(output, self.env.action_space.low, self.env.action_space.high)
+			observation, reward, done, info = self.env.step(action)
+			observation = utility.normalize(observation, self.env.observation_space.low, self.env.observation_space.high)
+
+			fitness += reward
+
+			if done:
+				break
+
+		return fitness
+
+	def __del__(self):
+		self.env.close()
 
 
 class HalfCheetah(AbstractEnvironment):

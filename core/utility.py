@@ -1,5 +1,6 @@
 from core.config import config
 import math
+import numpy as np
 
 
 def sigmoid(x):
@@ -85,6 +86,11 @@ def distance(individual1, individual2):  # todo: are disabled genes included?
 	return delta
 
 
-# assumes output is [0, 1]
-def scale(output, action_space_low, action_space_high):
-	return output * (abs(action_space_high) + abs(action_space_low)) + action_space_low
+# from range [0, 1] to [low, high]
+def scale(data, low, high):
+	return data * np.abs(high - low) + low
+
+
+# from range [low, high] to [0, 1]
+def normalize(data, low, high):
+	return (data - low) / np.abs(high - low)
