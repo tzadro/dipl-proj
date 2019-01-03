@@ -1,6 +1,6 @@
-from config import config
-from individual import crossover
-from interface import log
+from core.config import config
+from core.individual import crossover
+from core.interface import log
 import random
 import math
 import numpy as np

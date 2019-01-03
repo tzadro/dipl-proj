@@ -1,7 +1,7 @@
-from config import config
-from connection import Connection
-from node import Node
-import utility
+from core.config import config
+from core.connection import Connection
+from core.node import Node
+from core import utility
 import copy
 import random
 
@@ -89,7 +89,8 @@ class Individual:
 		num_inputs = len(config.input_keys)
 		num_outputs = len(config.output_keys)
 
-		if num_connections == utility.max_num_edges(num_nodes) - (utility.max_num_edges(num_inputs) + utility.max_num_edges(num_outputs)):
+		if num_connections == utility.max_num_edges(num_nodes) - (
+				utility.max_num_edges(num_inputs) + utility.max_num_edges(num_outputs)):
 			return
 
 		while True:

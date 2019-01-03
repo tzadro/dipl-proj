@@ -1,6 +1,6 @@
-from config import config
-from phenotype import Phenotype
-import utility
+from core.config import config
+from core.phenotype import Phenotype
+from core import utility
 import gym
 """
 import ple

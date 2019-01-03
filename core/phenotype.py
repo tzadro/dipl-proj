@@ -1,6 +1,6 @@
-from config import config
-from neuron import Neuron
-import utility
+from core.config import config
+from core.neuron import Neuron
+from core import utility
 
 
 class Phenotype:

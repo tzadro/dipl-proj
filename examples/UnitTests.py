@@ -1,11 +1,11 @@
-from config import config
-from connection import Connection
-from node import Node
-from neuron import Neuron
-from phenotype import Phenotype
-from individual import Individual
-from interface import NetworkVisualizer
-import utility
+from core.config import config
+from core.connection import Connection
+from core.node import Node
+from core.neuron import Neuron
+from core.phenotype import Phenotype
+from core.individual import Individual
+from core.interface import NetworkVisualizer
+from core import utility
 import numpy as np
 
 

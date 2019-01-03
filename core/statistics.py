@@ -1,4 +1,4 @@
-from config import config
+from core.config import config
 import numpy as np
 
 

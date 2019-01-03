@@ -1,8 +1,7 @@
-from config import config
-from environments import XORProblem
-from statistics import Statistics
-import neat
-import interface
+from core.config import config
+from core.environments import XORProblem
+from core.statistics import Statistics
+from core import neat, interface
 
 env = XORProblem()
 stats = Statistics()

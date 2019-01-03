@@ -1,4 +1,4 @@
-import utility
+from core import utility
 
 
 class Neuron:

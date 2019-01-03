@@ -1,7 +1,7 @@
-from config import config
-from individual import Individual
-from species import Species
-import utility
+from core.config import config
+from core.individual import Individual
+from core.species import Species
+from core import utility
 import math
 import random
 

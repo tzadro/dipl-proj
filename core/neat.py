@@ -1,7 +1,7 @@
-from config import config
-from population import Population
-from individual import crossover
-from interface import log
+from core.config import config
+from core.population import Population
+from core.individual import crossover
+from core.interface import log
 import math
 import random
 
