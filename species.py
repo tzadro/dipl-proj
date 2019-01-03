@@ -7,7 +7,8 @@ import numpy as np
 
 
 class Species:
-	def __init__(self, representative):
+	def __init__(self, key, representative):
+		self.key = key
 		self.representative = representative.duplicate()
 		self.individuals = [representative]
 		self.adjusted_fitness = None
@@ -84,7 +85,7 @@ class Species:
 	def trim_to(self, n=1):
 		self.individuals = self.individuals[:n]
 
-	def clear(self):
+	def reset(self):
 		random_individual = self.random_select()
 		self.representative = random_individual.duplicate()
 		self.individuals = []
@@ -158,5 +159,5 @@ class Species:
 			children.append(child)
 			self.num_children -= 1
 
-		self.clear()
+		self.reset()
 		return children

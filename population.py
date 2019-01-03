@@ -10,6 +10,7 @@ class Population:
 	def __init__(self):
 		self.individuals = [Individual() for _ in range(config.pop_size)]
 		self.species = []
+		self.next_species_key = 0
 		self.speciate()
 
 		self.max_fitness_ever = -math.inf
@@ -17,17 +18,14 @@ class Population:
 
 	def evaluate_fitness(self, evaluate):
 		best_individual = None
-		avg_fitness = 0
 
 		for individual in self.individuals:
 			individual.fitness = evaluate(individual)
-			avg_fitness += individual.fitness
 
 			if not best_individual or individual.fitness > best_individual.fitness:
 				best_individual = individual
 
-		avg_fitness /= len(self.individuals)
-		return best_individual, best_individual.fitness, avg_fitness
+		return best_individual
 
 	def speciate(self):
 		for individual in self.individuals:
@@ -42,8 +40,9 @@ class Population:
 					break
 
 			if not placed:
-				new_spec = Species(individual)
+				new_spec = Species(self.next_species_key, individual)
 				self.species.append(new_spec)
+				self.next_species_key += 1
 
 		self.species = [spec for spec in self.species if len(spec.individuals) > 0]
 
@@ -104,7 +103,7 @@ class Population:
 
 			children += [spec.breed_child(generation_new_nodes, generation_new_connections) for _ in range(spec.num_children)]
 
-			spec.clear()
+			spec.reset()
 
 		self.individuals = children
 
@@ -128,6 +127,6 @@ class Population:
 			children += [spec.breed_child_by_tournament_selection(generation_new_nodes, generation_new_connections)]
 
 		for spec in self.species:
-			spec.clear()
+			spec.reset()
 
 		self.individuals = children
