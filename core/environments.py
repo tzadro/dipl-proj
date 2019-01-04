@@ -2,7 +2,6 @@ from core.config import config
 from core.phenotype import Phenotype
 from core import utility
 import gym
-import numpy as np
 """
 import ple
 import math
