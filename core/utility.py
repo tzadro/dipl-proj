@@ -94,3 +94,8 @@ def scale(data, low, high):
 # from range [low, high] to [0, 1]
 def normalize(data, low, high):
 	return (data - low) / np.abs(high - low)
+
+
+# rescale data to have a mean 0 and stdev 1
+def standardize(data, mean, stdev):
+	return (data - mean) / stdev
