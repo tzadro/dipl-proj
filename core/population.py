@@ -3,7 +3,6 @@ from core.individual import Individual, crossover
 from core.species import Species
 from core import utility
 import math
-import random
 
 
 class Population:
@@ -132,11 +131,9 @@ class Population:
 				if parent1 == parent2:
 					child = parent1.duplicate()
 				else:
-					# todo: check
 					child = crossover([parent1, parent2])
 
 				# mutate
-				# todo: check
 				child.mutate(generation_new_nodes, generation_new_connections)
 
 				children.append(child)

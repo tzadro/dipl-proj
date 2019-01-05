@@ -5,7 +5,7 @@ from core import neat, interface
 
 env = HalfCheetah()
 stats = Statistics()
-algorithm = neat.NewNEAT(env.evaluate, stats)
+algorithm = neat.NEAT(env.evaluate, stats)
 networkVisualizer = interface.NetworkVisualizer()
 
 for i in range(config.num_iter):

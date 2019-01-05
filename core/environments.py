@@ -103,6 +103,9 @@ class HalfCheetah(AbstractEnvironment):
 
 		fitness = 0
 
+		# ensures every run starts with same observation
+		self.env.seed(0)
+
 		observation = self.env.reset()
 		while True:
 			self.env.render()
