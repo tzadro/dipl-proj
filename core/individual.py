@@ -13,10 +13,6 @@ class Individual:
 		self.fitness = None
 		self.adjusted_fitness = None
 
-		# used only for stanley neat
-		self.expected_num_offsprings = None
-		self.eliminate = False
-
 		if connections and nodes:
 			self.connections = connections
 			self.nodes = nodes
@@ -57,14 +53,6 @@ class Individual:
 
 		self.mutate_connections()
 		self.mutate_nodes()
-
-	def stanley_mutate(self, generation_new_nodes, generation_new_connections):
-		if random.random() < config.new_node_probability:
-			self.new_node(generation_new_nodes, generation_new_connections)
-		elif random.random() < config.new_connection_probability:
-			self.new_connection(generation_new_connections)
-		else:
-			self.mutate_connections()
 
 	def mutate_connections(self):
 		for connection in self.connections.values():
@@ -161,9 +149,6 @@ class Individual:
 
 		clone.fitness = None
 		clone.adjusted_fitness = None
-
-		clone.expected_num_offsprings = None
-		clone.eliminate = False
 
 		return clone
 
