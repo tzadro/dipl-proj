@@ -20,6 +20,7 @@ class Config:
 		self.survival_threshold = 0.2
 		self.normalize = False
 		self.disable_self_loops = True
+		self.tournament_size = 3
 
 		# weight
 		self.weight_new_mu = 0.0

@@ -1,5 +1,5 @@
 from core.config import config
-from core.individual import Individual
+from core.individual import Individual, crossover
 from core.species import Species
 from core import utility
 import math
@@ -27,6 +27,125 @@ class Population:
 
 		return best_individual
 
+	# from best to worst
+	def sort(self):
+		# sort individuals in every species
+		for spec in self.species:
+			spec.sort()
+
+		# sort species by max fitness
+		self.species.sort(key=lambda x: -x.individuals[0].fitness)
+
+	def remove_stagnant_species(self):
+		for spec in reversed(self.species):
+			if len(self.species) <= config.species_elitism:
+				break
+
+			best_fitness = spec.individuals[0].fitness
+			if best_fitness > spec.max_fitness_ever:
+				spec.num_generations_before_last_improvement = 0
+				spec.max_fitness_ever = best_fitness
+			else:
+				spec.num_generations_before_last_improvement += 1
+
+				if spec.num_generations_before_last_improvement > config.max_num_generations_before_species_improvement:
+					self.species.remove(spec)
+
+	def adjust_species_fitness(self):
+		# find min and max for normalization
+		min_fitness = math.inf
+		max_fitness = -math.inf
+
+		for spec in self.species:
+			for individual in spec.individuals:
+				if individual.fitness < min_fitness:
+					min_fitness = individual.fitness
+
+				if individual.fitness > max_fitness:
+					max_fitness = individual.fitness
+
+		fitness_range = max(abs(max_fitness - min_fitness), 1.0)
+
+		# compute adjusted fitness for every species
+		for spec in self.species:
+			mean_fitness = sum([individual.fitness for individual in spec.individuals]) / len(spec.individuals)
+			spec.adjusted_fitness = (mean_fitness - min_fitness) / fitness_range
+
+	def assign_num_children(self):
+		total_spawn = 0
+		adjusted_fitness_sum = sum([spec.adjusted_fitness for spec in self.species])
+
+		# todo: weird formula
+		for spec in self.species:
+			adjusted_fitness = spec.adjusted_fitness
+			size = len(spec.individuals)
+
+			s = max(config.elitism, adjusted_fitness / adjusted_fitness_sum * config.pop_size)
+
+			d = (s - size) * 0.5
+			c = int(round(d))
+
+			spawn = size
+			if abs(c) > 0:
+				spawn += c
+			elif d > 0:
+				spawn += 1
+			elif d < 0:
+				spawn -= 1
+
+			spec.num_children = spawn
+			total_spawn += spec.num_children
+
+		norm = config.pop_size / total_spawn
+
+		for spec in self.species:
+			spec.num_children = max(config.elitism, round(spec.num_children * norm))
+
+		if config.elitism == 0:
+			self.species = [spec for spec in self.species if spec.num_children > 0]
+
+	def reproduce(self):
+		# track new innovations in a generation to prevent giving same structural changes different innovation numbers
+		generation_new_nodes = {}
+		generation_new_connections = {}
+
+		children = []
+		for spec in self.species:
+			size = len(spec.individuals)
+
+			# elitism
+			num_elites = min(config.elitism, size)
+			for i in range(num_elites):
+				child = spec.individuals[i].duplicate()
+				children.append(child)
+				spec.num_children -= 1
+
+			# survival threshold
+			num_surviving = max(2, math.ceil(config.survival_threshold * size))
+			spec.trim_to(num_surviving)
+
+			while spec.num_children > 0:
+				# randomly select two parents
+				parent1, parent2 = spec.random_select(2, True)
+
+				# crossover or duplicate
+				if parent1 == parent2:
+					child = parent1.duplicate()
+				else:
+					# todo: check
+					child = crossover([parent1, parent2])
+
+				# mutate
+				# todo: check
+				child.mutate(generation_new_nodes, generation_new_connections)
+
+				children.append(child)
+				spec.num_children -= 1
+
+			spec.reset()
+
+		self.individuals = children
+
 	def speciate(self):
 		for individual in self.individuals:
 			placed = False
@@ -45,88 +164,3 @@ class Population:
 				self.next_species_key += 1
 
 		self.species = [spec for spec in self.species if len(spec.individuals) > 0]
-
-	def adjust_fitness(self):
-		for spec in self.species:
-			spec.adjust_fitness()
-			spec.sort()
-		self.sort()
-
-		# todo: check if ordering is ok
-		if len(self.species) > 1:
-			self.species = [spec for spec in self.species if spec.num_generations_before_last_improvement <= config.max_num_generations_before_species_improvement or spec == self.species[0]]
-		if len(self.species) > 2:
-			if self.species[0].individuals[0].fitness > self.max_fitness_ever:
-				self.max_fitness_ever = self.species[0].individuals[0].fitness
-				self.num_generations_before_last_improvement = 0
-			else:
-				self.num_generations_before_last_improvement += 1
-				if self.num_generations_before_last_improvement > config.max_num_generations_before_population_improvement:
-					self.species = self.species[:2]
-
-					self.max_fitness_ever = -math.inf
-					self.num_generations_before_last_improvement = 0
-
-	# from best to worst
-	def sort(self):
-		def key(element):
-			return -element.individuals[0].fitness
-
-		# todo: sort species by species fitness, not by best fitted individual in the species
-		self.species.sort(key=key)
-
-	def assign_num_children(self):
-		sum_spec_fitness = sum([spec.adjusted_fitness for spec in self.species])
-
-		for spec in self.species:
-			spec.num_children = math.floor(spec.adjusted_fitness / sum_spec_fitness * (config.pop_size - len(self.species))) + 1
-
-		# todo: this won't ever trigger, either don't give every species at least one spot or remove this
-		self.species = [spec for spec in self.species if spec.num_children > 0]
-
-	def remove_worst(self):
-		for spec in self.species:
-			num_surviving = math.floor(len(spec.individuals) * config.survival_threshold) + 1
-			spec.trim_to(num_surviving)
-
-	def breed_new_generation(self):
-		children = []
-
-		# track new innovations in a generation to prevent giving same structural changes different innovation numbers
-		generation_new_nodes = {}
-		generation_new_connections = {}
-
-		for spec in self.species:
-			if len(spec.individuals) > config.min_num_individuals_for_elitism:
-				children += [spec.individuals[0].duplicate()]
-				spec.num_children -= 1
-
-			children += [spec.breed_child(generation_new_nodes, generation_new_connections) for _ in range(spec.num_children)]
-
-			spec.reset()
-
-		self.individuals = children
-
-	def breed_new_generation_by_tournament_selection(self):
-		children = []
-
-		# track new innovations in a generation to prevent giving same structural changes different innovation numbers
-		generation_new_nodes = {}
-		generation_new_connections = {}
-
-		for spec in self.species:
-			children += [spec.individuals[0].duplicate()]
-
-		while len(children) < config.pop_size:
-			if len(self.species) == 1:
-				spec = self.species[0]
-			else:
-				specs = random.sample(self.species, 2)
-				spec = specs[0] if specs[0].fitness > specs[1].fitness else specs[1]
-
-			children += [spec.breed_child_by_tournament_selection(generation_new_nodes, generation_new_connections)]
-
-		for spec in self.species:
-			spec.reset()
-
-		self.individuals = children
