@@ -28,17 +28,6 @@ class NetworkVisualizer:
 
 			self.node_positions[key] = (x, y)
 
-		hidden_start_key = num_inputs + num_outputs
-		hidden_keys = range(hidden_start_key, hidden_start_key + config.num_starting_hidden_nodes)
-		for i, key in enumerate(hidden_keys):
-			x = config.network_canvas_width / 2
-			if config.num_starting_hidden_nodes == 1:
-				y = config.num_starting_hidden_nodes / 2.
-			else:
-				y = (config.num_starting_hidden_nodes - (i + 1)) * config.network_canvas_height / (config.num_starting_hidden_nodes - 1)
-
-			self.node_positions[key] = (x, y)
-
 	def visualize_network(self, connections):
 		edges = [(connection.from_key, connection.to_key, round(connection.weight, 2)) for connection in connections.values() if connection.enabled]
 
@@ -71,7 +60,6 @@ def log(message):
 
 def verbose(i, population, best_fitness, avg_fitness):
 	print('Generation: {:d}, num_individuals: {:d}, best_score: {:.2f}, avg_score: {:.2f}'.format(i, len(population.individuals), best_fitness, avg_fitness))
-	print('Num organisms with more than default number of connections: {:d}'.format(sum([len(individual.connections.values()) > config.num_starting_connections for individual in population.individuals])))
 	for j, spec in enumerate(population.species):
 		print('\tSpecies: {:d}'.format(j))
 		print('\t\tfitness: {:.2f}'.format(spec.adjusted_fitness))

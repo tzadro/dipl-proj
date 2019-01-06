@@ -36,7 +36,8 @@ class Statistics:
 	def update_run(self, num_ev, best_individual):
 		self.num_evaluations.append(num_ev)
 
-		num_hidden = len(best_individual.nodes) - (config.num_starting_nodes + config.num_starting_hidden_nodes)
+		num_starting_nodes = len(config.input_keys) + len(config.output_keys)
+		num_hidden = len(best_individual.nodes) - num_starting_nodes
 		self.num_hidden_nodes.append(num_hidden)
 
 		num_conn = len([conn for conn in best_individual.connections.values() if conn.enabled])

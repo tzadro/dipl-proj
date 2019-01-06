@@ -34,7 +34,7 @@ class Population:
 
 	def remove_stagnant_species(self):
 		for spec in reversed(self.species):
-			if len(self.species) <= config.species_elitism:
+			if len(self.species) <= config.min_num_species:
 				break
 
 			best_fitness = spec.individuals[0].fitness

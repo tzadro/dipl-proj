@@ -20,29 +20,17 @@ class Individual:
 			self.configure_new()
 
 	def configure_new(self):
-		for key in range(config.num_starting_nodes):
+		for key in config.input_keys + config.output_keys:
 			bias = random.gauss(config.bias_new_mu, config.bias_new_sigma)
 			node = Node(key, bias)
 			self.nodes[key] = node
 
 		next_innovation_number = 0
-		if config.num_starting_hidden_nodes == 0:
-			for input_key in config.input_keys:
-				for output_key in config.output_keys:
-					new_connection = Connection(next_innovation_number, input_key, output_key, random.gauss(config.weight_new_mu, config.weight_new_sigma), True)
-					self.connections[next_innovation_number] = new_connection
-					next_innovation_number += 1
-		else:
-			for hidden_node_key in range(config.num_starting_nodes - config.num_starting_hidden_nodes, config.num_starting_nodes):
-				for input_key in config.input_keys:
-					new_connection = Connection(next_innovation_number, input_key, hidden_node_key, random.gauss(config.weight_new_mu, config.weight_new_sigma), True)
-					self.connections[next_innovation_number] = new_connection
-					next_innovation_number += 1
-
-				for output_key in config.output_keys:
-					new_connection = Connection(next_innovation_number, hidden_node_key, output_key, random.gauss(config.weight_new_mu, config.weight_new_sigma), True)
-					self.connections[next_innovation_number] = new_connection
-					next_innovation_number += 1
+		for input_key in config.input_keys:
+			for output_key in config.output_keys:
+				new_connection = Connection(next_innovation_number, input_key, output_key, random.gauss(config.weight_new_mu, config.weight_new_sigma), True)
+				self.connections[next_innovation_number] = new_connection
+				next_innovation_number += 1
 
 	def mutate(self, generation_new_nodes, generation_new_connections):
 		if random.random() < config.new_connection_probability:
