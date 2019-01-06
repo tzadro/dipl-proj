@@ -6,9 +6,6 @@ class Config:
 		self.c3 = 0.5
 		self.compatibility_threshold = 3.0
 		self.max_num_generations_before_species_improvement = 20
-		self.max_num_generations_before_population_improvement = 30
-		self.min_num_individuals_for_elitism = 5
-		# self.connection_mutation_probability = 0.8
 		self.stay_disabled_probability = 0.75
 		self.skip_crossover_probability = 0.25
 		self.new_node_probability = 0.03
