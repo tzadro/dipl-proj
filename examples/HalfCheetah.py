@@ -5,7 +5,7 @@ from core import neat, interface
 
 env = HalfCheetah()
 stats = Statistics()
-algorithm = neat.NewNEAT(env.evaluate, stats)
+algorithm = neat.NEAT(env.evaluate, stats)
 networkVisualizer = interface.NetworkVisualizer()
 
 for i in range(config.num_iter):
@@ -21,3 +21,4 @@ for i in range(config.num_iter):
 			networkVisualizer.visualize_network(best_individual.connections)
 
 interface.plot_overall_fitness(stats.best_fitnesses, stats.avg_fitnesses, stats.stdev_fitnesses)
+interface.plot_species_sizes(stats.species_sizes)

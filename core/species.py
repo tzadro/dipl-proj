@@ -1,5 +1,4 @@
 from core.config import config
-from core.individual import crossover
 import random
 import math
 import numpy as np
@@ -11,78 +10,78 @@ class Species:
 		self.representative = representative.duplicate()
 		self.individuals = [representative]
 		self.adjusted_fitness = None
+		self.num_children = None
+
 		self.max_fitness_ever = -math.inf
 		self.num_generations_before_last_improvement = 0
-		self.num_children = None
 
 	def add(self, individual):
 		self.individuals.append(individual)
 
-	def adjust_fitness(self):
-		self.adjusted_fitness = 0
-
-		num_individuals = len(self.individuals)
-		for individual in self.individuals:
-			individual.adjusted_fitness = individual.fitness / num_individuals
-			self.adjusted_fitness += individual.adjusted_fitness
-
-		if self.adjusted_fitness > self.max_fitness_ever:
-			self.max_fitness_ever = self.adjusted_fitness
-			self.num_generations_before_last_improvement = 0
-		else:
-			self.num_generations_before_last_improvement += 1
-
 	# from best to worst
 	def sort(self):
-		def key(element):
-			return -element.adjusted_fitness
+		# sort by unadjusted fitness
+		self.individuals.sort(key=lambda x: -x.fitness)
 
-		self.individuals.sort(key=key)
-
-	def breed_child(self, generation_new_nodes, generation_new_connections):
-		if len(self.individuals) == 1 or random.random() < config.skip_crossover_probability:
-			child = self.roulette_select().duplicate()
-		else:
-			child = crossover(self.roulette_select(2))
-
-		child.mutate(generation_new_nodes, generation_new_connections)
-		return child
-
-	def breed_child_by_tournament_selection(self, generation_new_nodes, generation_new_connections):
-		def key(element):
-			return -element.adjusted_fitness
-
-		if len(self.individuals) == 1 or random.random() < config.skip_crossover_probability:
-			child = self.random_select().duplicate()
-		elif len(self.individuals) == 2:
-			child = crossover(self.random_select(2))
-		else:
-			tournament = self.random_select(3)
-			tournament.sort(key=key)
-			child = crossover(tournament[:2])
-
-		child.mutate(generation_new_nodes, generation_new_connections)
-		return child
-
-	# roulette wheel selection
-	def roulette_select(self, size=None, replace=False):
-		fitness_sum = sum([individual.fitness for individual in self.individuals])
-		p = [individual.fitness / fitness_sum for individual in self.individuals]
-		return np.random.choice(self.individuals, size, replace, p)
-
-	# random selection
-	def random_select(self, size=1):
-		if size == 1:
-			return random.choice(self.individuals)
-		else:
-			return random.sample(self.individuals, size)
-
+	# leave only first n individuals
 	def trim_to(self, n=1):
 		self.individuals = self.individuals[:n]
 
+	# returns single element, tuple or a list based on selection size
+	def roulette_select(self, size=1, replace=False):
+		assert not [individual for individual in self.individuals if individual.fitness < 0], \
+			'All fitnesses must be positive for roulette wheel selection'
+
+		fitness_sum = sum([individual.fitness for individual in self.individuals])
+
+		assert fitness_sum > 0, 'Fitness sum must not be zero'
+
+		p = [individual.fitness / fitness_sum for individual in self.individuals]
+		individuals = np.random.choice(self.individuals, size, replace, p)
+
+		if size == 1:
+			return individuals[0]
+		if size == 2:
+			return individuals[0], individuals[1]
+		else:
+			return individuals
+
+	# returns single element, tuple or a list based on selection size
+	def random_select(self, size=1, replace=False):
+		assert len(self.individuals) > 0, 'No individuals to select from'
+
+		if size == 1:
+			return random.choice(self.individuals)
+
+		if replace:
+			individuals = random.choices(self.individuals, k=size)
+		else:
+			assert len(self.individuals) >= size, 'Sample size must not be larger than number of individuals'
+
+			individuals = random.sample(self.individuals, size)
+
+		if size == 2:
+			return individuals[0], individuals[1]
+		else:
+			return individuals
+
+	# returns single element, tuple or a list based on selection size
+	def tournament_select(self, size=1, replace=False):
+		assert size < config.tournament_size, 'Size must be smaller than tournament size for selection to have effect'
+
+		tournament = self.random_select(config.tournament_size, replace)
+		tournament.sort(key=lambda x: -x.fitness)
+
+		if size == 1:
+			return tournament[0]
+		if size == 2:
+			return tournament[0], tournament[1]
+		else:
+			return tournament[:size]
+
 	def reset(self):
-		random_individual = self.random_select()
-		self.representative = random_individual.duplicate()
+		new_representative = self.random_select()
+		self.representative = new_representative.duplicate()
 		self.individuals = []
 		self.adjusted_fitness = None
 		self.num_children = None

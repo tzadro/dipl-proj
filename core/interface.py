@@ -28,17 +28,6 @@ class NetworkVisualizer:
 
 			self.node_positions[key] = (x, y)
 
-		hidden_start_key = num_inputs + num_outputs
-		hidden_keys = range(hidden_start_key, hidden_start_key + config.num_starting_hidden_nodes)
-		for i, key in enumerate(hidden_keys):
-			x = config.network_canvas_width / 2
-			if config.num_starting_hidden_nodes == 1:
-				y = config.num_starting_hidden_nodes / 2.
-			else:
-				y = (config.num_starting_hidden_nodes - (i + 1)) * config.network_canvas_height / (config.num_starting_hidden_nodes - 1)
-
-			self.node_positions[key] = (x, y)
-
 	def visualize_network(self, connections):
 		edges = [(connection.from_key, connection.to_key, round(connection.weight, 2)) for connection in connections.values() if connection.enabled]
 
@@ -67,18 +56,6 @@ class NetworkVisualizer:
 def log(message):
 	if config.verbose:
 		print(message)
-
-
-def verbose(i, population, best_fitness, avg_fitness):
-	print('Generation: {:d}, num_individuals: {:d}, best_score: {:.2f}, avg_score: {:.2f}'.format(i, len(population.individuals), best_fitness, avg_fitness))
-	print('Num organisms with more than default number of connections: {:d}'.format(sum([len(individual.connections.values()) > config.num_starting_connections for individual in population.individuals])))
-	for j, spec in enumerate(population.species):
-		print('\tSpecies: {:d}'.format(j))
-		print('\t\tfitness: {:.2f}'.format(spec.adjusted_fitness))
-		print('\t\tnum_individuals: {:d}, num_children: {:d}'.format(len(spec.individuals), spec.num_children))
-		best_adjusted_fitness = spec.individuals[0].adjusted_fitness
-		avg_adjusted_fitness = sum([individual.adjusted_fitness for individual in spec.individuals]) / len(spec.individuals)
-		print('\t\tbest_adjusted_fitness: {:.2f}, avg_adjusted_fitness: {:.2f}'.format(best_adjusted_fitness, avg_adjusted_fitness))
 
 
 def plot_overall_fitness(best_fitnesses, avg_fitnesses, stdev_fitnesses):
@@ -129,4 +106,4 @@ def print_evaluation_stats(num_evaluations, num_hidden_nodes, num_connections):
 	print('Structure:')
 	print('\tavg num hidden nodes: {:.2f}'.format(avg_hidden))
 	print('\tavg num connections: {:.2f}'.format(avg_conn))
-	print('From: {:d} finished runs (of {:d} total runs)'.format(num_finished_runs, config.num_runs))
+	print('From {:d} finished runs (of {:d} total runs)'.format(num_finished_runs, config.num_runs))

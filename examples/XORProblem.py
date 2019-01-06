@@ -5,7 +5,7 @@ from core import neat, interface
 
 env = XORProblem()
 stats = Statistics()
-algorithm = neat.NewNEAT(env.evaluate, stats)
+algorithm = neat.NEAT(env.evaluate, stats)
 network_visualizer = interface.NetworkVisualizer()
 
 for run in range(config.num_runs):
