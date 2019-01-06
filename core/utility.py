@@ -57,7 +57,7 @@ def check_if_path_exists_by_neurons(from_key, to_key, neurons, checked=None):
 	return False
 
 
-def distance(individual1, individual2):  # todo: are disabled genes included?
+def distance(individual1, individual2):
 	connections1 = individual1.connections
 	connections2 = individual2.connections
 
@@ -70,7 +70,7 @@ def distance(individual1, individual2):  # todo: are disabled genes included?
 	weight_diffs = []
 	E = 0
 	D = 0
-	N = max(len(connections1), len(connections2)) if config.normalize else 1
+	N = max(len(connections1), len(connections2)) if config.normalize else 1.
 
 	for innovation_number in all_innovation_numbers:
 		if innovation_number in connections1 and innovation_number in connections2:

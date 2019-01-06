@@ -12,9 +12,6 @@ class Population:
 		self.next_species_key = 0
 		self.speciate()
 
-		self.max_fitness_ever = -math.inf
-		self.num_generations_before_last_improvement = None
-
 	def evaluate_fitness(self, evaluate):
 		best_individual = None
 

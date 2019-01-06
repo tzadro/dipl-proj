@@ -7,7 +7,6 @@ class Config:
 		self.compatibility_threshold = 3.0
 		self.max_num_generations_before_species_improvement = 20
 		self.stay_disabled_probability = 0.75
-		self.skip_crossover_probability = 0.25
 		self.new_node_probability = 0.03
 		self.new_connection_probability = 0.05
 		self.sigmoid_coef = 4.9
@@ -42,11 +41,11 @@ class Config:
 		self.num_starting_hidden_nodes = 0
 		# self.fixed_topology = False
 
+		self.verbose = False
+		self.visualize_best_networks = True
+		self.visualize_every = 20
 		self.network_canvas_height = 100
 		self.network_canvas_width = 100
-		self.visualize_every = 20
-		self.visualize_best_networks = True
-		self.verbose = False
 
 		self.num_starting_nodes = None
 		self.next_node_key = None
