@@ -21,6 +21,7 @@ class Config:
 		# mutation
 		self.new_node_probability = 0.03
 		self.new_connection_probability = 0.05
+		self.stay_disabled_probability = 0.75
 		self.disable_self_loops = True
 		self.survival_threshold = 0.2
 
