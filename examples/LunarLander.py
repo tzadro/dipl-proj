@@ -29,7 +29,8 @@ for i in range(config.num_iter):
 		print('Solved after', i, 'generations')
 		break
 
-# env.evaluate(best_individual)
-
 interface.plot_overall_fitness(stats.best_fitnesses, stats.avg_fitnesses, stats.stdev_fitnesses)
 interface.plot_species_sizes(stats.species_sizes)
+
+input('Press any key to demonstrate best individual: ')
+env.evaluate(best_individual)
