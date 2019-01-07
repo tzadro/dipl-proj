@@ -64,13 +64,14 @@ def plot_overall_fitness(best_fitnesses, avg_fitnesses, stdev_fitnesses):
 	avg = np.array(avg_fitnesses)
 	stdev = np.array(stdev_fitnesses)
 
-	plt.plot(generations, best, color='red', label='Best score')
-	plt.plot(generations, avg, color='blue', label='Average score')
+	# plot fitness over generations
+	plt.plot(generations, best, color='red', label='Best')
+	plt.plot(generations, avg, color='blue', label='Average')
 	plt.plot(generations, avg + stdev, color='blue', linestyle='dashed')
 	plt.plot(generations, avg - stdev, color='blue', linestyle='dashed')
 	plt.title('Fitness over generations')
 	plt.xlabel('Generation')
-	plt.ylabel('Score')
+	plt.ylabel('Fitness')
 	plt.legend()
 	plt.show()
 
@@ -78,16 +79,45 @@ def plot_overall_fitness(best_fitnesses, avg_fitnesses, stdev_fitnesses):
 def plot_species_sizes(species_sizes):
 	num_generations = len(species_sizes)
 	num_species = len(species_sizes[-1])
+	generations = range(num_generations)
 
 	curves = np.zeros((num_species, num_generations))
+	num_active_species = []
+	avg_sizes = []
+
 	for i, row in enumerate(species_sizes):
 		for j, element in enumerate(row):
 			curves[j][i] = element
 
-	plt.stackplot(range(num_generations), curves)
-	plt.title('Species sizes over generations')
+		num_active = np.count_nonzero(row)
+		num_active_species.append(num_active)
+
+		avg_size = sum(row) / num_active
+		avg_sizes.append(avg_size)
+
+	# plot distribution of individuals per species
+	plt.stackplot(generations, curves)
+	plt.title('Distribution of individuals per species')
 	plt.xlabel('Generation')
-	plt.ylabel('Size')
+	plt.ylabel('Number of individuals')
+	plt.show()
+
+	# plot species stats over generations
+	fig, ax1 = plt.subplots()
+	ax2 = ax1.twinx()
+	ax1.set_xlabel('Generation')
+
+	ax1.plot(generations, avg_sizes, color='blue', label='Average species size')
+	ax1.set_ylabel('Number of individuals')
+
+	ax2.plot(generations, num_active_species, color='red', label='Number of species')
+	ax2.set_ylabel('Number of species')
+
+	lines1, labels1 = ax1.get_legend_handles_labels()
+	lines2, labels2 = ax2.get_legend_handles_labels()
+	plt.legend(lines1 + lines2, labels1 + labels2)
+
+	plt.title('Species stats over generations')
 	plt.show()
 
 
