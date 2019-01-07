@@ -91,6 +91,38 @@ class Pixelcopter(AbstractEnvironment):
 		return fitness
 
 
+class LunarLander(AbstractEnvironment):
+	def __init__(self):
+		num_inputs, num_outputs = 8, 4
+		config.update(num_inputs, num_outputs)
+
+		self.env = gym.make('LunarLander-v2')
+
+	def evaluate(self, individual, num_times=1, fixed_seed=True):
+		phenotype = Phenotype(individual.connections.values(), individual.nodes.values())
+
+		fitness = 0
+
+		if fixed_seed:
+			# ensures every run starts with same observation
+			self.env.seed(0)
+
+		observation = self.env.reset()
+		while True:
+			self.env.render()
+
+			output = phenotype.forward(observation)
+			action = output.index(max(output))
+			observation, reward, done, info = self.env.step(action)
+
+			fitness += reward
+
+			if done:
+				break
+
+		return fitness
+
+
 class HalfCheetah(AbstractEnvironment):
 	def __init__(self):
 		num_inputs, num_outputs = 17, 6
