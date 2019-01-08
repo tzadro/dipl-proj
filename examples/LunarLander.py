@@ -10,6 +10,8 @@ networkVisualizer = interface.NetworkVisualizer()
 
 for i in range(config.num_iter):
 	best_individual = algorithm.epoch()
+	env.seed += 1
+
 	print('Generation: {:d}, best_score: {:.2f}, avg_score: {:.2f}'.format(i, stats.best_fitnesses[-1], stats.avg_fitnesses[-1]))
 
 	if config.visualize_best_networks:
@@ -33,4 +35,4 @@ interface.plot_overall_fitness(stats.best_fitnesses, stats.avg_fitnesses, stats.
 interface.plot_species_sizes(stats.species_sizes)
 
 input('Press any key to demonstrate best individual: ')
-env.evaluate(best_individual)
+env.evaluate(best_individual, fixed_seed=False)

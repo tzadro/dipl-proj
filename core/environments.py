@@ -97,30 +97,38 @@ class LunarLander(AbstractEnvironment):
 		config.update(num_inputs, num_outputs)
 
 		self.env = gym.make('LunarLander-v2')
+		self.seed = 0
 
 	def evaluate(self, individual, num_times=1, fixed_seed=True):
 		phenotype = Phenotype(individual.connections.values(), individual.nodes.values())
 
-		fitness = 0
+		fitnesses = []
 
-		if fixed_seed:
-			# ensures every run starts with same observation
-			self.env.seed(0)
+		for _ in range(num_times):
+			phenotype.flush()
+			
+			fitness = 0
 
-		observation = self.env.reset()
-		while True:
-			self.env.render()
+			if fixed_seed:
+				# ensures every run starts with same observation
+				self.env.seed(self.seed)
 
-			output = phenotype.forward(observation)
-			action = output.index(max(output))
-			observation, reward, done, info = self.env.step(action)
+			observation = self.env.reset()
+			while True:
+				self.env.render()
 
-			fitness += reward
+				output = phenotype.forward(observation)
+				action = output.index(max(output))
+				observation, reward, done, info = self.env.step(action)
 
-			if done:
-				break
+				fitness += reward
 
-		return fitness
+				if done:
+					break
+
+			fitnesses.append(fitness)
+
+		return sum(fitnesses) / num_times
 
 
 class HalfCheetah(AbstractEnvironment):
