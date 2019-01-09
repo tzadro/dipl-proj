@@ -31,7 +31,7 @@ class Config:
 		self.stay_disabled_probability = 0.75
 		self.disable_self_loops = True
 		self.skip_crossover = 0.2
-		self.survival_threshold = 0.2
+		self.survival_threshold = 0.8
 
 		# weight
 		self.weight_new_mu = 0.0
@@ -52,6 +52,7 @@ class Config:
 		# other
 		self.sigmoid_coef = 4.9
 		self.tournament_size = 3
+		self.tournament_select = True
 
 		# interface
 		self.verbose = False
