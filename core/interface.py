@@ -159,7 +159,6 @@ def plot_distances(avg_Es, avg_Ds, avg_weight_diffs):
 	plt.ylabel('Number of individuals')
 	plt.legend()
 	plt.show()
-	exit()
 
 
 def print_evaluation_stats(num_evaluations, num_hidden_nodes, num_connections):
