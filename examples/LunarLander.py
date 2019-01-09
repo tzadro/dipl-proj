@@ -33,6 +33,7 @@ for i in range(config.num_iter):
 
 interface.plot_overall_fitness(stats.best_fitnesses, stats.avg_fitnesses, stats.stdev_fitnesses)
 interface.plot_species_sizes(stats.species_sizes, stats.compatibility_thresholds)
+interface.plot_distances(stats.avg_Es, stats.avg_Ds, stats.avg_weight_diffs)
 
 input('Press any key to demonstrate best individual: ')
 env.evaluate(best_individual, fixed_seed=False)

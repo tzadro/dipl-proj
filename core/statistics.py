@@ -10,14 +10,17 @@ class Statistics:
 		self.stdev_fitnesses = []
 		self.species_sizes = []
 		self.compatibility_thresholds = []
+		self.avg_Es = []
+		self.avg_Ds = []
+		self.avg_weight_diffs = []
 
 		# over runs
 		self.num_evaluations = []
 		self.num_hidden_nodes = []
 		self.num_connections = []
 
-	def update_generation(self, population):
-		fitnesses = [individual.fitness for individual in population.individuals]
+	def update_fitnesses(self, individuals):
+		fitnesses = [individual.fitness for individual in individuals]
 
 		best = max(fitnesses)
 		self.best_fitnesses.append(best)
@@ -28,13 +31,23 @@ class Statistics:
 		stdev = np.std(fitnesses)
 		self.stdev_fitnesses.append(stdev)
 
-		num_species = population.next_species_key
-		generation_sizes = [0] * num_species
-		for spec in population.species:
+	def update_species(self, species, total_num_species_ever):
+		generation_sizes = [0] * total_num_species_ever
+		for spec in species:
 			generation_sizes[spec.key] = len(spec.individuals)
 		self.species_sizes.append(generation_sizes)
 
 		self.compatibility_thresholds.append(config.compatibility_threshold)
+
+	def update_distances(self, Es, Ds, weight_diffs):
+		avg_E = sum(Es) / len(Es)
+		self.avg_Es.append(avg_E)
+
+		avg_D = sum(Ds) / len(Ds)
+		self.avg_Ds.append(avg_D)
+
+		avg_weight_diff = sum(weight_diffs) / len(weight_diffs)
+		self.avg_weight_diffs.append(avg_weight_diff)
 
 	def update_run(self, num_ev, best_individual):
 		self.num_evaluations.append(num_ev)
@@ -52,3 +65,6 @@ class Statistics:
 		self.stdev_fitnesses = []
 		self.species_sizes = []
 		self.compatibility_thresholds = []
+		self.avg_Es = []
+		self.avg_Ds = []
+		self.avg_weight_diffs = []

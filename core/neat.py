@@ -24,7 +24,7 @@ class NEAT(AbstractNEAT):
 	def epoch(self):
 		# evaluate population and track stats
 		best_individual = self.population.evaluate_fitness(self.evaluate)
-		self.stats.update_generation(self.population)
+		self.stats.update_fitnesses(self.population.individuals)
 
 		# sort individuals inside each species and then sort species by their max fitness
 		self.population.sort()
@@ -42,7 +42,9 @@ class NEAT(AbstractNEAT):
 		self.population.reproduce()
 
 		# speciate new individuals and remove empty species
-		self.population.speciate()
+		Es, Ds, weight_diffs = self.population.speciate()
+		self.stats.update_species(self.population.species, self.population.next_species_key)
+		self.stats.update_distances(Es, Ds, weight_diffs)
 
 		# change compatibility threshold if number of species becomes too big or too small
 		if config.adjust_compatibility_threshold:

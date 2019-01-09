@@ -82,8 +82,12 @@ def distance(individual1, individual2):
 			else:
 				D += 1
 
-	delta = (config.c1 * E) / N + (config.c2 * D) / N + config.c3 * sum(weight_diffs) / len(weight_diffs)
-	return delta
+	adjusted_E = (config.c1 * E) / N
+	adjusted_D = (config.c2 * D) / N
+	avg_weight_diff = sum(weight_diffs) / len(weight_diffs)
+	adjusted_weight_diff = config.c3 * avg_weight_diff
+	delta = adjusted_E + adjusted_D + adjusted_weight_diff
+	return delta, adjusted_D, adjusted_E, adjusted_weight_diff
 
 
 # from range [0, 1] to [low, high]

@@ -59,7 +59,11 @@ def log(message):
 
 
 def plot_overall_fitness(best_fitnesses, avg_fitnesses, stdev_fitnesses):
-	generations = range(len(best_fitnesses))
+	num_generations = len(best_fitnesses)
+
+	assert num_generations == len(avg_fitnesses) and num_generations == len(stdev_fitnesses), 'All lists must be the same length'
+
+	generations = range(num_generations)
 	best = np.array(best_fitnesses)
 	avg = np.array(avg_fitnesses)
 	stdev = np.array(stdev_fitnesses)
@@ -78,6 +82,9 @@ def plot_overall_fitness(best_fitnesses, avg_fitnesses, stdev_fitnesses):
 
 def plot_species_sizes(species_sizes, compatibility_thresholds):
 	num_generations = len(species_sizes)
+
+	assert num_generations == len(compatibility_thresholds), 'All lists must be the same length'
+
 	num_species = len(species_sizes[-1])
 	generations = range(num_generations)
 
@@ -135,6 +142,24 @@ def plot_species_sizes(species_sizes, compatibility_thresholds):
 
 	plt.title('Species stats over generations')
 	plt.show()
+
+
+def plot_distances(avg_Es, avg_Ds, avg_weight_diffs):
+	num_generations = len(avg_Es)
+
+	assert num_generations == len(avg_Ds) and num_generations == len(avg_weight_diffs), 'All lists must be the same length'
+
+	generations = range(num_generations)
+	labels = ['Average excess', 'Average disjoint', 'Average weight diff']
+
+	# plot average individuals distances through generations
+	plt.stackplot(generations, avg_Es, avg_Ds, avg_weight_diffs, labels=labels)
+	plt.title('Average individuals distances through generations')
+	plt.xlabel('Value')
+	plt.ylabel('Number of individuals')
+	plt.legend()
+	plt.show()
+	exit()
 
 
 def print_evaluation_stats(num_evaluations, num_hidden_nodes, num_connections):

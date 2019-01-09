@@ -116,8 +116,16 @@ class Population:
 		for individual in self.individuals:
 			placed = False
 
+			Es = []
+			Ds = []
+			weight_diffs = []
+
 			for spec in self.species:
-				dist_from_repr = utility.distance(individual, spec.representative)
+				dist_from_repr, E, D, weight_diff = utility.distance(individual, spec.representative)
+
+				Es.append(E)
+				Ds.append(D)
+				weight_diffs.append(weight_diff)
 
 				if dist_from_repr <= config.compatibility_threshold:
 					spec.add(individual)
@@ -130,6 +138,8 @@ class Population:
 				self.next_species_key += 1
 
 		self.species = [spec for spec in self.species if len(spec.individuals) > 0]
+
+		return Es, Ds, weight_diffs
 
 	def adjust_compatibility_threshold(self):
 		num_species = len(self.species)

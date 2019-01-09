@@ -29,6 +29,7 @@ for run in range(config.num_runs):
 
 	interface.plot_overall_fitness(stats.best_fitnesses, stats.avg_fitnesses, stats.stdev_fitnesses)
 	interface.plot_species_sizes(stats.species_sizes, stats.compatibility_thresholds)
+	interface.plot_distances(stats.avg_Es, stats.avg_Ds, stats.avg_weight_diffs)
 
 	env.reset()
 	algorithm.reset()
