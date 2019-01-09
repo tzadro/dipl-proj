@@ -9,6 +9,7 @@ class Statistics:
 		self.avg_fitnesses = []
 		self.stdev_fitnesses = []
 		self.species_sizes = []
+		self.compatibility_thresholds = []
 
 		# over runs
 		self.num_evaluations = []
@@ -33,6 +34,8 @@ class Statistics:
 			generation_sizes[spec.key] = len(spec.individuals)
 		self.species_sizes.append(generation_sizes)
 
+		self.compatibility_thresholds.append(config.compatibility_threshold)
+
 	def update_run(self, num_ev, best_individual):
 		self.num_evaluations.append(num_ev)
 
@@ -48,3 +51,4 @@ class Statistics:
 		self.avg_fitnesses = []
 		self.stdev_fitnesses = []
 		self.species_sizes = []
+		self.compatibility_thresholds = []

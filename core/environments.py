@@ -137,14 +137,16 @@ class HalfCheetah(AbstractEnvironment):
 		config.update(num_inputs, num_outputs)
 
 		self.env = gym.make('HalfCheetah-v2')
+		self.seed = 0
 
-	def evaluate(self, individual):
+	def evaluate(self, individual, fixed_seed=True):
 		phenotype = Phenotype(individual.connections.values(), individual.nodes.values())
 
 		fitness = 0
 
-		# ensures every run starts with same observation
-		self.env.seed(0)
+		if fixed_seed:
+			# ensures every run starts with same observation
+			self.env.seed(self.seed)
 
 		observation = self.env.reset()
 		while True:
