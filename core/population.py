@@ -163,6 +163,7 @@ class Population:
 	def adjust_compatibility_threshold(self):
 		num_species = len(self.species)
 
+		delta = 0
 		if num_species > config.desired_num_species:
 			delta = config.ct_step
 		elif num_species < config.desired_num_species:

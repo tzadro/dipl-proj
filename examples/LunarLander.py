@@ -6,7 +6,7 @@ from core import neat, interface
 env = LunarLander()
 stats = Statistics()
 algorithm = neat.NEAT(env.evaluate, stats)
-networkVisualizer = interface.NetworkVisualizer()
+network_visualizer = interface.NetworkVisualizer()
 
 for i in range(config.num_iter):
 	best_individual = algorithm.epoch()
@@ -16,10 +16,10 @@ for i in range(config.num_iter):
 
 	if config.visualize_best_networks:
 		for individual in algorithm.population.individuals:
-			networkVisualizer.update_node_positions(individual.connections, individual.nodes)
+			network_visualizer.update_node_positions(individual.connections, individual.nodes)
 
 		if i % config.visualize_every == 0:
-			networkVisualizer.visualize_network(best_individual.connections)
+			network_visualizer.visualize_network(best_individual.connections)
 
 	avg_score = env.evaluate(best_individual, num_times=100, fixed_seed=False)
 	print('\tSolve attempt avg_score: {:.2f}'.format(avg_score))
