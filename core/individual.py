@@ -141,16 +141,16 @@ class Individual:
 		return clone
 
 
-def crossover(parents):
-	if parents[0].fitness > parents[1].fitness:
-		fitter_parent, other_parent = (parents[0], parents[1])
-	elif parents[0].fitness == parents[1].fitness:
-		if len(parents[0].connections) < len(parents[1].connections):
-			fitter_parent, other_parent = (parents[0], parents[1])
+def crossover(parent1, parent2):
+	if parent1.fitness > parent2.fitness:
+		fitter_parent, other_parent = (parent1, parent2)
+	elif parent1.fitness == parent2.fitness:
+		if len(parent1.connections) < len(parent2.connections):
+			fitter_parent, other_parent = (parent1, parent2)
 		else:
-			fitter_parent, other_parent = (parents[1], parents[0])
+			fitter_parent, other_parent = (parent2, parent1)
 	else:
-		fitter_parent, other_parent = (parents[1], parents[0])
+		fitter_parent, other_parent = (parent2, parent1)
 
 	child_connections = {}
 	child_nodes = {}

@@ -1,4 +1,5 @@
 from core.config import config
+from core.individual import crossover
 import random
 import math
 import numpy as np
@@ -78,6 +79,41 @@ class Species:
 			return tournament[0], tournament[1]
 		else:
 			return tournament[:size]
+
+	def reproduce(self, generation_new_nodes, generation_new_connections):
+		size = len(self.individuals)
+
+		children = []
+
+		# elitism
+		num_elites = min(config.elitism, size)
+		for i in range(num_elites):
+			child = self.individuals[i].duplicate()
+			children.append(child)
+			self.num_children -= 1
+
+		# survival threshold
+		num_surviving = max(2, math.ceil(config.survival_threshold * size))
+		self.trim_to(num_surviving)
+
+		size = len(self.individuals)
+		while self.num_children > 0:
+			if random.random() < config.skip_crossover or size < 2:
+				parent = self.random_select()
+				child = parent.duplicate()
+			else:
+				parent1, parent2 = self.random_select(2)
+				child = crossover(parent1, parent2)
+
+			# mutate
+			child.mutate(generation_new_nodes, generation_new_connections)
+
+			children.append(child)
+			self.num_children -= 1
+
+		self.reset()
+
+		return children
 
 	def reset(self):
 		new_representative = self.random_select()

@@ -1,5 +1,5 @@
 from core.config import config
-from core.individual import Individual, crossover
+from core.individual import Individual
 from core.species import Species
 from core import utility
 import math
@@ -108,36 +108,7 @@ class Population:
 
 		children = []
 		for spec in self.species:
-			size = len(spec.individuals)
-
-			# elitism
-			num_elites = min(config.elitism, size)
-			for i in range(num_elites):
-				child = spec.individuals[i].duplicate()
-				children.append(child)
-				spec.num_children -= 1
-
-			# survival threshold
-			num_surviving = max(2, math.ceil(config.survival_threshold * size))
-			spec.trim_to(num_surviving)
-
-			while spec.num_children > 0:
-				# randomly select two parents
-				parent1, parent2 = spec.random_select(2, True)
-
-				# crossover or duplicate
-				if parent1 == parent2:
-					child = parent1.duplicate()
-				else:
-					child = crossover([parent1, parent2])
-
-				# mutate
-				child.mutate(generation_new_nodes, generation_new_connections)
-
-				children.append(child)
-				spec.num_children -= 1
-
-			spec.reset()
+			children += spec.reproduce(generation_new_nodes, generation_new_connections)
 
 		self.individuals = children
 
