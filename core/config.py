@@ -16,7 +16,14 @@ class Config:
 		self.c2 = 1.0
 		self.c3 = 0.5
 		self.compatibility_threshold = 3.0
-		self.normalize = False
+		self.normalize = True
+
+		# compatibility_threshold
+		self.adjust_compatibility_threshold = True
+		self.desired_num_species = 5
+		self.ct_step = 0.3
+		self.ct_min_val = 1.5
+		self.ct_max_val = 4.5
 
 		# mutation
 		self.new_node_probability = 0.03

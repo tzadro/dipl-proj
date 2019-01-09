@@ -76,7 +76,7 @@ def plot_overall_fitness(best_fitnesses, avg_fitnesses, stdev_fitnesses):
 	plt.show()
 
 
-def plot_species_sizes(species_sizes):
+def plot_species_sizes(species_sizes, compatibility_thresholds):
 	num_generations = len(species_sizes)
 	num_species = len(species_sizes[-1])
 	generations = range(num_generations)
@@ -103,19 +103,35 @@ def plot_species_sizes(species_sizes):
 	plt.show()
 
 	# plot species stats over generations
+	colors = ['blue', 'red', 'green']
+
 	fig, ax1 = plt.subplots()
 	ax2 = ax1.twinx()
+	ax3 = ax1.twinx()
+	ax3.spines['right'].set_position(('axes', 1.2))
 	ax1.set_xlabel('Generation')
 
-	ax1.plot(generations, avg_sizes, color='blue', label='Average species size')
+	ax1.plot(generations, avg_sizes, color=colors[0], label='Average species size')
 	ax1.set_ylabel('Number of individuals')
 
-	ax2.plot(generations, num_active_species, color='red', label='Number of species')
+	ax2.plot(generations, num_active_species, color=colors[1], label='Number of species')
 	ax2.set_ylabel('Number of species')
 
-	lines1, labels1 = ax1.get_legend_handles_labels()
-	lines2, labels2 = ax2.get_legend_handles_labels()
-	plt.legend(lines1 + lines2, labels1 + labels2)
+	ax3.plot(generations, compatibility_thresholds, color=colors[2], label='Compatibility threshold')
+	ax3.set_ylabel('Value')
+
+	line1, label1 = ax1.get_legend_handles_labels()
+	line2, label2 = ax2.get_legend_handles_labels()
+	line3, label3 = ax3.get_legend_handles_labels()
+	plt.legend(line1 + line2 + line3, label1 + label2 + label3)
+
+	ax1.yaxis.label.set_color(colors[0])
+	ax2.yaxis.label.set_color(colors[1])
+	ax3.yaxis.label.set_color(colors[2])
+
+	ax1.tick_params(axis='y', colors=colors[0])
+	ax2.tick_params(axis='y', colors=colors[1])
+	ax3.tick_params(axis='y', colors=colors[2])
 
 	plt.title('Species stats over generations')
 	plt.show()

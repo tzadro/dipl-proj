@@ -28,7 +28,7 @@ for run in range(config.num_runs):
 		network_visualizer.visualize_network(best_individual.connections)
 
 	interface.plot_overall_fitness(stats.best_fitnesses, stats.avg_fitnesses, stats.stdev_fitnesses)
-	interface.plot_species_sizes(stats.species_sizes)
+	interface.plot_species_sizes(stats.species_sizes, stats.compatibility_thresholds)
 
 	env.reset()
 	algorithm.reset()

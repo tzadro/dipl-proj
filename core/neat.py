@@ -1,3 +1,4 @@
+from core.config import config
 from core.population import Population
 
 
@@ -7,12 +8,16 @@ class AbstractNEAT:
 		self.stats = stats
 		self.population = Population()
 
+		self.starting_compatibility_threshold = config.compatibility_threshold
+
 	def epoch(self):
 		pass
 
 	def reset(self):
 		self.stats.reset_generation()
 		self.population = Population()
+
+		config.compatibility_threshold = self.starting_compatibility_threshold
 
 
 class NEAT(AbstractNEAT):
@@ -38,5 +43,9 @@ class NEAT(AbstractNEAT):
 
 		# speciate new individuals and remove empty species
 		self.population.speciate()
+
+		# change compatibility threshold if number of species becomes too big or too small
+		if config.adjust_compatibility_threshold:
+			self.population.adjust_compatibility_threshold()
 
 		return best_individual

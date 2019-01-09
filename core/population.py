@@ -3,6 +3,7 @@ from core.individual import Individual, crossover
 from core.species import Species
 from core import utility
 import math
+import numpy as np
 
 
 class Population:
@@ -158,3 +159,14 @@ class Population:
 				self.next_species_key += 1
 
 		self.species = [spec for spec in self.species if len(spec.individuals) > 0]
+
+	def adjust_compatibility_threshold(self):
+		num_species = len(self.species)
+
+		if num_species > config.desired_num_species:
+			delta = config.ct_step
+		elif num_species < config.desired_num_species:
+			delta = -config.ct_step
+
+		new_value = config.compatibility_threshold + delta
+		config.compatibility_threshold = np.clip(new_value, config.ct_min_val, config.ct_max_val)
