@@ -51,7 +51,7 @@ def test_distance(individual1, individual2):
 	config.c3 = 1
 	config.normalize = True
 
-	res = utility.distance(individual1, individual2)
+	res, _, _, _ = utility.distance(individual1, individual2)
 
 	print('Distance test:', round(res, 2) == 2.3)
 
