@@ -25,7 +25,7 @@ class Species:
 		self.individuals.sort(key=lambda x: -x.fitness)
 
 	# leave only first n individuals
-	def trim_to(self, n=1):
+	def trim_to(self, n):
 		self.individuals = self.individuals[:n]
 
 	# returns single element, tuple or a list based on selection size

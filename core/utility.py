@@ -71,7 +71,7 @@ def distance(individual1, individual2):
 	E = 0
 	D = 0
 	max_num_nodes = max(len(connections1), len(connections2))
-	max_num_hidden = max_num_nodes - (len(config.input_keys) + len(config.output_keys))
+	max_num_hidden = max_num_nodes - config.num_starting_nodes
 	N = max_num_hidden if config.normalize else 1.
 
 	for innovation_number in all_innovation_numbers:

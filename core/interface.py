@@ -80,6 +80,49 @@ def plot_overall_fitness(best_fitnesses, avg_fitnesses, stdev_fitnesses):
 	plt.show()
 
 
+def plot_structures(avg_num_hidden_nodes, stdev_num_hidden_nodes, avg_num_connections, stdev_num_connections):
+	num_generations = len(avg_num_hidden_nodes)
+
+	assert num_generations == len(stdev_num_hidden_nodes) and num_generations == len(avg_num_connections) and num_generations == len(stdev_num_connections), 'All lists must be the same length'
+
+	generations = range(num_generations)
+	avg_num_hidden_nodes = np.array(avg_num_hidden_nodes)
+	stdev_num_hidden_nodes = np.array(stdev_num_hidden_nodes)
+	avg_num_connections = np.array(avg_num_connections)
+	stdev_num_connections = np.array(stdev_num_connections)
+
+	# plot structure over generations
+	colors = ['blue', 'red']
+
+	fig, ax1 = plt.subplots()
+	ax2 = ax1.twinx()
+	ax1.set_xlabel('Generation')
+
+	ax1.plot(generations, avg_num_hidden_nodes, color=colors[0], label='Average num hidden nodes')
+	ax1.plot(generations, avg_num_hidden_nodes + stdev_num_hidden_nodes, color=colors[0], linestyle='dashed')
+	ax1.plot(generations, avg_num_hidden_nodes - stdev_num_hidden_nodes, color=colors[0], linestyle='dashed')
+	ax1.set_ylabel('Number of hidden nodes')
+
+	ax2.plot(generations, avg_num_connections, color=colors[1], label='Average num connections')
+	ax2.plot(generations, avg_num_connections + stdev_num_connections, color=colors[1], linestyle='dashed')
+	ax2.plot(generations, avg_num_connections - stdev_num_connections, color=colors[1], linestyle='dashed')
+	ax2.set_ylabel('Number of connections')
+
+	line1, label1 = ax1.get_legend_handles_labels()
+	line2, label2 = ax2.get_legend_handles_labels()
+	plt.legend(line1 + line2, label1 + label2)
+
+	ax1.yaxis.label.set_color(colors[0])
+	ax2.yaxis.label.set_color(colors[1])
+
+	ax1.tick_params(axis='y', colors=colors[0])
+	ax2.tick_params(axis='y', colors=colors[1])
+
+	plt.title('Structure over generations')
+	plt.show()
+	exit()
+
+
 def plot_species_sizes(species_sizes, compatibility_thresholds):
 	num_generations = len(species_sizes)
 

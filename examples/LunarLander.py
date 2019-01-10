@@ -26,12 +26,13 @@ for i in range(config.num_iter):
 
 	if avg_score >= 200:
 		if config.visualize_best_networks and i % config.visualize_every != 0:
-			networkVisualizer.visualize_network(best_individual.connections)
+			network_visualizer.visualize_network(best_individual.connections)
 
 		print('Solved after', i, 'generations')
 		break
 
 interface.plot_overall_fitness(stats.best_fitnesses, stats.avg_fitnesses, stats.stdev_fitnesses)
+interface.plot_distances(stats.avg_num_hidden_nodesg, stats.stdev_num_hidden_nodes, stats.avg_num_connections, stats.stdev_num_connections)
 interface.plot_species_sizes(stats.species_sizes, stats.compatibility_thresholds)
 interface.plot_distances(stats.avg_Es, stats.avg_Ds, stats.avg_weight_diffs)
 

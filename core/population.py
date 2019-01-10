@@ -1,6 +1,7 @@
 from core.config import config
 from core.individual import Individual
 from core.species import Species
+from core.interface import log
 from core import utility
 import math
 import numpy as np
@@ -46,6 +47,7 @@ class Population:
 				spec.num_generations_before_last_improvement += 1
 
 				if spec.num_generations_before_last_improvement > config.max_num_generations_before_species_improvement:
+					log('\t\tRemoving stagnant species {:d} after {:d} generations without improvement'.format(spec.key, spec.num_generations_before_last_improvement))
 					self.species.remove(spec)
 
 	def adjust_species_fitness(self):
@@ -99,6 +101,7 @@ class Population:
 			spec.num_children = max(config.elitism, round(spec.num_children * norm))
 
 		if config.elitism == 0:
+			log('\t\tRemoving species {:d} because no children were assigned'.format(self.spec.key))
 			self.species = [spec for spec in self.species if spec.num_children > 0]
 
 	def reproduce(self):
@@ -136,6 +139,10 @@ class Population:
 				new_spec = Species(self.next_species_key, individual)
 				self.species.append(new_spec)
 				self.next_species_key += 1
+
+		for spec in self.species:
+			if len(spec.individuals) == 0:
+				log('\t\tSpecies {:d} is empty after speciation'.format(spec.key))
 
 		self.species = [spec for spec in self.species if len(spec.individuals) > 0]
 

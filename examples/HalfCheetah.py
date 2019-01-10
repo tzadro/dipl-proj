@@ -3,6 +3,15 @@ from core.environments import HalfCheetah
 from core.statistics import Statistics
 from core import neat, interface
 
+config.pop_size = 300
+config.c1 = 2.0
+config.c2 = 2.0
+config.ct_min_val = 0.9
+config.ct_max_val = 9.0
+config.new_node_probability = 0.06
+config.new_connection_probability = 0.1
+config.verbose = True
+
 env = HalfCheetah()
 stats = Statistics()
 algorithm = neat.NEAT(env.evaluate, stats)
@@ -12,8 +21,6 @@ for i in range(config.num_iter):
 	best_individual = algorithm.epoch()
 	# env.seed += 1
 
-	print('Generation: {:d}, best_score: {:.2f}, avg_score: {:.2f}'.format(i, stats.best_fitnesses[-1], stats.avg_fitnesses[-1]))
-
 	if config.visualize_best_networks:
 		for individual in algorithm.population.individuals:
 			network_visualizer.update_node_positions(individual.connections, individual.nodes)
@@ -22,6 +29,7 @@ for i in range(config.num_iter):
 			network_visualizer.visualize_network(best_individual.connections)
 
 interface.plot_overall_fitness(stats.best_fitnesses, stats.avg_fitnesses, stats.stdev_fitnesses)
+interface.plot_distances(stats.avg_num_hidden_nodesg, stats.stdev_num_hidden_nodes, stats.avg_num_connections, stats.stdev_num_connections)
 interface.plot_species_sizes(stats.species_sizes, stats.compatibility_thresholds)
 interface.plot_distances(stats.avg_Es, stats.avg_Ds, stats.avg_weight_diffs)
 

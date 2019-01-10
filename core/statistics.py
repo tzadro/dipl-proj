@@ -8,6 +8,10 @@ class Statistics:
 		self.best_fitnesses = []
 		self.avg_fitnesses = []
 		self.stdev_fitnesses = []
+		self.avg_num_hidden_nodes = []
+		self.stdev_num_hidden_nodes = []
+		self.avg_num_connections = []
+		self.stdev_num_connections = []
 		self.species_sizes = []
 		self.compatibility_thresholds = []
 		self.avg_Es = []
@@ -31,6 +35,22 @@ class Statistics:
 		stdev = np.std(fitnesses)
 		self.stdev_fitnesses.append(stdev)
 
+	def update_structures(self, individuals):
+		num_hidden_nodes = [len(individual.nodes) - config.num_starting_nodes for individual in individuals]
+		num_connections = [len(individual.connections) for individual in individuals]
+
+		avg_num_hidden = np.mean(num_hidden_nodes)
+		self.avg_num_hidden_nodes.append(avg_num_hidden)
+
+		stdev_num_hidden = np.std(num_hidden_nodes)
+		self.stdev_num_hidden_nodes.append(stdev_num_hidden)
+
+		avg_num_conns = np.mean(num_connections)
+		self.avg_num_connections.append(avg_num_conns)
+
+		stdev_num_conns = np.std(num_hidden_nodes)
+		self.stdev_num_connections.append(stdev_num_conns)
+
 	def update_species(self, species, total_num_species_ever):
 		generation_sizes = [0] * total_num_species_ever
 		for spec in species:
@@ -52,8 +72,7 @@ class Statistics:
 	def update_run(self, num_ev, best_individual):
 		self.num_evaluations.append(num_ev)
 
-		num_starting_nodes = len(config.input_keys) + len(config.output_keys)
-		num_hidden = len(best_individual.nodes) - num_starting_nodes
+		num_hidden = len(best_individual.nodes) - config.num_starting_nodes
 		self.num_hidden_nodes.append(num_hidden)
 
 		num_conn = len([conn for conn in best_individual.connections.values() if conn.enabled])
@@ -63,6 +82,10 @@ class Statistics:
 		self.best_fitnesses = []
 		self.avg_fitnesses = []
 		self.stdev_fitnesses = []
+		self.avg_num_hidden_nodes = []
+		self.stdev_num_hidden_nodes = []
+		self.avg_num_connections = []
+		self.stdev_num_connections = []
 		self.species_sizes = []
 		self.compatibility_thresholds = []
 		self.avg_Es = []

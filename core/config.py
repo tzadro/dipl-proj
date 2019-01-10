@@ -63,13 +63,15 @@ class Config:
 		self.network_canvas_width = 100
 
 		# network
+		self.num_starting_nodes = None
 		self.next_node_key = None
 		self.innovation_number = None
 		self.input_keys = None
 		self.output_keys = None
 
 	def update(self, num_inputs, num_outputs):
-		self.next_node_key = num_inputs + num_outputs
+		self.num_starting_nodes = num_inputs + num_outputs
+		self.next_node_key = self.num_starting_nodes
 		self.innovation_number = num_inputs * num_outputs
 		self.input_keys = list(range(num_inputs))
 		self.output_keys = list(range(num_inputs, num_inputs + num_outputs))
