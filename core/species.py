@@ -102,7 +102,7 @@ class Species:
 				parent = self.random_select()
 				child = parent.duplicate()
 			else:
-				if not config.tournament_select or size < config.tournament_size:
+				if not config.tournament_selection or size < config.tournament_size:
 					parent1, parent2 = self.random_select(2)
 				else:
 					parent1, parent2 = self.tournament_select(2)

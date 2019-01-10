@@ -70,7 +70,9 @@ def distance(individual1, individual2):
 	weight_diffs = []
 	E = 0
 	D = 0
-	N = max(len(connections1), len(connections2)) if config.normalize else 1.
+	max_num_nodes = max(len(connections1), len(connections2))
+	max_num_hidden = max_num_nodes - (len(config.input_keys) + len(config.output_keys))
+	N = max_num_hidden if config.normalize else 1.
 
 	for innovation_number in all_innovation_numbers:
 		if innovation_number in connections1 and innovation_number in connections2:
