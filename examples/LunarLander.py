@@ -15,8 +15,9 @@ for i in range(config.num_iter):
 	print('Generation: {:d}, best_score: {:.2f}, avg_score: {:.2f}'.format(i, stats.best_fitnesses[-1], stats.avg_fitnesses[-1]))
 
 	if config.visualize_best_networks:
-		for individual in algorithm.population.individuals:
-			network_visualizer.update_node_positions(individual.connections, individual.nodes)
+		for spec in algorithm.population.species:
+			for individual in spec.individuals:
+				network_visualizer.update_node_positions(individual.connections, individual.nodes)
 
 		if i % config.visualize_every == 0:
 			network_visualizer.visualize_network(best_individual.connections)

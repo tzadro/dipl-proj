@@ -120,7 +120,6 @@ def plot_structures(avg_num_hidden_nodes, stdev_num_hidden_nodes, avg_num_connec
 
 	plt.title('Structure over generations')
 	plt.show()
-	exit()
 
 
 def plot_species_sizes(species_sizes, compatibility_thresholds):

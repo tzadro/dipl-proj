@@ -13,8 +13,9 @@ for run in range(config.num_runs):
 		best_individual = algorithm.epoch()
 
 		if config.visualize_best_networks:
-			for individual in algorithm.population.individuals:
-				network_visualizer.update_node_positions(individual.connections, individual.nodes)
+			for spec in algorithm.population.species:
+				for individual in spec.individuals:
+					network_visualizer.update_node_positions(individual.connections, individual.nodes)
 
 		if env.solved:
 			stats.update_run(env.evaluations, best_individual)

@@ -25,8 +25,8 @@ class NEAT(AbstractNEAT):
 	def epoch(self):
 		# evaluate population and track stats
 		best_individual = self.population.evaluate_fitness(self.evaluate)
-		self.stats.update_fitnesses(self.population.individuals)
-		self.stats.update_structures(self.population.individuals)
+		self.stats.update_fitnesses(self.population.species)
+		self.stats.update_structures(self.population.species)
 		log('\tBest fitness: {:.2f}, Average fitness: {:.2f}'.format(self.stats.best_fitnesses[-1], self.stats.avg_fitnesses[-1]))
 		log('\tAverage num hidden nodes: {:.2f}, Average num connections: {:.2f}'.format(self.stats.avg_num_hidden_nodes[-1], self.stats.avg_num_connections[-1]))
 
@@ -44,10 +44,10 @@ class NEAT(AbstractNEAT):
 		self.population.assign_num_children()
 
 		# copy elites if enabled, remove worst in each species and breed new generation
-		self.population.reproduce()
+		children = self.population.reproduce()
 
 		# speciate new individuals and remove empty species
-		Es, Ds, weight_diffs = self.population.speciate()
+		Es, Ds, weight_diffs = self.population.speciate(children)
 		self.stats.update_species(self.population.species, self.population.next_species_key)
 		self.stats.update_distances(Es, Ds, weight_diffs)
 		log('\tNum species is {:d}'.format(len(self.population.species)))

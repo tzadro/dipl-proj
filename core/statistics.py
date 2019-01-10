@@ -23,8 +23,10 @@ class Statistics:
 		self.num_hidden_nodes = []
 		self.num_connections = []
 
-	def update_fitnesses(self, individuals):
-		fitnesses = [individual.fitness for individual in individuals]
+	def update_fitnesses(self, species):
+		fitnesses = []
+		for spec in species:
+			fitnesses += [individual.fitness for individual in spec.individuals]
 
 		best = max(fitnesses)
 		self.best_fitnesses.append(best)
@@ -35,9 +37,12 @@ class Statistics:
 		stdev = np.std(fitnesses)
 		self.stdev_fitnesses.append(stdev)
 
-	def update_structures(self, individuals):
-		num_hidden_nodes = [len(individual.nodes) - config.num_starting_nodes for individual in individuals]
-		num_connections = [len(individual.connections) for individual in individuals]
+	def update_structures(self, species):
+		num_hidden_nodes = []
+		num_connections = []
+		for spec in species:
+			num_hidden_nodes += [len(individual.nodes) - config.num_starting_nodes for individual in spec.individuals]
+			num_connections += [len(individual.connections) for individual in spec.individuals]
 
 		avg_num_hidden = np.mean(num_hidden_nodes)
 		self.avg_num_hidden_nodes.append(avg_num_hidden)

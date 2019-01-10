@@ -9,19 +9,21 @@ import numpy as np
 
 class Population:
 	def __init__(self):
-		self.individuals = [Individual() for _ in range(config.pop_size)]
 		self.species = []
 		self.next_species_key = 0
-		self.speciate()
+
+		individuals = [Individual() for _ in range(config.pop_size)]
+		self.speciate(individuals)
 
 	def evaluate_fitness(self, evaluate):
 		best_individual = None
 
-		for individual in self.individuals:
-			individual.fitness = evaluate(individual)
+		for spec in self.species:
+			for individual in spec.individuals:
+				individual.fitness = evaluate(individual)
 
-			if not best_individual or individual.fitness > best_individual.fitness:
-				best_individual = individual
+				if not best_individual or individual.fitness > best_individual.fitness:
+					best_individual = individual
 
 		return best_individual
 
@@ -113,10 +115,10 @@ class Population:
 		for spec in self.species:
 			children += spec.reproduce(generation_new_nodes, generation_new_connections)
 
-		self.individuals = children
+		return children
 
-	def speciate(self):
-		for individual in self.individuals:
+	def speciate(self, children):
+		for individual in children:
 			placed = False
 
 			Es = []
