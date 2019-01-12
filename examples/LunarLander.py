@@ -6,8 +6,10 @@ from core import neat, interface
 config.pop_size = 300
 config.c1 = 2.0
 config.c2 = 2.0
-config.ct_min_val = 0.9
-config.ct_max_val = 9.0
+config.compatibility_threshold = 1.0
+config.ct_step = 0.15
+config.ct_min_val = 0.4
+config.ct_max_val = 4.6
 config.new_node_probability = 0.06
 config.new_connection_probability = 0.1
 config.verbose = True

@@ -11,7 +11,7 @@ class Config:
 		self.pop_size = 150
 		self.elitism = 2
 		self.min_num_species = 2
-		self.max_num_generations_before_species_improvement = 20
+		self.max_num_gens_before_spec_improv = 20
 
 		# distance
 		self.c1 = 1.0

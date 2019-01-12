@@ -43,13 +43,13 @@ class Population:
 
 			best_fitness = spec.individuals[0].fitness
 			if best_fitness > spec.max_fitness_ever:
-				spec.num_generations_before_last_improvement = 0
+				spec.num_gens_before_last_improv = 0
 				spec.max_fitness_ever = best_fitness
 			else:
-				spec.num_generations_before_last_improvement += 1
+				spec.num_gens_before_last_improv += 1
 
-				if spec.num_generations_before_last_improvement > config.max_num_generations_before_species_improvement:
-					log('\t\tRemoving stagnant species {:d} after {:d} generations without improvement'.format(spec.key, spec.num_generations_before_last_improvement))
+				if spec.num_gens_before_last_improv > config.max_num_gens_before_spec_improv:
+					log('\t\tRemoving stagnant species {:d} after {:d} generations without improvement'.format(spec.key, spec.num_gens_before_last_improv))
 					self.species.remove(spec)
 
 	def adjust_species_fitness(self):

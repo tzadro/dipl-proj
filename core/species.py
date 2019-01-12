@@ -14,7 +14,7 @@ class Species:
 		self.num_children = None
 
 		self.max_fitness_ever = -math.inf
-		self.num_generations_before_last_improvement = 0
+		self.num_gens_before_last_improv = 0
 
 	def add(self, individual):
 		self.individuals.append(individual)
