@@ -16,13 +16,13 @@ config.verbose = True
 
 env = LunarLander()
 stats = Statistics()
-algorithm = neat.NEAT(env.evaluate, stats)
+algorithm = neat.NEAT(env.evaluate)
 network_visualizer = interface.NetworkVisualizer()
 
 for i in range(config.num_iter):
 	interface.log('Generation: {:d}'.format(i))
 
-	best_individual = algorithm.epoch()
+	best_individual = algorithm.epoch(stats)
 	env.seed += 1
 
 	if config.visualize_best_networks:

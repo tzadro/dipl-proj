@@ -5,12 +5,12 @@ from core import neat, interface
 
 env = XORProblem()
 stats = Statistics()
-algorithm = neat.NEAT(env.evaluate, stats)
+algorithm = neat.NEAT(env.evaluate)
 network_visualizer = interface.NetworkVisualizer()
 
 for run in range(config.num_runs):
 	for i in range(config.num_iter):
-		best_individual = algorithm.epoch()
+		best_individual = algorithm.epoch(stats)
 
 		if config.visualize_best_networks:
 			for spec in algorithm.population.species:
@@ -31,6 +31,7 @@ for run in range(config.num_runs):
 
 	env.reset()
 	algorithm.reset()
+	stats.reset_generation()
 
 if config.num_runs > 1 and len(stats.num_evaluations) > 1:
 	interface.print_evaluation_stats(stats.num_evaluations, stats.num_hidden_nodes, stats.num_connections)

@@ -4,9 +4,8 @@ from core.interface import log
 
 
 class AbstractNEAT:
-	def __init__(self, evaluate, stats):
+	def __init__(self, evaluate):
 		self.evaluate = evaluate
-		self.stats = stats
 		self.population = Population()
 
 		self.starting_compatibility_threshold = config.compatibility_threshold
@@ -15,20 +14,19 @@ class AbstractNEAT:
 		pass
 
 	def reset(self):
-		self.stats.reset_generation()
 		self.population = Population()
 
 		config.compatibility_threshold = self.starting_compatibility_threshold
 
 
 class NEAT(AbstractNEAT):
-	def epoch(self):
+	def epoch(self, stats):
 		# evaluate population and track stats
 		best_individual = self.population.evaluate_fitness(self.evaluate)
-		self.stats.update_fitnesses(self.population.species)
-		self.stats.update_structures(self.population.species)
-		log('\tBest fitness: {:.2f}, Average fitness: {:.2f}'.format(self.stats.best_fitnesses[-1], self.stats.avg_fitnesses[-1]))
-		log('\tAverage num hidden nodes: {:.2f}, Average num connections: {:.2f}'.format(self.stats.avg_num_hidden_nodes[-1], self.stats.avg_num_connections[-1]))
+		stats.update_fitnesses(self.population.species)
+		stats.update_structures(self.population.species)
+		log('\tBest fitness: {:.2f}, Average fitness: {:.2f}'.format(stats.best_fitnesses[-1], stats.avg_fitnesses[-1]))
+		log('\tAverage num hidden nodes: {:.2f}, Average num connections: {:.2f}'.format(stats.avg_num_hidden_nodes[-1], stats.avg_num_connections[-1]))
 
 		# sort individuals inside each species and then sort species by their max fitness
 		self.population.sort()
@@ -48,8 +46,8 @@ class NEAT(AbstractNEAT):
 
 		# speciate new individuals and remove empty species
 		Es, Ds, weight_diffs = self.population.speciate(children)
-		self.stats.update_species(self.population.species, self.population.next_species_key)
-		self.stats.update_distances(Es, Ds, weight_diffs)
+		stats.update_species(self.population.species, self.population.next_species_key)
+		stats.update_distances(Es, Ds, weight_diffs)
 		log('\tNum species is {:d}'.format(len(self.population.species)))
 		log('\tAverage distance is {:.2f}'.format(sum(weight_diffs) / len(weight_diffs)))
 
