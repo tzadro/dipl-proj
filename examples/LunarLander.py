@@ -3,16 +3,25 @@ from core.environments import LunarLander
 from core.statistics import Statistics
 from core import neat, interface
 
+config.pop_size = 300
+config.c1 = 2.0
+config.c2 = 2.0
+config.ct_min_val = 0.9
+config.ct_max_val = 9.0
+config.new_node_probability = 0.06
+config.new_connection_probability = 0.1
+config.verbose = True
+
 env = LunarLander()
 stats = Statistics()
 algorithm = neat.NEAT(env.evaluate, stats)
 network_visualizer = interface.NetworkVisualizer()
 
 for i in range(config.num_iter):
+	interface.log('Generation: {:d}'.format(i))
+
 	best_individual = algorithm.epoch()
 	env.seed += 1
-
-	print('Generation: {:d}, best_score: {:.2f}, avg_score: {:.2f}'.format(i, stats.best_fitnesses[-1], stats.avg_fitnesses[-1]))
 
 	if config.visualize_best_networks:
 		for spec in algorithm.population.species:
@@ -23,13 +32,13 @@ for i in range(config.num_iter):
 			network_visualizer.visualize_network(best_individual.connections)
 
 	avg_score = env.evaluate(best_individual, num_times=100, fixed_seed=False)
-	print('\tSolve attempt avg_score: {:.2f}'.format(avg_score))
+	interface.log('Solve attempt avg_score: {:.2f}'.format(avg_score))
 
 	if avg_score >= 200:
 		if config.visualize_best_networks and i % config.visualize_every != 0:
 			network_visualizer.visualize_network(best_individual.connections)
 
-		print('Solved after', i, 'generations')
+		interface.log('Solved after', i, 'generations')
 		break
 
 interface.plot_overall_fitness(stats.best_fitnesses, stats.avg_fitnesses, stats.stdev_fitnesses)
