@@ -23,7 +23,7 @@ for i in range(config.num_iter):
 	interface.log('Generation: {:d}'.format(i))
 
 	best_individual = algorithm.epoch(stats)
-	env.seed += 1
+	# env.seed += 1
 
 	if config.visualize_best_networks:
 		for spec in algorithm.population.species:
@@ -33,7 +33,7 @@ for i in range(config.num_iter):
 		if i % config.visualize_every == 0:
 			network_visualizer.visualize_network(best_individual.connections)
 
-	avg_score = env.evaluate(best_individual, num_times=100, fixed_seed=False)
+	avg_score = env.evaluate(best_individual, True)
 	interface.log('Solve attempt avg_score: {:.2f}'.format(avg_score))
 
 	if avg_score >= 200:
@@ -49,4 +49,5 @@ interface.plot_species_sizes(stats.species_sizes, stats.compatibility_thresholds
 interface.plot_distances(stats.avg_Es, stats.avg_Ds, stats.avg_weight_diffs)
 
 input('Press any key to demonstrate best individual: ')
-env.evaluate(best_individual, fixed_seed=False)
+env.seed = 0
+env.evaluate(best_individual)

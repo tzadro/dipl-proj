@@ -99,18 +99,22 @@ class LunarLander(AbstractEnvironment):
 		self.env = gym.make('LunarLander-v2')
 		self.seed = 0
 
-	def evaluate(self, individual, num_times=1, fixed_seed=True):
+	def evaluate(self, individual, solve_attempt=False):
 		phenotype = Phenotype(individual.connections.values(), individual.nodes.values())
 
 		fitnesses = []
 
-		for _ in range(num_times):
+		num_times = 100 if solve_attempt else 1
+		for i in range(num_times):
 			phenotype.flush()
 			
 			fitness = 0
 
-			if fixed_seed:
-				# ensures every run starts with same observation
+			if solve_attempt:
+				# if solve attempt test first 100 seeds
+				self.env.seed(i)
+			else:
+				# else run fixed seed
 				self.env.seed(self.seed)
 
 			observation = self.env.reset()
