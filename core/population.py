@@ -154,9 +154,9 @@ class Population:
 		num_species = len(self.species)
 
 		delta = 0
-		if num_species > config.desired_num_species:
+		if num_species > config.max_desired_num_species:
 			delta = config.ct_step
-		elif num_species < config.desired_num_species:
+		elif num_species < config.min_desired_num_species:
 			delta = -config.ct_step
 
 		new_value = config.compatibility_threshold + delta

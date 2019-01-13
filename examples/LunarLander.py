@@ -40,7 +40,7 @@ for i in range(config.num_iter):
 		if config.visualize_best_networks and i % config.visualize_every != 0:
 			network_visualizer.visualize_network(best_individual.connections)
 
-		interface.log('Solved after', i, 'generations')
+		interface.log('Solved after {:d} generations'.format(i))
 		break
 
 interface.plot_overall_fitness(stats.best_fitnesses, stats.avg_fitnesses, stats.stdev_fitnesses)

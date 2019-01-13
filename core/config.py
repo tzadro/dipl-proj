@@ -22,7 +22,8 @@ class Config:
 
 		# compatibility_threshold
 		self.adjust_compatibility_threshold = True
-		self.desired_num_species = 5
+		self.min_desired_num_species = 5
+		self.max_desired_num_species = 10
 		self.ct_step = 0.3
 		self.ct_min_val = 1.5
 		self.ct_max_val = 4.5
