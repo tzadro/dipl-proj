@@ -23,7 +23,7 @@ for i in range(config.num_iter):
 	interface.log('Generation: {:d}'.format(i))
 
 	best_individual = algorithm.epoch(stats)
-	# env.seed += 1
+	env.seed += 1
 
 	if config.visualize_best_networks:
 		for spec in algorithm.population.species:
@@ -44,7 +44,7 @@ for i in range(config.num_iter):
 		break
 
 interface.plot_overall_fitness(stats.best_fitnesses, stats.avg_fitnesses, stats.stdev_fitnesses)
-interface.plot_distances(stats.avg_num_hidden_nodesg, stats.stdev_num_hidden_nodes, stats.avg_num_connections, stats.stdev_num_connections)
+interface.plot_distances(stats.avg_num_hidden_nodes, stats.stdev_num_hidden_nodes, stats.avg_num_connections, stats.stdev_num_connections)
 interface.plot_species_sizes(stats.species_sizes, stats.compatibility_thresholds)
 interface.plot_distances(stats.avg_Es, stats.avg_Ds, stats.avg_weight_diffs)
 
