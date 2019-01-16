@@ -204,18 +204,23 @@ def plot_distances(avg_Es, avg_Ds, avg_weight_diffs):
 
 
 def print_evaluation_stats(num_evaluations, num_hidden_nodes, num_connections):
-	num_finished_runs = len(num_evaluations)
-	avg_ev = sum(num_evaluations) / num_finished_runs
+	avg_ev = np.mean(num_evaluations)
 	avg_gen = avg_ev / config.pop_size
 	std_ev = np.std(num_evaluations)
 	std_gen = std_ev / config.pop_size
-	avg_hidden = sum(num_hidden_nodes) / num_finished_runs
-	avg_conn = sum(num_connections) / num_finished_runs
+	worst_run = max(num_evaluations)
+	worst_run_gen = worst_run / config.pop_size
+	avg_hidden = np.mean(num_hidden_nodes)
+	std_hidden = np.std(num_hidden_nodes)
+	avg_conn = np.mean(num_connections)
+	std_conn = np.std(num_connections)
+	num_finished_runs = len(num_evaluations)
 
 	print('Num evaluations:')
 	print('\tavg: {:.2f} (~{:d} generations)'.format(avg_ev, int(avg_gen)))
 	print('\tstdev: {:.2f} (~{:d} generations)'.format(std_ev, int(std_gen)))
+	print('\tworst: {:.2f} (~{:d} generations)'.format(worst_run, int(worst_run_gen)))
 	print('Structure:')
-	print('\tavg num hidden nodes: {:.2f}'.format(avg_hidden))
-	print('\tavg num connections: {:.2f}'.format(avg_conn))
+	print('\tavg num hidden nodes: {:.2f} (std {:.2f})'.format(avg_hidden, std_hidden))
+	print('\tavg num connections: {:.2f} (std {:.2f})'.format(avg_conn, std_conn))
 	print('From {:d} finished runs (of {:d} total runs)'.format(num_finished_runs, config.num_runs))
