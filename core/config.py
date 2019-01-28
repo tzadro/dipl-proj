@@ -29,6 +29,7 @@ class Config:
 		self.ct_max_val = 4.5
 
 		# reproduction
+		self.spawn_smooth_coef = 0.5
 		self.survival_threshold = 0.2
 		self.skip_crossover = 0.2
 		self.tournament_size = 3

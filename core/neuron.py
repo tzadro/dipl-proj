@@ -26,17 +26,21 @@ class Neuron:
 	def accept(self, neurons):
 		self.num_accepts_before_triggering -= 1
 
+		# if all incoming connections have triggered calculate value and propagate activation
 		if self.num_accepts_before_triggering == 0:
 			self.calculate_value(neurons)
 			self.trigger_outgoing(neurons)
 
 	def calculate_value(self, neurons):
+		# start from bias
 		score = self.bias
 
+		# for every incoming connection add incoming nodes value adjusted by connection weight
 		for connection in self.incoming_connections:
 			from_neuron = neurons[connection.from_key]
 			score += connection.weight * from_neuron.value
 
+		# run sum through sigmoid activation
 		self.value = utility.sigmoid(score)
 
 	def set_value(self, value, neurons):
@@ -44,6 +48,7 @@ class Neuron:
 		self.trigger_outgoing(neurons)
 
 	def trigger_outgoing(self, neurons):
+		# activate neurons for every outgoing connection
 		for key in self.outgoing_keys:
 			outgoing_neuron = neurons[key]
 			outgoing_neuron.accept(neurons)

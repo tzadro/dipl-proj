@@ -27,20 +27,24 @@ class Population:
 
 		return best_individual
 
-	# from best to worst
+	# from best to worst, also sorts species
 	def sort(self):
-		# sort individuals in every species
+		# sort individuals in every species from best to worst
 		for spec in self.species:
 			spec.sort()
 
 		# sort species by max fitness
 		self.species.sort(key=lambda x: -x.individuals[0].fitness)
 
+	# assumes species are sorted
 	def remove_stagnant_species(self):
+		# iterate through all species from worst to best
 		for spec in reversed(self.species):
+			# stop removing stagnant species if number of species is less than or equal to minimum number of species
 			if len(self.species) <= config.min_num_species:
 				break
 
+			# if species improved reset counter, else increment it
 			best_fitness = spec.individuals[0].fitness
 			if best_fitness > spec.max_fitness_ever:
 				spec.num_gens_before_last_improv = 0
@@ -48,15 +52,15 @@ class Population:
 			else:
 				spec.num_gens_before_last_improv += 1
 
+				# if species hasn't improved in a long time remove it from the population
 				if spec.num_gens_before_last_improv > config.max_num_gens_before_spec_improv:
 					log('\t\tRemoving stagnant species {:d} after {:d} generations without improvement'.format(spec.key, spec.num_gens_before_last_improv))
 					self.species.remove(spec)
 
 	def adjust_species_fitness(self):
-		# find min and max for normalization
+		# find minimum and maximum fitness for normalization
 		min_fitness = math.inf
 		max_fitness = -math.inf
-
 		for spec in self.species:
 			for individual in spec.individuals:
 				if individual.fitness < min_fitness:
@@ -65,43 +69,41 @@ class Population:
 				if individual.fitness > max_fitness:
 					max_fitness = individual.fitness
 
+		# define fitness range
 		fitness_range = max(abs(max_fitness - min_fitness), 1.0)
 
-		# compute adjusted fitness for every species
 		for spec in self.species:
+			# calculate species mean fitness
 			mean_fitness = sum([individual.fitness for individual in spec.individuals]) / len(spec.individuals)
+			# set adjusted fitness as normalized mean fitness
 			spec.adjusted_fitness = (mean_fitness - min_fitness) / fitness_range
 
 	def assign_num_children(self):
 		total_spawn = 0
 		adjusted_fitness_sum = sum([spec.adjusted_fitness for spec in self.species])
 
-		# todo: weird formula
 		for spec in self.species:
 			adjusted_fitness = spec.adjusted_fitness
 			size = len(spec.individuals)
 
-			s = max(config.elitism, adjusted_fitness / adjusted_fitness_sum * config.pop_size)
+			# calculate potential number of children proportionally to species adjusted fitness
+			potential_size = max(config.elitism, adjusted_fitness / adjusted_fitness_sum * config.pop_size)
+			# calculate difference between current size and potential number of children
+			size_delta = potential_size - size
+			# set number of children somewhere between current and potential size depending on smoothing coefficient
+			num_children = size + round(size_delta * config.spawn_smooth_coef)
 
-			d = (s - size) * 0.5
-			c = int(round(d))
+			spec.num_children = num_children
+			total_spawn += num_children
 
-			spawn = size
-			if abs(c) > 0:
-				spawn += c
-			elif d > 0:
-				spawn += 1
-			elif d < 0:
-				spawn -= 1
-
-			spec.num_children = spawn
-			total_spawn += spec.num_children
-
+		# calculate coefficient with which we will normalize all number of children
 		norm = config.pop_size / total_spawn
 
 		for spec in self.species:
+			# by normalizing we assure population size will always be as close to defined as possible
 			spec.num_children = max(config.elitism, round(spec.num_children * norm))
 
+		# if there is no elitism in species it is possible some have 0 children assigned, remove those species if so
 		if config.elitism == 0:
 			log('\t\tRemoving species {:d} because no children were assigned'.format(self.spec.key))
 			self.species = [spec for spec in self.species if spec.num_children > 0]
@@ -118,6 +120,7 @@ class Population:
 		return children
 
 	def speciate(self, children):
+		# assign every individual to a species
 		for individual in children:
 			placed = False
 
@@ -125,6 +128,7 @@ class Population:
 			Ds = []
 			weight_diffs = []
 
+			# first see if individual is compatible with any existing species
 			for spec in self.species:
 				dist_from_repr, E, D, weight_diff = utility.distance(individual, spec.representative)
 
@@ -132,20 +136,24 @@ class Population:
 				Ds.append(D)
 				weight_diffs.append(weight_diff)
 
+				# if distance from species representative is smaller than threshold add individual to that species
 				if dist_from_repr <= config.compatibility_threshold:
 					spec.add(individual)
 					placed = True
 					break
 
+			# if individual is not placed to any existing species create new species and set it as representative
 			if not placed:
 				new_spec = Species(self.next_species_key, individual)
 				self.species.append(new_spec)
 				self.next_species_key += 1
 
+		# log empty species
 		for spec in self.species:
 			if len(spec.individuals) == 0:
 				log('\t\tSpecies {:d} is empty after speciation'.format(spec.key))
 
+		# delete any species that is empty after speciation
 		self.species = [spec for spec in self.species if len(spec.individuals) > 0]
 
 		return Es, Ds, weight_diffs
@@ -153,11 +161,13 @@ class Population:
 	def adjust_compatibility_threshold(self):
 		num_species = len(self.species)
 
+		# calculate compatibility threshold modifier depending on current number of species
 		delta = 0
 		if num_species > config.max_desired_num_species:
 			delta = config.ct_step
 		elif num_species < config.min_desired_num_species:
 			delta = -config.ct_step
 
+		# adjust current value with calculated modifier but make sure it doesn't go over defined boundaries
 		new_value = config.compatibility_threshold + delta
 		config.compatibility_threshold = np.clip(new_value, config.ct_min_val, config.ct_max_val)

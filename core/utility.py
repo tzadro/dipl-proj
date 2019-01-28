@@ -74,20 +74,26 @@ def distance(individual1, individual2):
 	max_num_hidden = max_num_nodes - config.num_starting_nodes
 	N = max_num_hidden if config.normalize else 1.
 
+	# iterate through all innovation numbers in either of the parents
 	for innovation_number in all_innovation_numbers:
+		# if both parents have that gene calculate weight difference
 		if innovation_number in connections1 and innovation_number in connections2:
 			weight_diff = abs(connections1[innovation_number].weight - connections2[innovation_number].weight)
 			weight_diffs.append(weight_diff)
+		# else increment number of excess or disjoint genes depending on the location of the gene
 		else:
 			if innovation_number > max_common_innovation_number:
 				E += 1
 			else:
 				D += 1
 
+	# normalize excess and disjoint genes
 	adjusted_E = (config.c1 * E) / N
 	adjusted_D = (config.c2 * D) / N
+	# calculate average weight difference
 	avg_weight_diff = sum(weight_diffs) / len(weight_diffs)
 	adjusted_weight_diff = config.c3 * avg_weight_diff
+	# calculate distance
 	delta = adjusted_E + adjusted_D + adjusted_weight_diff
 	return delta, adjusted_D, adjusted_E, adjusted_weight_diff
 

@@ -70,9 +70,11 @@ class Species:
 	def tournament_select(self, size=1, replace=False):
 		assert size < config.tournament_size, 'Size must be smaller than tournament size for selection to have effect'
 
+		# randomly select individuals that will be inside the tournament and sort them from best to worst
 		tournament = self.random_select(config.tournament_size, replace)
 		tournament.sort(key=lambda x: -x.fitness)
 
+		# we return individuals from the top because they are the winners
 		if size == 1:
 			return tournament[0]
 		if size == 2:
@@ -80,24 +82,27 @@ class Species:
 		else:
 			return tournament[:size]
 
+	# assumes individuals are sorted
 	def reproduce(self, generation_new_nodes, generation_new_connections):
 		size = len(self.individuals)
 
 		children = []
 
-		# elitism
+		# if elitism is enabled automatically forward best individuals to next generation
 		num_elites = min(config.elitism, size)
 		for i in range(num_elites):
 			child = self.individuals[i].duplicate()
 			children.append(child)
 			self.num_children -= 1
 
-		# survival threshold
+		# remove bottom part of the individuals which are not allowed to reproduce
 		num_surviving = max(2, math.ceil(config.survival_threshold * size))
 		self.trim_to(num_surviving)
 
 		size = len(self.individuals)
+		# create children until assigned cap is reached
 		while self.num_children > 0:
+			# select two parents for crossover or duplicate a single individual
 			if random.random() < config.skip_crossover or size < 2:
 				parent = self.random_select()
 				child = parent.duplicate()
@@ -109,12 +114,13 @@ class Species:
 
 				child = crossover(parent1, parent2)
 
-			# mutate
+			# after we have a child, mutate it
 			child.mutate(generation_new_nodes, generation_new_connections)
 
 			children.append(child)
 			self.num_children -= 1
 
+		# reset species, remove all individuals and set a random one as a representative
 		self.reset()
 
 		return children
