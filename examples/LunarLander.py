@@ -43,6 +43,7 @@ for i in range(config.num_iter):
 		interface.log('Solved after {:d} generations'.format(i))
 		break
 
+interface.print_info(best_individual)
 interface.plot_overall_fitness(stats.best_fitnesses, stats.avg_fitnesses, stats.stdev_fitnesses)
 interface.plot_structures(stats.avg_num_hidden_nodes, stats.stdev_num_hidden_nodes, stats.avg_num_connections, stats.stdev_num_connections)
 interface.plot_species_sizes(stats.species_sizes, stats.compatibility_thresholds)

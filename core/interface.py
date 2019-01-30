@@ -203,6 +203,15 @@ def plot_distances(avg_Es, avg_Ds, avg_weight_diffs):
 	plt.show()
 
 
+def print_info(individual):
+	print('Individual info:')
+	print('\tScore: {:.2f}'.format(individual.fitness))
+	num_hidden = len(individual.nodes) - config.num_starting_nodes
+	print('\tNum nodes: {:d}'.format(num_hidden))
+	num_conn = len([conn for conn in individual.connections.values() if conn.enabled])
+	print('\tNum connections: {:d}'.format(num_conn))
+
+
 def print_evaluation_stats(num_evaluations, num_hidden_nodes, num_connections):
 	avg_ev = np.mean(num_evaluations)
 	avg_gen = avg_ev / config.pop_size

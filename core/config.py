@@ -60,7 +60,7 @@ class Config:
 		# interface
 		self.verbose = False
 		self.visualize_best_networks = True
-		self.visualize_every = 20
+		self.visualize_every = 100
 		self.network_canvas_height = 100
 		self.network_canvas_width = 100
 

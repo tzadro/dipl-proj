@@ -6,6 +6,8 @@ from core import neat, interface
 config.pop_size = 300
 config.c1 = 2.0
 config.c2 = 2.0
+config.compatibility_threshold = 1.0
+config.ct_step = 0.15
 config.ct_min_val = 0.9
 config.ct_max_val = 9.0
 config.new_node_probability = 0.06
@@ -29,6 +31,7 @@ for i in range(config.num_iter):
 		if i % config.visualize_every == 0:
 			network_visualizer.visualize_network(best_individual.connections)
 
+interface.print_info(best_individual)
 interface.plot_overall_fitness(stats.best_fitnesses, stats.avg_fitnesses, stats.stdev_fitnesses)
 interface.plot_structures(stats.avg_num_hidden_nodes, stats.stdev_num_hidden_nodes, stats.avg_num_connections, stats.stdev_num_connections)
 interface.plot_species_sizes(stats.species_sizes, stats.compatibility_thresholds)
