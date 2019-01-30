@@ -20,6 +20,8 @@ algorithm = neat.NEAT(env.evaluate)
 network_visualizer = interface.NetworkVisualizer()
 
 for i in range(config.num_iter):
+	interface.log('Generation: {:d}'.format(i))
+
 	best_individual = algorithm.epoch(stats)
 	# env.seed += 1
 
