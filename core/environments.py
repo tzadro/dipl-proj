@@ -99,7 +99,7 @@ class LunarLander(AbstractEnvironment):
 		self.env = gym.make('LunarLander-v2')
 		self.seed = 0
 
-	def evaluate(self, individual, solve_attempt=False):
+	def evaluate(self, individual, solve_attempt=False, render=False):
 		phenotype = Phenotype(individual.connections.values(), individual.nodes.values())
 
 		fitnesses = []
@@ -119,7 +119,8 @@ class LunarLander(AbstractEnvironment):
 
 			observation = self.env.reset()
 			while True:
-				self.env.render()
+				if render:
+					self.env.render()
 
 				output = phenotype.forward(observation)
 				action = output.index(max(output))
@@ -143,7 +144,7 @@ class HalfCheetah(AbstractEnvironment):
 		self.env = gym.make('HalfCheetah-v2')
 		self.seed = 0
 
-	def evaluate(self, individual, fixed_seed=True):
+	def evaluate(self, individual, fixed_seed=True, render=False):
 		phenotype = Phenotype(individual.connections.values(), individual.nodes.values())
 
 		fitness = 0
@@ -154,7 +155,8 @@ class HalfCheetah(AbstractEnvironment):
 
 		observation = self.env.reset()
 		while True:
-			self.env.render()
+			if render:
+				self.env.render()
 
 			output = phenotype.forward(observation)
 			action = utility.scale(output, self.env.action_space.low, self.env.action_space.high)

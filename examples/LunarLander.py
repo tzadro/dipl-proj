@@ -3,6 +3,7 @@ from core.environments import LunarLander
 from core.statistics import Statistics
 from core import neat, interface
 
+config.num_iter = 201
 config.pop_size = 300
 config.c1 = 2.0
 config.c2 = 2.0
@@ -13,6 +14,7 @@ config.ct_max_val = 4.6
 config.new_node_probability = 0.06
 config.new_connection_probability = 0.1
 config.verbose = True
+config.visualize_every = 200
 
 env = LunarLander()
 stats = Statistics()
@@ -51,4 +53,4 @@ interface.plot_distances(stats.avg_Es, stats.avg_Ds, stats.avg_weight_diffs)
 
 input('Press any key to demonstrate best individual: ')
 env.seed = 0
-env.evaluate(best_individual)
+env.evaluate(best_individual, render=True)
