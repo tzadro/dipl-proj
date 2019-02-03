@@ -149,6 +149,7 @@ class HalfCheetah(AbstractEnvironment):
 		self.seed = 0
 
 	def evaluate(self, individual, fixed_seed=True, render=False):
+		# create phenotype from individual's connection and node genes
 		phenotype = Phenotype(individual.connections.values(), individual.nodes.values())
 
 		fitness = 0
@@ -157,17 +158,24 @@ class HalfCheetah(AbstractEnvironment):
 			# ensures every run starts with same observation
 			self.env.seed(self.seed)
 
+		# start new game
 		observation = self.env.reset()
 		while True:
 			if render:
+				# displays game state on screen
 				self.env.render()
 
+			# feed forward neural network with observation
 			output = phenotype.forward(observation)
+			# scale output to get action
 			action = utility.scale(output, self.env.action_space.low, self.env.action_space.high)
+			# take step with given action
 			observation, reward, done, info = self.env.step(action)
 
+			# accumulate rewards to get individual's fitness
 			fitness += reward
 
+			# stop if game is over
 			if done:
 				break
 
