@@ -34,13 +34,16 @@ class XORProblem(AbstractEnvironment):
 		self.solved = False
 
 	def evaluate(self, individual):
+		# track number of evaluations made
 		self.evaluations += 1
 
+		# create phenotype from individual's connection and node genes
 		phenotype = Phenotype(individual.connections.values(), individual.nodes.values())
 
 		correct_solutions = True
 		fitness = 4
 
+		# for every one of four different cases feed the network input and calculate error based on the output
 		for observation, solution in zip(self.observations, self.solutions):
 			phenotype.flush()
 			output = phenotype.forward(observation)
@@ -49,6 +52,7 @@ class XORProblem(AbstractEnvironment):
 			correct_solutions = correct_solutions and round(result) == solution
 			fitness -= (solution - result)**2
 
+		# if solution made no errors the environment is considered solved
 		self.solved = self.solved or correct_solutions
 		return fitness
 
