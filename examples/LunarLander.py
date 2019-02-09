@@ -1,7 +1,7 @@
 from core.config import config
 from core.environments import LunarLander
 from core.statistics import Statistics
-from core import neat, interface
+from core import neat, interface, utility
 
 config.num_iter = 201
 config.pop_size = 300
@@ -20,6 +20,12 @@ env = LunarLander()
 stats = Statistics()
 algorithm = neat.NEAT(env.evaluate)
 network_visualizer = interface.NetworkVisualizer()
+
+agent_file_name = 'lunar-lander-agent.pickle'
+demonstrate = interface.demonstrate_if_exists(agent_file_name, env)
+
+if demonstrate:
+	exit()
 
 for i in range(config.num_iter):
 	interface.log('Generation: {:d}'.format(i))
@@ -51,6 +57,5 @@ interface.plot_structures(stats.avg_num_hidden_nodes, stats.stdev_num_hidden_nod
 interface.plot_species_sizes(stats.species_sizes, stats.compatibility_thresholds)
 interface.plot_distances(stats.avg_Es, stats.avg_Ds, stats.avg_weight_diffs)
 
-input('Press any key to demonstrate best individual: ')
-env.seed = 0
-env.evaluate(best_individual, render=True)
+utility.save(agent_file_name, best_individual)
+

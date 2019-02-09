@@ -1,7 +1,9 @@
 from core.config import config
+from core import utility
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
+from os.path import exists
 
 
 class NetworkVisualizer:
@@ -233,3 +235,21 @@ def print_evaluation_stats(num_evaluations, num_hidden_nodes, num_connections):
 	print('\tavg num hidden nodes: {:.2f} (std {:.2f})'.format(avg_hidden, std_hidden))
 	print('\tavg num connections: {:.2f} (std {:.2f})'.format(avg_conn, std_conn))
 	print('From {:d} finished runs (of {:d} total runs)'.format(num_finished_runs, config.num_runs))
+
+
+def demonstrate_if_exists(agent_file_name, env):
+	if exists(agent_file_name):
+		response = input('Do you wish to [t]rain new agent or [d]emonstrate existing one: ')
+
+		if response == 't':
+			return False
+
+		if response != 'd':
+			return True
+
+		agent = utility.load(agent_file_name)
+		env.evaluate(agent, render=True)
+
+		return True
+
+	return False

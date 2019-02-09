@@ -1,6 +1,8 @@
 from core.config import config
 import math
 import numpy as np
+import pickle
+from os.path import exists
 
 
 def sigmoid(x):
@@ -111,3 +113,16 @@ def normalize(data, low, high):
 # rescale data to have a mean 0 and stdev 1
 def standardize(data, mean, stdev):
 	return (data - mean) / stdev
+
+
+def save(file_name, instance):
+	with open(file_name, 'wb') as file:
+		pickle.dump(instance, file)
+
+
+def load(file_name):
+	assert exists(file_name), 'Pickle file does not exist'
+
+	with open(file_name, 'rb') as file:
+		instance = pickle.load(file)
+		return instance
