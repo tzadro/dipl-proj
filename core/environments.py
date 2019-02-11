@@ -103,7 +103,10 @@ class LunarLander(AbstractEnvironment):
 		self.env = gym.make('LunarLander-v2')
 		self.seed = 0
 
-	def evaluate(self, individual, solve_attempt=False, render=False):
+	def evaluate(self, individual, solve_attempt=False, render=False, video_file_name=None):
+		if video_file_name:
+			video_recorder = gym.wrappers.monitoring.video_recorder.VideoRecorder(self.env, path=video_file_name)
+
 		phenotype = Phenotype(individual.connections.values(), individual.nodes.values())
 
 		fitnesses = []
@@ -126,6 +129,9 @@ class LunarLander(AbstractEnvironment):
 				if render:
 					self.env.render()
 
+				if video_file_name:
+					video_recorder.capture_frame()
+
 				output = phenotype.forward(observation)
 				action = output.index(max(output))
 				observation, reward, done, info = self.env.step(action)
@@ -137,7 +143,13 @@ class LunarLander(AbstractEnvironment):
 
 			fitnesses.append(fitness)
 
+		if video_file_name:
+			video_recorder.close()
+
 		return sum(fitnesses) / num_times
+
+	def __del__(self):
+		self.env.close()
 
 
 class HalfCheetah(AbstractEnvironment):
@@ -148,7 +160,10 @@ class HalfCheetah(AbstractEnvironment):
 		self.env = gym.make('HalfCheetah-v2')
 		self.seed = 0
 
-	def evaluate(self, individual, fixed_seed=True, render=False):
+	def evaluate(self, individual, fixed_seed=True, render=False, video_file_name=None):
+		if video_file_name:
+			video_recorder = gym.wrappers.monitoring.video_recorder.VideoRecorder(self.env, path=video_file_name)
+
 		# create phenotype from individual's connection and node genes
 		phenotype = Phenotype(individual.connections.values(), individual.nodes.values())
 
@@ -165,6 +180,9 @@ class HalfCheetah(AbstractEnvironment):
 				# displays game state on screen
 				self.env.render()
 
+			if video_file_name:
+				video_recorder.capture_frame()
+
 			# feed forward neural network with observation
 			output = phenotype.forward(observation)
 			# scale output to get action
@@ -178,6 +196,9 @@ class HalfCheetah(AbstractEnvironment):
 			# stop if game is over
 			if done:
 				break
+
+		if video_file_name:
+			video_recorder.close()
 
 		return fitness
 

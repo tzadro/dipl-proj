@@ -20,7 +20,8 @@ algorithm = neat.NEAT(env.evaluate)
 network_visualizer = interface.NetworkVisualizer()
 
 agent_file_name = 'half-cheetah-agent.pickle'
-demonstrate = interface.demonstrate_if_exists(agent_file_name, env)
+video_file_name = 'half-cheetah-demo.mp4'
+demonstrate = interface.demonstrate_if_exists(agent_file_name, env, video_file_name)
 
 if demonstrate:
 	exit()

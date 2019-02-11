@@ -237,7 +237,7 @@ def print_evaluation_stats(num_evaluations, num_hidden_nodes, num_connections):
 	print('From {:d} finished runs (of {:d} total runs)'.format(num_finished_runs, config.num_runs))
 
 
-def demonstrate_if_exists(agent_file_name, env):
+def demonstrate_if_exists(agent_file_name, env, video_file_name=None):
 	if exists(agent_file_name):
 		response = input('Do you wish to [t]rain new agent or [d]emonstrate existing one: ')
 
@@ -248,7 +248,7 @@ def demonstrate_if_exists(agent_file_name, env):
 			return True
 
 		agent = utility.load(agent_file_name)
-		env.evaluate(agent, render=True)
+		env.evaluate(agent, render=True, video_file_name=video_file_name)
 
 		return True
 
