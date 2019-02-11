@@ -181,6 +181,7 @@ class HalfCheetah(AbstractEnvironment):
 				self.env.render()
 
 			if video_file_name:
+				# save game state as a video
 				video_recorder.capture_frame()
 
 			# feed forward neural network with observation

@@ -20,7 +20,7 @@ algorithm = neat.NEAT(env.evaluate)
 network_visualizer = interface.NetworkVisualizer()
 
 agent_file_name = 'half-cheetah-agent.pickle'
-video_file_name = 'half-cheetah-demo.mp4'
+video_file_name = None  # 'half-cheetah-demo.mp4' causes a bug
 demonstrate = interface.demonstrate_if_exists(agent_file_name, env, video_file_name)
 
 if demonstrate:
